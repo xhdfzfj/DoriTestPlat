@@ -1,4 +1,5 @@
 ﻿#include <QDebug>
+#include "../Class/PrivateEventClass.h"
 #include "MainModelClass.h"
 
 /**
@@ -17,6 +18,10 @@ MainModelClass::MainModelClass(QObject *parent)
  */
 MainModelClass::~MainModelClass()
 {
+    if( mSpiAnalyseObjP != nullptr )
+    {
+        delete mSpiAnalyseObjP;
+    }
     delete mLogViewModelObjP;
 }
 
@@ -45,6 +50,8 @@ void MainModelClass::sub_OpenSerialPortClick( QString pButtonText )
  */
 void MainModelClass::sub_AnalyseSpiClick( QUrl pSpiFilePath )
 {
+    std::function< void ( void * ) > _tmpFunc = nullptr;
+
     if( pSpiFilePath.isLocalFile() )
     {
         std::string _tmpStr;
@@ -57,10 +64,33 @@ void MainModelClass::sub_AnalyseSpiClick( QUrl pSpiFilePath )
             mSpiAnalyseObjP = nullptr;
         }
 
+        _tmpFunc = std::bind( &MainModelClass::sub_ChildObjectEventHandle, this, std::placeholders::_1 );
         mSpiAnalyseObjP = new SpiCaptureDataClass( _tmpStr );
+        mSpiAnalyseObjP->sub_SetParentEventInterface( _tmpFunc );
+
+        mSpiAnalyseObjP->sub_StartAnalyse();
+        //mSpiAnalyseObjP->sub_Test();
     }
     else
     {
         mLogViewModelObjP->sub_EnterLog( xhdLogEventClass::LogLevel::logErr, "请选择SPI文件" );
+    }
+}
+
+/**
+ * @brief MainModelClass::sub_ChildObjectEventHandle
+ *      各个子对象的事件处理接口
+ * @param pEventP
+ */
+void MainModelClass::sub_ChildObjectEventHandle( void * pEventP )
+{
+    PrivateEventClass * _tmpEventObjP;
+
+    _tmpEventObjP = ( PrivateEventClass * )pEventP;
+
+    if( _tmpEventObjP->mEventType_e == EventType_e::logInfoType )
+    {
+        mLogViewModelObjP->sub_EnterLog( _tmpEventObjP->mLoglevel, QString::fromStdString( _tmpEventObjP->mInfoStr ) );
+        delete _tmpEventObjP;
     }
 }

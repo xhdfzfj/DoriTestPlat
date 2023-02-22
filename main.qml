@@ -5,8 +5,8 @@ import QtQuick.Dialogs 1.3
 //import Dori.TestPlat.ModelObject 1.0
 
 Window {
-    width: 1024
-    height: 768
+    width: 1368
+    height: 1024
     visible: true
     title: qsTr("功能测试软件")
 

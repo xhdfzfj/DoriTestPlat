@@ -6,11 +6,12 @@ QT += quick
 
 SOURCES += \
         Class/FileAnalyseBaseClass.cpp \
+        Class/PrivateEventClass.cpp \
+        Class/SelfClearInterFaceClass.cpp \
         Class/SpiCaptureDataClass.cpp \
         Model/LogViewModel.cpp \
         Model/MainModelClass.cpp \
         Model/xhdlogeventclass.cpp \
-        SelfClearInterFaceClass.cpp \
         main.cpp
 
 RESOURCES += qml.qrc
@@ -33,10 +34,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     Class/FileAnalyseBaseClass.h \
+    Class/PrivateEventClass.h \
+    Class/SelfClearInterFaceClass.h \
     Class/SpiCaptureDataClass.h \
     Model/LogViewModel.h \
     Model/MainModelClass.h \
-    Model/xhdlogeventclass.h \
-    SelfClearInterFaceClass.h
+    Model/xhdlogeventclass.h
 
 DISTFILES +=

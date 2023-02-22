@@ -81,7 +81,11 @@ int FileAnalyseBaseClass::fun_GetFileData( uint8_t * pSaveBufP, int pLen, int pS
 
         mCurrOffset += _retValue;
     }
-    mInFileStream.read( ( char * )pSaveBufP, pLen );
+    else
+    {
+        _retValue = 0;
+    }
+    mInFileStream.read( ( char * )pSaveBufP, _retValue );
 
     return _retValue;
 }

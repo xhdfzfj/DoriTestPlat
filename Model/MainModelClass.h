@@ -17,6 +17,8 @@ public:
     Q_INVOKABLE void sub_AnalyseSpiClick( QUrl pSpiFilePath );
     Q_INVOKABLE void sub_ClearSelf();
 
+    void sub_ChildObjectEventHandle( void * pEventP );
+
 public: //将变量申明
     LogViewModel * mLogViewModelObjP;
 

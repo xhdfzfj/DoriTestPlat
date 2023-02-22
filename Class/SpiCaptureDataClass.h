@@ -24,6 +24,9 @@ public:
 protected:
     void sub_ClearHandle() override;
     void sub_SpiDataAnalyseHandle();
+
+private:
+    spiCmdStruct_S * fun_FindSpiCmdInArray( uint8_t pData );
     //void sub_Test() { mParentEventInf( nullptr ); }
 
 private:

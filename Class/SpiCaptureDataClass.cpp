@@ -68,6 +68,22 @@ void SpiCaptureDataClass::sub_StartAnalyse()
 }
 
 /**
+ * @brief SpiCaptureDataClass::fun_FindSpiCmdInArray
+ *      判断参数是否是SPI指令
+ * @param pData
+ * @return
+ */
+spiCmdStruct_S * SpiCaptureDataClass::fun_FindSpiCmdInArray( uint8_t pData )
+{
+    spiCmdStruct_S * _retP;
+
+    _retP = nullptr;
+
+
+    return _retP;
+}
+
+/**
  * @brief SpiCaptureDataClass::sub_SpiDataAnalyseHandle
  *      数据分析线程
  */
@@ -75,12 +91,14 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
 {
     int _retValue;
     PrivateEventClass * _tmpEventObjP;
+    spiCmdStruct_S * _spiCmdP;
 
     if( mSpiDataBufP == nullptr )
     {
         mSpiDataBufP = new uint8_t [ 1024 ];
     }
 
+    _spiCmdP = nullptr;
     _retValue = fun_GetFileData( mSpiDataBufP, 1024 );
     while( _retValue > 0 )
     {
@@ -89,6 +107,12 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
             break;
         }
         mSpiDataBufLen += _retValue;
+
+        for( int i = 0; i < mSpiDataBufLen; i++ )
+        {
+            _spiCmdP = fun_FindSpiCmdInArray( mSpiDataBufP[ i ] );
+        }
+
         _retValue = fun_GetFileData( mSpiDataBufP, 1024 );
     }
 

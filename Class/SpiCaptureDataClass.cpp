@@ -1,6 +1,7 @@
 ﻿#include "PrivateEventClass.h"
 #include "SpiCaptureDataClass.h"
 
+const int mSpiCmdCount = 8;
 const spiCmdStruct_S mSpiCmdS[] = { { 0x05, "读取状态寄存器" },
                                     { 0x01, "写状态寄存器" },
                                     { 0x03, "读取数据" },
@@ -79,7 +80,14 @@ spiCmdStruct_S * SpiCaptureDataClass::fun_FindSpiCmdInArray( uint8_t pData )
 
     _retP = nullptr;
 
-
+    for( int i = 0; i < mSpiCmdCount; i++ )
+    {
+        if( pData == mSpiCmdS[ i ].mCmd )
+        {
+            _retP = ( spiCmdStruct_S * )( &mSpiCmdS[ i ] );
+            break;
+        }
+    }
     return _retP;
 }
 
@@ -108,10 +116,14 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
         }
         mSpiDataBufLen += _retValue;
 
-        for( int i = 0; i < mSpiDataBufLen; i++ )
-        {
-            _spiCmdP = fun_FindSpiCmdInArray( mSpiDataBufP[ i ] );
-        }
+//        for( int i = 0; i < mSpiDataBufLen; i++ )
+//        {
+//            _spiCmdP = fun_FindSpiCmdInArray( mSpiDataBufP[ i ] );
+//            if( _spiCmdP != nullptr )
+//            {
+//                //找到相应的SPI CMD
+//            }
+//        }
 
         _retValue = fun_GetFileData( mSpiDataBufP, 1024 );
     }

@@ -5,6 +5,7 @@
 #include <QUrl>
 #include "../Class/SpiCaptureDataClass.h"
 #include "./LogViewModel.h"
+#include "../Control/GuiDrawControl.h"
 
 class MainModelClass : public QObject
 {
@@ -16,6 +17,7 @@ public:
     Q_INVOKABLE void sub_OpenSerialPortClick( QString pButtonText );
     Q_INVOKABLE void sub_AnalyseSpiClick( QUrl pSpiFilePath );
     Q_INVOKABLE void sub_ClearSelf();
+    Q_INVOKABLE void sub_GetDrawObjectFromQml( QObject * pObjectP );
 
     void sub_ChildObjectEventHandle( void * pEventP );
 

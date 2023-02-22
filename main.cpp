@@ -5,6 +5,7 @@
 #include <QLocale>
 #include <QTranslator>
 
+#include "./Control/GuiDrawControl.h"
 #include "Model/MainModelClass.h"
 
 MainModelClass * gMainModelObjP;
@@ -26,7 +27,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    //qmlRegisterType< MainModelClass >( "Dori.TestPlat.ModelObject", 1, 0, "MainModelClass" );
+    qmlRegisterType< GuiDrawControl >( "xhd.controls.guidrawcontrol", 1, 0, "GuiDrawControl" );
 
     gMainModelObjP = new MainModelClass();
 

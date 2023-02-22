@@ -9,6 +9,7 @@ SOURCES += \
         Class/PrivateEventClass.cpp \
         Class/SelfClearInterFaceClass.cpp \
         Class/SpiCaptureDataClass.cpp \
+        Control/GuiDrawControl.cpp \
         Model/LogViewModel.cpp \
         Model/MainModelClass.cpp \
         Model/xhdlogeventclass.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     Class/PrivateEventClass.h \
     Class/SelfClearInterFaceClass.h \
     Class/SpiCaptureDataClass.h \
+    Control/GuiDrawControl.h \
     Model/LogViewModel.h \
     Model/MainModelClass.h \
     Model/xhdlogeventclass.h

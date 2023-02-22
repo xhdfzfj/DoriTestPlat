@@ -44,6 +44,17 @@ void MainModelClass::sub_OpenSerialPortClick( QString pButtonText )
 }
 
 /**
+ * @brief MainModelClass::sub_GetDrawObjectFromQml
+ * @param pObjectP
+ */
+void MainModelClass::sub_GetDrawObjectFromQml( QObject * pObjectP )
+{
+    GuiDrawControl * _tmpDrawObjP;
+
+    _tmpDrawObjP = ( GuiDrawControl * )pObjectP;
+}
+
+/**
  * @brief MainModelClass::sub_AnalyseSpiClick
  *      开始分析SPI捕捉的文件
  * @param pSpiFilePath

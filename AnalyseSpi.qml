@@ -1,4 +1,5 @@
 ﻿import QtQuick 2.14
+import xhd.controls.guidrawcontrol 1.0
 
 Rectangle
 {
@@ -9,21 +10,19 @@ Rectangle
         id:guiSpiDataAnalyseGrid
         width: parent.width
         height: parent.height
-        columns:2
 
-        Rectangle
+        GuiDrawControl
         {
-            width: parent.width / 2
+            id: guiSpiDrawControl
+            width: parent.width
             height: parent.height
-            color:"red"
-        }
 
-        Rectangle
-        {
-
-            width: parent.width / 2
-            height: parent.height
-            color:"yellow"
+            fillColor: "red"
         }
+    }
+
+    Component.onCompleted:
+    {
+        MainModelObj.sub_GetDrawObjectFromQml( guiSpiDrawControl );
     }
 }

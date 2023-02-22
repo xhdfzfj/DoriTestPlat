@@ -87,6 +87,7 @@ Window {
                     anchors.fill: parent
                     topMargin: logColumnsHeader.implicitHeight + 2
                     model: logViewModelInstance
+                    implicitHeight: parent.height
 
                     Row
                     {
@@ -133,7 +134,7 @@ Window {
                             _retWidth = ( _tmpWidth / 5 ) * 2;
                         }
 
-                        console.log( "width:", _retWidth, " colum:", column );
+                        //console.log( "width:", _retWidth, " colum:", column );
                         return _retWidth;
                     }
 
@@ -163,6 +164,14 @@ Window {
                 id:guiLoader
                 width: parent.width - parent.width / 3
                 height: parent.height
+                onLoaded:
+                {
+                    console.log( "装载完成" );
+                    if( workState === 1 )
+                    {
+
+                    }
+                }
             }
 
 //            Rectangle

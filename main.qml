@@ -5,8 +5,8 @@ import QtQuick.Dialogs 1.3
 //import Dori.TestPlat.ModelObject 1.0
 
 Window {
-    width: 1368
-    height: 1024
+    width: 1920
+    height: 1080
     visible: true
     title: qsTr("功能测试软件")
 
@@ -87,7 +87,7 @@ Window {
                     anchors.fill: parent
                     topMargin: logColumnsHeader.implicitHeight + 2
                     model: logViewModelInstance
-                    implicitHeight: parent.height
+                    implicitHeight: 1024
 
                     Row
                     {

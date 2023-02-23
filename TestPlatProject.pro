@@ -9,9 +9,11 @@ SOURCES += \
         Class/PrivateEventClass.cpp \
         Class/SelfClearInterFaceClass.cpp \
         Class/SpiCaptureDataClass.cpp \
+        Class/SpiCmdInfoClass.cpp \
         Control/GuiDrawControl.cpp \
         Model/LogViewModel.cpp \
         Model/MainModelClass.cpp \
+        Model/spiviewmodel.cpp \
         Model/xhdlogeventclass.cpp \
         main.cpp
 
@@ -38,9 +40,12 @@ HEADERS += \
     Class/PrivateEventClass.h \
     Class/SelfClearInterFaceClass.h \
     Class/SpiCaptureDataClass.h \
+    Class/SpiCmdInfoClass.h \
     Control/GuiDrawControl.h \
+    Include/CommonStruct.h \
     Model/LogViewModel.h \
     Model/MainModelClass.h \
+    Model/spiviewmodel.h \
     Model/xhdlogeventclass.h
 
 DISTFILES +=

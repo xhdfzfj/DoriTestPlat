@@ -5,11 +5,13 @@
 #include <functional>
 #include <thread>
 #include "./FileAnalyseBaseClass.h"
+#include "./SpiCmdInfoClass.h"
 
 typedef struct __spiCmdStruct_S
 {
     uint8_t mCmd;
     std::string mCmdDescribeStr;
+    int mByteS;     //预期的字节数 -1代表没有预期
 }spiCmdStruct_S;
 
 class SpiCaptureDataClass : FileAnalyseBaseClass, SelfClearInterFaceClass
@@ -27,6 +29,7 @@ protected:
 
 private:
     spiCmdStruct_S * fun_FindSpiCmdInArray( uint8_t pData );
+    int fun_SpiCmdAnalyse( uint8_t * pSpiCmdDataP, int pDataLen, spiCmdStruct_S * pDestSpiCmdStructP );
     //void sub_Test() { mParentEventInf( nullptr ); }
 
 private:

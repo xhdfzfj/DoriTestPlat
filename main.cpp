@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.rootContext()->setContextProperty( "MainModelObj", gMainModelObjP );
     engine.rootContext()->setContextProperty( "logViewModelInstance", gMainModelObjP->mLogViewModelObjP );
+    engine.rootContext()->setContextProperty( "spiCmdViewModelInstance", gMainModelObjP->mSpiModelObjP );
     engine.load(url);
 
     return app.exec();

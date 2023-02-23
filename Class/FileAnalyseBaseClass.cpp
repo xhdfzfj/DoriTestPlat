@@ -1,4 +1,5 @@
-﻿#include "FileAnalyseBaseClass.h"
+﻿#include <QtGlobal>
+#include "FileAnalyseBaseClass.h"
 
 /**
  * @brief FileAnalyseBaseClass::FileAnalyseBaseClass
@@ -45,7 +46,7 @@ int FileAnalyseBaseClass::fun_GetFileData( uint8_t * pSaveBufP, int pLen, int pS
     {
         std::string _tmpFilePath;
 
-#if Q_OS_WIN
+#ifdef Q_OS_WIN
         _tmpFilePath = mFilePath.substr( 1, mFilePath.length() - 1 );
 #else
         _tmpFilePath = mFilePath;

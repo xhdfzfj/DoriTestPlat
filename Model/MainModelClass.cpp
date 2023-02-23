@@ -1,5 +1,4 @@
 ﻿#include <QDebug>
-#include "../Class/PrivateEventClass.h"
 #include "MainModelClass.h"
 
 /**
@@ -11,6 +10,12 @@ MainModelClass::MainModelClass(QObject *parent)
 {
     mLogViewModelObjP = new LogViewModel( this );
     mSpiAnalyseObjP = nullptr;
+    mSpiModelObjP = new SpiViewModel( this );
+
+    mEventHandleThreadStopFlag = false;
+
+    mEventHandleThreadP = new std::thread( &MainModelClass::sub_EventHandle, this );
+
 }
 
 /**
@@ -18,9 +23,20 @@ MainModelClass::MainModelClass(QObject *parent)
  */
 MainModelClass::~MainModelClass()
 {
+    mEventHandleThreadStopFlag = true;
+    mSynCv.notify_one();
+    mEventHandleThreadP->join();
+    delete mEventHandleThreadP;
+
+    sub_ClearEventQueue();
+
     if( mSpiAnalyseObjP != nullptr )
     {
         delete mSpiAnalyseObjP;
+    }
+    if( mSpiModelObjP != nullptr )
+    {
+        delete mSpiModelObjP;
     }
     delete mLogViewModelObjP;
 }
@@ -99,9 +115,69 @@ void MainModelClass::sub_ChildObjectEventHandle( void * pEventP )
 
     _tmpEventObjP = ( PrivateEventClass * )pEventP;
 
-    if( _tmpEventObjP->mEventType_e == EventType_e::logInfoType )
+    mEventQLock.lock();
+    mEventQ.push( _tmpEventObjP );
+
+    qDebug() << "mEentQ count:" << mEventQ.size();
+    mEventQLock.unlock();
+    mSynCv.notify_one();
+}
+
+/**
+ * @brief MainModelClass::sub_ClearEventQueue
+ *      清理事件队列
+ */
+void MainModelClass::sub_ClearEventQueue( void )
+{
+    PrivateEventClass * _eventObjP;
+
+    mEventQLock.lock();
+
+    while( !mEventQ.empty() )
     {
-        mLogViewModelObjP->sub_EnterLog( _tmpEventObjP->mLoglevel, QString::fromStdString( _tmpEventObjP->mInfoStr ) );
-        delete _tmpEventObjP;
+        _eventObjP = mEventQ.front();
+        mEventQ.pop();
+
+        delete _eventObjP;
+    }
+
+    mEventQLock.unlock();
+}
+
+/**
+ * @brief MainModelClass::sub_EventHandle
+ *      事件的线程处理
+ */
+void MainModelClass::sub_EventHandle( void )
+{
+    PrivateEventClass * _tmpEventObjP;
+
+    while( !mEventHandleThreadStopFlag )
+    {
+        std::unique_lock< std::mutex > mSynLock( mSynmtx );
+        mSynCv.wait( mSynLock );
+        if( mEventHandleThreadStopFlag )
+        {
+            break;
+        }
+        while( !mEventQ.empty() )
+        {
+            _tmpEventObjP = mEventQ.front();
+            mEventQLock.lock();
+            mEventQ.pop();
+            mEventQLock.unlock();
+
+            if( _tmpEventObjP->mEventType_e == EventType_e::logInfoType )
+            {
+                mLogViewModelObjP->sub_EnterLog( _tmpEventObjP->mLoglevel, QString::fromStdString( _tmpEventObjP->mInfoStr ) );
+                delete _tmpEventObjP;
+            }
+            else if( _tmpEventObjP->mEventType_e == EventType_e::SpiCmdInfoType )
+            {
+                mSpiModelObjP->sub_EnterSpiCmdInfo( ( SpiCmdInfoClass * )_tmpEventObjP->mVoidParam1P );
+                delete _tmpEventObjP;
+            }
+        }
     }
 }
+

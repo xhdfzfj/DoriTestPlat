@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 9.0.1, 2023-02-22T07:38:50. -->
+<!-- Written by QtCreator 9.0.1, 2023-02-24T07:45:24. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -236,8 +236,9 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/media/xuhuidong/xuhuidong/qt/TestPlatProject/TestPlatProject.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/media/xuhuidong/xuhuidong/qt/TestPlatProject/TestPlatProject.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">TestPlatProject2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/media/xuhuidong/xuhuidong/qt/NewDoriTestPlat/TestPlatProject.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/media/xuhuidong/xuhuidong/qt/NewDoriTestPlat/TestPlatProject.pro</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>

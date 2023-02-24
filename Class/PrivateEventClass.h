@@ -7,6 +7,7 @@ typedef enum __EventType_e
 {
     logInfoType,
     SpiCmdInfoType,
+    SpiCmdInfoType,
 }EventType_e;
 
 typedef enum __DataType_e
@@ -20,6 +21,12 @@ typedef enum __Sender_e
     SpiCapture,
 }Sender_e;
 
+typedef enum __FreeParamType_e
+{
+    NoFreeType,
+    SpiCmdInfoClassType,
+}FreeParamType_e;
+
 class PrivateEventClass
 {
 public:
@@ -29,6 +36,7 @@ public:
 
     void SetLogLevel( xhdLogEventClass::LogLevel pLevel ) { mLoglevel = pLevel; }
     void SetSender( Sender_e pSender ) { mSender_e = pSender; }
+    void SetFreeState( FreeParamType_e pFreeState ) { mFreeFlag = pFreeState; }
 
 public:
     EventType_e mEventType_e;
@@ -41,10 +49,7 @@ public:
     std::string mInfoStr;
 
 private:
-    int mFreeFlag;  // 0 不用释放 mVoidParm1P
-                    // 1 释放 mVoidParam1P
-                    // 2 以数组方式进行释放 mVoidParam1P
-
+    FreeParamType_e mFreeFlag;
 };
 
 #endif // PRIVATEEVENTCLASS_H

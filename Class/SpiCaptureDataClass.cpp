@@ -117,6 +117,8 @@ int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen
 
             //_spiCmdInfoP 由系统事件处理程序释放
             _tmpEventObjP = new PrivateEventClass( EventType_e::SpiCmdInfoType, DataType_e::DataType, Sender_e::SpiCapture, ( void * )_spiCmdInfoP );
+            _tmpEventObjP->SetFreeState( FreeParamType_e::SpiCmdInfoClassType );
+
             if( mParentEventInf )
             {
                 mParentEventInf( ( void * )_tmpEventObjP );

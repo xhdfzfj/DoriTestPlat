@@ -151,7 +151,6 @@ Window {
                             verticalAlignment: Text.AlignVCenter
                             wrapMode: Text.WordWrap
                             text: display
-                            anchors.topMargin: 3
                         }
                     }
 

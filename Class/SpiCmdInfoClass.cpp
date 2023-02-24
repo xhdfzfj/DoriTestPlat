@@ -1,4 +1,5 @@
-﻿#include "SpiCmdInfoClass.h"
+#include <cstring>
+#include "SpiCmdInfoClass.h"
 
 SpiCmdInfoClass::SpiCmdInfoClass( std::string pCmdInfo, int pCmd, uint8_t * pDataP, int pDataLen )
 {

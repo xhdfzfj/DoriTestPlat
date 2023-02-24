@@ -19,7 +19,17 @@ SpiViewModel::SpiViewModel(QObject * parent ) : QAbstractTableModel( parent )
  */
 SpiViewModel::~SpiViewModel()
 {
+    std::map< int, SpiCmdInfoClass * >::iterator _itm;
+    SpiCmdInfoClass * _tmpObjP;
 
+    if( !mCmdInfoS.empty() )
+    {
+        for( _itm = mCmdInfoS.begin(); _itm != mCmdInfoS.end(); _itm++ )
+        {
+            _tmpObjP = _itm->second;
+            delete _tmpObjP;
+        }
+    }
 }
 
 /**
@@ -150,6 +160,11 @@ QVariant SpiViewModel::data(const QModelIndex &index, int role) const
                 {
                     _tmpStr = QString::number( _spiInfoP->mCmd, 16 );
                     _tmpStr += ":" + QString::fromStdString( _spiInfoP->mCmdInfo );
+                    return QVariant( _tmpStr );
+                }
+                else if( _colIndex == 1 )
+                {
+                    _tmpStr = "test test test";
                     return QVariant( _tmpStr );
                 }
             }

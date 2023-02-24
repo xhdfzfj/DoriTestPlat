@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QAbstractTableModel>
 #include <map>
-#include "../include/CommonStruct.h"
+#include "../Include/CommonStruct.h"
 #include "../Class/SpiCmdInfoClass.h"
 
 class SpiViewModel : public QAbstractTableModel

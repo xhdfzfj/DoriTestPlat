@@ -1,4 +1,5 @@
-﻿#include "PrivateEventClass.h"
+﻿#include "./SpiCmdInfoClass.h"
+#include "PrivateEventClass.h"
 
 PrivateEventClass::PrivateEventClass( EventType_e pEventType, DataType_e pDataType, std::string pStr )
 {
@@ -6,7 +7,8 @@ PrivateEventClass::PrivateEventClass( EventType_e pEventType, DataType_e pDataTy
     mDataType_e = pDataType;
 
     mInfoStr = pStr;
-    mFreeFlag = 0;
+
+    mFreeFlag = NoFreeType;
 }
 
 
@@ -17,17 +19,15 @@ PrivateEventClass::PrivateEventClass( EventType_e pEventType, DataType_e pDataTy
     mSender_e = pSender;
 
     mVoidParam1P = pParamP;
+
+    mFreeFlag = NoFreeType;
 }
 
 
 PrivateEventClass::~PrivateEventClass()
 {
-    if( mFreeFlag == 1 )
+    if( mFreeFlag == FreeParamType_e::SpiCmdInfoClassType )
     {
-        delete mVoidParam1P;
-    }
-    else if( mFreeFlag == 2 )
-    {
-        delete [] mVoidParam1P;
+        delete ( SpiCmdInfoClass * )mVoidParam1P;
     }
 }

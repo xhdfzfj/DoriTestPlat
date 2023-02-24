@@ -1,4 +1,5 @@
-﻿import QtQuick 2.14
+import QtQuick 2.15
+
 import QtQuick.Controls 2.14
 import xhd.controls.guidrawcontrol 1.0
 
@@ -27,28 +28,45 @@ Rectangle
                 implicitHeight: 1024
                 model:spiCmdViewModelInstance
 
-                Row
+                delegate:Rectangle
                 {
-                    id:guiSpiCmdInfoHeader
-                    y:guiSpiCmdInfoView.contentY
-                    z:2
-
-                    Repeater
+                    color: model.row % 2 == 0 ? "blue" : "lightblue"
+                    Text
                     {
-                        model:guiSpiCmdInfoView.columns > 0 ? guiSpiCmdInfoView.columns : 1
-                        Label
-                        {
-                            width:guiSpiCmdInfoView.columnWidthProvider( modelData )
-                            height: 30
-                            text:spiCmdViewModelInstance.headerData( modelData, Qt.Horizontal )
-                            color:"white"
-                            padding: 10
-                            verticalAlignment: Text.AlignVCenter
-                            horizontalAlignment: Text.AlignHCenter
-                            background: Rectangle { color: "blue" }
-                        }
+                        anchors.fill: parent
+                        anchors.margins: 5
+                        color: 'black'
+                        clip: true
+                        font.pixelSize: 15
+                        verticalAlignment: Text.AlignVCenter
+                        wrapMode: Text.WordWrap
+                        text: display
+                        width: columnWidthProvider( model.col )
                     }
                 }
+
+//                Row
+//                {
+//                    id:guiSpiCmdInfoHeader
+//                    y:guiSpiCmdInfoView.contentY
+//                    z:2
+
+//                    Repeater
+//                    {
+//                        model:guiSpiCmdInfoView.columns > 0 ? guiSpiCmdInfoView.columns : 1
+//                        Label
+//                        {
+//                            width:guiSpiCmdInfoView.columnWidthProvider( modelData )
+//                            height: 30
+//                            text:spiCmdViewModelInstance.headerData( modelData, Qt.Horizontal )
+//                            color:"white"
+//                            //padding: 10
+//                            verticalAlignment: Text.AlignVCenter
+//                            horizontalAlignment: Text.AlignHCenter
+//                            background: Rectangle { color: "blue" }
+//                        }
+//                    }
+//                }
 
                 columnWidthProvider:function( column )
                 {
@@ -61,37 +79,21 @@ Rectangle
                     _columnIndex = column;
                     if( _columnIndex === 0 )
                     {
-                        _retWidth = _tmpWidth / 5 ;
+                        _retWidth = _tmpWidth / 3 ;
                     }
                     else if( _columnIndex === 1 )
                     {
-                        _retWidth = ( _tmpWidth / 5 ) * 4;
+                        _retWidth = ( _tmpWidth / 3 ) * 2;
                     }
 //                    else
 //                    {
 //                        _retWidth = ( _tmpWidth / 5 ) * 2;
 //                    }
 
-                    //console.log( "width:", _retWidth, " colum:", column );
+                    console.log( "spi width:", _retWidth, " colum:", column );
                     return _retWidth;
                 }
 
-                delegate:Rectangle
-                {
-                    color: model.row % 2 == 0 ? "grey" : "lightgrey"
-                    Text
-                    {
-                        anchors.fill: parent
-                        anchors.margins: 5
-                        color: 'black'
-                        clip: true
-                        font.pixelSize: 15
-                        verticalAlignment: Text.AlignVCenter
-                        wrapMode: Text.WordWrap
-                        text: display
-                        anchors.topMargin: 3
-                    }
-                }
             }//TableView
         }
 

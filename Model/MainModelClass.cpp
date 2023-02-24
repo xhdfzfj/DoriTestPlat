@@ -160,20 +160,23 @@ void MainModelClass::sub_EventHandle( void )
         {
             break;
         }
-        _tmpEventObjP = mEventQ.front();
-        mEventQLock.lock();
-        mEventQ.pop();
-        mEventQLock.unlock();
+        while( !mEventQ.empty() )
+        {
+            _tmpEventObjP = mEventQ.front();
+            mEventQLock.lock();
+            mEventQ.pop();
+            mEventQLock.unlock();
 
-        if( _tmpEventObjP->mEventType_e == EventType_e::logInfoType )
-        {
-            mLogViewModelObjP->sub_EnterLog( _tmpEventObjP->mLoglevel, QString::fromStdString( _tmpEventObjP->mInfoStr ) );
-            delete _tmpEventObjP;
-        }
-        else if( _tmpEventObjP->mEventType_e == EventType_e::SpiCmdInfoType )
-        {
-            mSpiModelObjP->sub_EnterSpiCmdInfo( ( SpiCmdInfoClass * )_tmpEventObjP->mVoidParam1P );
-            delete _tmpEventObjP;
+            if( _tmpEventObjP->mEventType_e == EventType_e::logInfoType )
+            {
+                mLogViewModelObjP->sub_EnterLog( _tmpEventObjP->mLoglevel, QString::fromStdString( _tmpEventObjP->mInfoStr ) );
+                delete _tmpEventObjP;
+            }
+            else if( _tmpEventObjP->mEventType_e == EventType_e::SpiCmdInfoType )
+            {
+                mSpiModelObjP->sub_EnterSpiCmdInfo( ( SpiCmdInfoClass * )_tmpEventObjP->mVoidParam1P );
+                delete _tmpEventObjP;
+            }
         }
     }
 }

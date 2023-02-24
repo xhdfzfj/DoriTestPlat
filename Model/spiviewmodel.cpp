@@ -164,7 +164,15 @@ QVariant SpiViewModel::data(const QModelIndex &index, int role) const
                 }
                 else if( _colIndex == 1 )
                 {
-                    _tmpStr = "test test test";
+                    if( _spiInfoP->mStartOffsetInFile != -1 )
+                    {
+                        _tmpStr = "开始偏移:" + QString::number( _spiInfoP->mStartOffsetInFile, 16 ) + ",操做长度:" + QString::number( _spiInfoP->mOperateLen );
+                    }
+                    else
+                    {
+                        _tmpStr = "无任何偏移信息";
+                    }
+
                     return QVariant( _tmpStr );
                 }
             }

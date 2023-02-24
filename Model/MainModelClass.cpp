@@ -85,6 +85,8 @@ void MainModelClass::sub_AnalyseSpiClick( QUrl pSpiFilePath )
 
         _tmpStr = pSpiFilePath.path().toStdString();
 
+        mLogViewModelObjP->sub_EnterLog( xhdLogEventClass::LogLevel::logInfo, "SPI文件:" + QString::fromStdString( _tmpStr ) );
+
         if( mSpiAnalyseObjP != nullptr )
         {
             delete mSpiAnalyseObjP;

@@ -1,4 +1,5 @@
 ﻿#include <QDebug>
+#include <iostream>
 #include "PrivateEventClass.h"
 #include "SpiCaptureDataClass.h"
 #include "../Include/CommonStruct.h"
@@ -80,17 +81,22 @@ void SpiCaptureDataClass::sub_StartAnalyse()
  *      -1 代表当前长度不够
  *      其它 代表越过的长度
  */
-int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen, spiCmdStruct_S * pDestSpiCmdStructP )
+int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen, spiCmdStruct_S * pDestSpiCmdStructP, int pStartOffsetInFile )
 {
     int _retValue;
     int _len;
+    uint32_t _tmpAddr;
+    uint32_t _tmpLen;
+    spiCmdStruct_S * _tmpSpiCmd_S_P;
     SpiCmdInfoClass * _spiCmdInfoP;
     PrivateEventClass * _tmpEventObjP;
     uint8_t * _tmpP;
+    std::string _tmpStr;
+    int j;
 
     _retValue = 0;
 
-    if( pDestSpiCmdStructP->mByteS != 0 )
+    if( pDestSpiCmdStructP->mByteS != -1 )
     {
         _len = pDestSpiCmdStructP->mByteS * 2;
         if( pCmdDataLen < _len )
@@ -100,8 +106,6 @@ int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen
         else
         {
             _tmpP = new uint8_t [ pDestSpiCmdStructP->mByteS ];
-
-            int j;
 
             j = 0;
             for( int i = 0; i < _len; i++ )
@@ -114,6 +118,7 @@ int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen
             }
 
             _spiCmdInfoP = new SpiCmdInfoClass( pDestSpiCmdStructP->mCmdDescribeStr, pDestSpiCmdStructP->mCmd, _tmpP, j );
+            _spiCmdInfoP->SetFileInfo( pStartOffsetInFile, j );
 
             //_spiCmdInfoP 由系统事件处理程序释放
             _tmpEventObjP = new PrivateEventClass( EventType_e::SpiCmdInfoType, DataType_e::DataType, Sender_e::SpiCapture, ( void * )_spiCmdInfoP );
@@ -125,6 +130,89 @@ int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen
             }
 
             _retValue = _len;
+        }
+    }
+    else
+    {
+        //无法确定长度
+        char _tmpDispBuf[ 32 ];
+        int _operateLen;
+
+        j = 2;
+        while( j < pCmdDataLen )
+        {
+            _tmpSpiCmd_S_P = fun_FindSpiCmdInArray( pCmdDataP[ j ] );
+            if( _tmpSpiCmd_S_P != nullptr )
+            {
+                j -= 2;
+                _tmpLen = j / 2;
+                _tmpLen += 1;   //要加上1
+                _operateLen = _tmpLen;
+
+                if( ( pDestSpiCmdStructP->mCmd == 0x03 ) || ( pDestSpiCmdStructP->mCmd == 0x02 ) )
+                {
+                    if( _tmpLen < 4 )
+                    {
+                        //长度不够
+                        j += 2;     //恢复原来的j值
+                        goto LOOP_GOTO_LABEL;
+                    }
+                    //读
+                    _tmpAddr = pCmdDataP[ 2 ];
+                    _tmpAddr <<= 8;
+                    _tmpAddr |= pCmdDataP[ 4 ];
+                    _tmpAddr <<= 8;
+                    _tmpAddr |= pCmdDataP[ 6 ];
+                    _tmpLen -= 4;
+                }
+                _tmpStr = pDestSpiCmdStructP->mCmdDescribeStr;
+                sprintf( _tmpDispBuf, "0x%08x", _tmpAddr );
+                _tmpStr += std::string( _tmpDispBuf );
+
+                if( pDestSpiCmdStructP->mCmd == 0x03 )
+                {
+                    _tmpStr += ",读取长度:";
+                    sprintf( _tmpDispBuf, "%d", _tmpLen );
+                    _tmpStr += std::string( _tmpDispBuf );
+                }
+
+                if( pDestSpiCmdStructP->mCmd == 0x02 )
+                {
+                    _tmpStr += ",写数据长度:";
+                    sprintf( _tmpDispBuf, "%d", _tmpLen );
+                    _tmpStr += std::string( _tmpDispBuf );
+                }
+
+                if( _tmpSpiCmd_S_P->mCmd != 0x05 )
+                {
+                    j += 2;     //恢复原来的j值
+                    goto LOOP_GOTO_LABEL;
+                }
+                else
+                {
+                    _spiCmdInfoP = new SpiCmdInfoClass( _tmpStr, pDestSpiCmdStructP->mCmd, nullptr, 0 );
+                    _spiCmdInfoP->SetFileInfo( pStartOffsetInFile, _operateLen );
+
+                    //_spiCmdInfoP 由系统事件处理程序释放
+                    _tmpEventObjP = new PrivateEventClass( EventType_e::SpiCmdInfoType, DataType_e::DataType, Sender_e::SpiCapture, ( void * )_spiCmdInfoP );
+                    _tmpEventObjP->SetFreeState( FreeParamType_e::SpiCmdInfoClassType );
+
+                    if( mParentEventInf )
+                    {
+                        mParentEventInf( ( void * )_tmpEventObjP );
+                    }
+                }
+
+                _retValue = j + 2;
+                break;
+            }
+            LOOP_GOTO_LABEL:
+            j += 2;
+        }
+
+        if( j >= pCmdDataLen )
+        {
+            _retValue = -1;
         }
     }
 
@@ -165,14 +253,16 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
     PrivateEventClass * _tmpEventObjP;
     spiCmdStruct_S * _spiCmdP;
     bool _flag;
-
-    int _testCount = 0;
+    int _FileOffset;
+    bool _flag1;
+    std::string _tmpStr;
 
     if( mSpiDataBufP == nullptr )
     {
         mSpiDataBufP = new uint8_t [ 4096 ];
     }
 
+    _FileOffset = 0;
     _flag = false;
     _spiCmdP = nullptr;
     _retValue = fun_GetFileData( &mSpiDataBufP[ mSpiDataBufLen ], 1024 );
@@ -184,28 +274,30 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
         }
         mSpiDataBufLen += _retValue;
 
-        for( int i = 0; i < mSpiDataBufLen; i++ )
+        int i;
+        _flag1 = false;
+        for( i = 0; i < mSpiDataBufLen; i++ )
         {
             _spiCmdP = fun_FindSpiCmdInArray( mSpiDataBufP[ i ] );
             if( _spiCmdP != nullptr )
             {
                 //找到相应的SPI CMD
                 _flag = true;
-                j = fun_SpiCmdAnalyse( &mSpiDataBufP[ i ], mSpiDataBufLen - i, _spiCmdP );
+
+                j = fun_SpiCmdAnalyse( &mSpiDataBufP[ i ], mSpiDataBufLen - i, _spiCmdP, _FileOffset + i );
                 if( j == -1 )
                 {
                     qDebug() << "长度不够";
+                    memmove( mSpiDataBufP, &mSpiDataBufP[ i ], mSpiDataBufLen - i );
+                    mSpiDataBufLen -= i;
+                    _FileOffset += i;
+                    _flag1 = true;
+                    break;
                 }
                 else
                 {
-                    _testCount += 1;
                     i += j;
                     i -= 1;     //由于循环时会加1
-                }
-
-                if( _testCount > 1 )
-                {
-                    goto sub_SpiDataAnalyseHandle_exit;
                 }
             }
             else
@@ -214,11 +306,39 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
                 {
                     //出错了
                     qDebug() << "捕捉出错";
+                    SpiCmdInfoClass * _spiCmdInfoP;
+
+                    _spiCmdInfoP = new SpiCmdInfoClass( "捕捉出错", -1, nullptr, 0 );
+
+                    _tmpEventObjP = new PrivateEventClass( EventType_e::SpiCmdInfoType, DataType_e::DataType, Sender_e::SpiCapture, ( void * )_spiCmdInfoP );
+                    _tmpEventObjP->SetFreeState( FreeParamType_e::SpiCmdInfoClassType );
+                    if( mParentEventInf )
+                    {
+                        mParentEventInf( ( void * )_tmpEventObjP );
+                    }
+
+                    _tmpStr = "捕捉出错";
+                    if( _spiCmdInfoP->mStartOffsetInFile != -1 )
+                    {
+                        _tmpStr += ",文件偏移:" + ( QString::number( _spiCmdInfoP->mStartOffsetInFile, 16 ) ).toStdString();
+                    }
+                    _tmpEventObjP = new PrivateEventClass( EventType_e::logInfoType, DataType_e::StringType, _tmpStr );
+                    _tmpEventObjP->SetLogLevel( xhdLogEventClass::LogLevel::logErr );
+                    if( mParentEventInf )
+                    {
+                        mParentEventInf( ( void * )_tmpEventObjP );
+                    }
+                    _flag = false;
                 }
             }
         }
 
-        _retValue = fun_GetFileData( mSpiDataBufP, 1024 );
+        _retValue = fun_GetFileData( &mSpiDataBufP[ mSpiDataBufLen ], 1024 );
+        if( !_flag1 )
+        {
+            _FileOffset += _retValue;
+        }
+
     }
 
     sub_SpiDataAnalyseHandle_exit:

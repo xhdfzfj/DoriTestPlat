@@ -1,4 +1,4 @@
-#include <cstring>
+﻿#include <cstring>
 #include "SpiCmdInfoClass.h"
 
 SpiCmdInfoClass::SpiCmdInfoClass( std::string pCmdInfo, int pCmd, uint8_t * pDataP, int pDataLen )
@@ -8,6 +8,9 @@ SpiCmdInfoClass::SpiCmdInfoClass( std::string pCmdInfo, int pCmd, uint8_t * pDat
     mDataLen = pDataLen;
 
     mDataP = pDataP;
+
+    mStartOffsetInFile = -1;
+    mOperateLen = -1;
 }
 
 
@@ -24,6 +27,8 @@ SpiCmdInfoClass * SpiCmdInfoClass::Clone( void )
     SpiCmdInfoClass * _retObj;
 
     _retObj = new SpiCmdInfoClass( mCmdInfo, mCmd, nullptr, 0 );
+    _retObj->mStartOffsetInFile = mStartOffsetInFile;
+    _retObj->mOperateLen = mOperateLen;
 
     uint8_t * _tmpP;
 

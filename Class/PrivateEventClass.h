@@ -7,6 +7,7 @@ typedef enum __EventType_e
 {
     logInfoType,
     SpiCmdInfoType,
+    HexDataDisplayType,
 }EventType_e;
 
 typedef enum __DataType_e
@@ -24,6 +25,7 @@ typedef enum __FreeParamType_e
 {
     NoFreeType,
     SpiCmdInfoClassType,
+    Uint8ArrayType,
 }FreeParamType_e;
 
 class PrivateEventClass
@@ -31,6 +33,7 @@ class PrivateEventClass
 public:
     PrivateEventClass( EventType_e pEventType, DataType_e pDataType, std::string pStr );
     PrivateEventClass( EventType_e pEventType, DataType_e pDataType, Sender_e pSender, void * pParamP );
+    PrivateEventClass( EventType_e pEventType, DataType_e pDataType, Sender_e pSender, void * pParamP, int pLen, int pStartOffset );
     virtual ~PrivateEventClass();
 
     void SetLogLevel( xhdLogEventClass::LogLevel pLevel ) { mLoglevel = pLevel; }
@@ -44,6 +47,9 @@ public:
     Sender_e mSender_e;
 
     void * mVoidParam1P;
+    int mVoidParam1Len;
+
+    int mIntParam1;
 
     std::string mInfoStr;
 

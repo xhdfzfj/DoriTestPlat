@@ -23,11 +23,33 @@ PrivateEventClass::PrivateEventClass( EventType_e pEventType, DataType_e pDataTy
     mFreeFlag = NoFreeType;
 }
 
+PrivateEventClass::PrivateEventClass( EventType_e pEventType, DataType_e pDataType, Sender_e pSender, void * pParamP, int pLen, int pStartOffset )
+{
+    mEventType_e = pEventType;
+    mDataType_e = pDataType;
+    mSender_e = pSender;
+
+    mVoidParam1P = pParamP;
+    mVoidParam1Len = pLen;
+
+    mIntParam1 = pStartOffset;
+
+    mFreeFlag = Uint8ArrayType;
+}
+
 
 PrivateEventClass::~PrivateEventClass()
 {
     if( mFreeFlag == FreeParamType_e::SpiCmdInfoClassType )
     {
         delete ( SpiCmdInfoClass * )mVoidParam1P;
+    }
+    else if( mFreeFlag == FreeParamType_e::Uint8ArrayType )
+    {
+        uint8_t * _tmpP;
+
+        _tmpP = ( uint8_t * )mVoidParam1P;
+
+        delete [] _tmpP;
     }
 }

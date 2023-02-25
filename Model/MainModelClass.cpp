@@ -179,6 +179,15 @@ void MainModelClass::sub_EventHandle( void )
                 mSpiModelObjP->sub_EnterSpiCmdInfo( ( SpiCmdInfoClass * )_tmpEventObjP->mVoidParam1P );
                 delete _tmpEventObjP;
             }
+            else if( _tmpEventObjP->mEventType_e == EventType_e::HexDataDisplayType )
+            {
+                if( _tmpEventObjP->mSender_e == Sender_e::SpiCapture )
+                {
+
+                }
+
+                delete _tmpEventObjP;
+            }
         }
     }
 }

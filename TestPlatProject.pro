@@ -11,6 +11,7 @@ SOURCES += \
         Class/SpiCaptureDataClass.cpp \
         Class/SpiCmdInfoClass.cpp \
         Control/GuiDrawControl.cpp \
+        Control/HexDataClass.cpp \
         Model/LogViewModel.cpp \
         Model/MainModelClass.cpp \
         Model/spiviewmodel.cpp \
@@ -42,6 +43,7 @@ HEADERS += \
     Class/SpiCaptureDataClass.h \
     Class/SpiCmdInfoClass.h \
     Control/GuiDrawControl.h \
+    Control/HexDataClass.h \
     Include/CommonStruct.h \
     Model/LogViewModel.h \
     Model/MainModelClass.h \

@@ -46,7 +46,6 @@ private:
     std::mutex mSynmtx;
     std::condition_variable mSynCv;
 
-
 signals:
 
 };

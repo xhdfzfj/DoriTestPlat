@@ -201,6 +201,22 @@ int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen
                     {
                         mParentEventInf( ( void * )_tmpEventObjP );
                     }
+
+                    if( ( pDestSpiCmdStructP->mCmd == 0x03 ) || ( pDestSpiCmdStructP->mCmd == 0x02 ) )
+                    {
+                        //要向显示控件发送事件
+                        uint8_t * _tmpP;
+
+                        _tmpP = new uint8_t [ _tmpLen ];        //不用进行释放,释放EVENT时会释入该内存
+                        memcpy( _tmpP, &pCmdDataP[ 4 ], _tmpLen );
+
+                        _tmpEventObjP = new PrivateEventClass( EventType_e::HexDataDisplayType, DataType_e::DataType, Sender_e::SpiCapture,
+                                                               ( void * )_tmpP, _tmpLen, pStartOffsetInFile );
+                        if( mParentEventInf )
+                        {
+                            mParentEventInf( ( void * )_tmpEventObjP );
+                        }
+                    }
                 }
 
                 _retValue = j + 2;
@@ -257,6 +273,8 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
     bool _flag1;
     std::string _tmpStr;
 
+    int _testCount = 0;
+
     if( mSpiDataBufP == nullptr )
     {
         mSpiDataBufP = new uint8_t [ 4096 ];
@@ -298,6 +316,12 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
                 {
                     i += j;
                     i -= 1;     //由于循环时会加1
+
+                    _testCount += 1;
+                    if( _testCount > 15 )
+                    {
+                        DebugStopFlag = true;
+                    }
                 }
             }
             else
@@ -339,6 +363,10 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
             _FileOffset += _retValue;
         }
 
+        if( DebugStopFlag )
+        {
+            break;
+        }
     }
 
     sub_SpiDataAnalyseHandle_exit:

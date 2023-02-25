@@ -40,6 +40,12 @@ private:
     bool mActionFlag;
     bool mAnalyseBreakFlag;
     std::thread * mAnalyseThreadP;
+
+    /***************************
+     * 以下调试用
+     * ************************/
+private:
+    bool DebugStopFlag = false;
 };
 
 #endif // SPICAPTUREDATACLASS_H

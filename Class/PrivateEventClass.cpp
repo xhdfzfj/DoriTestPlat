@@ -23,6 +23,7 @@ PrivateEventClass::PrivateEventClass( EventType_e pEventType, DataType_e pDataTy
     mFreeFlag = NoFreeType;
 }
 
+
 PrivateEventClass::PrivateEventClass( EventType_e pEventType, DataType_e pDataType, Sender_e pSender, void * pParamP, int pLen, int pStartOffset )
 {
     mEventType_e = pEventType;

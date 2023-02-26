@@ -97,13 +97,37 @@ Rectangle
             }//TableView
         }
 
-        GuiDrawControl
+        Rectangle
         {
-            id: guiSpiDrawControl
             width: parent.width / 2
             height: parent.height
 
-            fillColor: "red"
+            GuiDrawControl
+            {
+                id: guiSpiDrawControl
+                width: parent.width - 16
+                height: parent.height
+
+                fillColor: "red"
+            }
+
+            ScrollBar
+            {
+                id: verticalScrollBar
+                width: 16;
+                height: parent.height
+                anchors.left: guiSpiDrawControl.right
+                opacity: 1
+                visible: true
+                enabled: true
+                orientation: Qt.Vertical
+//                onPositionChanged:
+//                {
+//                    console.log( "scrollbar ", position );
+//                    guiDrawControl.sub_ScrollBarChanage( position );
+//                }
+            }
+
         }
     }
 

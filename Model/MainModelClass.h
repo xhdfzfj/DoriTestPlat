@@ -37,6 +37,7 @@ public: //将变量申明
 
 private:
     SpiCaptureDataClass * mSpiAnalyseObjP;
+    GuiDrawControl * mSpiAnalyseGuiObjP;    //不用进行释放
 
     std::mutex mEventQLock;
     std::queue< PrivateEventClass * > mEventQ;

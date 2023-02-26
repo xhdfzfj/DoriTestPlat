@@ -211,7 +211,7 @@ int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen
                         memcpy( _tmpP, &pCmdDataP[ 4 ], _tmpLen );
 
                         _tmpEventObjP = new PrivateEventClass( EventType_e::HexDataDisplayType, DataType_e::DataType, Sender_e::SpiCapture,
-                                                               ( void * )_tmpP, _tmpLen, pStartOffsetInFile );
+                                                               ( void * )_tmpP, _tmpLen, _tmpAddr );
                         if( mParentEventInf )
                         {
                             mParentEventInf( ( void * )_tmpEventObjP );

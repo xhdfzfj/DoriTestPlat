@@ -65,9 +65,7 @@ void MainModelClass::sub_OpenSerialPortClick( QString pButtonText )
  */
 void MainModelClass::sub_GetDrawObjectFromQml( QObject * pObjectP )
 {
-    GuiDrawControl * _tmpDrawObjP;
-
-    _tmpDrawObjP = ( GuiDrawControl * )pObjectP;
+    mSpiAnalyseGuiObjP = ( GuiDrawControl * )pObjectP;
 }
 
 /**
@@ -183,7 +181,7 @@ void MainModelClass::sub_EventHandle( void )
             {
                 if( _tmpEventObjP->mSender_e == Sender_e::SpiCapture )
                 {
-
+                    mSpiAnalyseGuiObjP->sub_HexDataInput( ( uint8_t * )_tmpEventObjP->mVoidParam1P, _tmpEventObjP->mVoidParam1Len, _tmpEventObjP->mIntParam1 );
                 }
 
                 delete _tmpEventObjP;

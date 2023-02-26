@@ -18,6 +18,10 @@ public:
 
     void sub_HexDataInput( uint8_t * pDataP, int pDataLen, int pStartOffset );
 
+private:
+    void sub_HexDataDraw( void );
+    int fun_CalcLineDisplayCount( int pWidth, int pHexDataWidth, int pSpaceWidth );
+
     /*********************************
      * 系统重载
      * ******************************/

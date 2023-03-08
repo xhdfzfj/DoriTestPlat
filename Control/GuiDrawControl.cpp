@@ -101,6 +101,7 @@ void GuiDrawControl::sub_HexDataDraw( void )
     int _stringWidth;
     int _spaceWidth;
     int _colonWidth;
+    int _startOffset;
 
     HexDataClass * _hDataObjP;
     QFontMetrics _tmpFm( mFont );
@@ -128,6 +129,7 @@ void GuiDrawControl::sub_HexDataDraw( void )
         return;
     }
 
+    _startOffset = -1;
     if( !mHexDataS.empty() )
     {
         for( auto _tmpItm : mHexDataS )

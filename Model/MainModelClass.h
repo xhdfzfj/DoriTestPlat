@@ -12,6 +12,7 @@
 #include "./LogViewModel.h"
 #include "../Control/GuiDrawControl.h"
 #include "./spiviewmodel.h"
+#include "./serialconfigmodel.h"
 
 class MainModelClass : public QObject
 {
@@ -34,6 +35,7 @@ private:
 public: //将变量申明
     LogViewModel * mLogViewModelObjP;
     SpiViewModel * mSpiModelObjP;
+    SerialConfigModel * mSerialConfigModelObjP;
 
 private:
     SpiCaptureDataClass * mSpiAnalyseObjP;

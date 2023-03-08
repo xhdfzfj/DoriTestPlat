@@ -11,6 +11,7 @@ MainModelClass::MainModelClass(QObject *parent)
     mLogViewModelObjP = new LogViewModel( this );
     mSpiAnalyseObjP = nullptr;
     mSpiModelObjP = new SpiViewModel( this );
+    mSerialConfigModelObjP = new SerialConfigModel(this);
 
     mEventHandleThreadStopFlag = false;
 
@@ -39,6 +40,7 @@ MainModelClass::~MainModelClass()
         delete mSpiModelObjP;
     }
     delete mLogViewModelObjP;
+    delete mSerialConfigModelObjP;
 }
 
 /**

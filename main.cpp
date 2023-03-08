@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty( "MainModelObj", gMainModelObjP );
     engine.rootContext()->setContextProperty( "logViewModelInstance", gMainModelObjP->mLogViewModelObjP );
     engine.rootContext()->setContextProperty( "spiCmdViewModelInstance", gMainModelObjP->mSpiModelObjP );
+    engine.rootContext()->setContextProperty( "serialConfigModelInstance", gMainModelObjP->mSerialConfigModelObjP);
     engine.load(url);
 
     return app.exec();

@@ -34,28 +34,59 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
                 x:3
                 width:80
-                text:qsTr( "打开串口")
+                text:serialConfigModelInstance.serialStatus === 0?qsTr( "打开串口" ):qsTr( "关闭串口" )
                 id:guiOpenComBut
 
                 onClicked:
                 {
                     MainModelObj.sub_OpenSerialPortClick( this.text );
-                    if( this.text === qsTr( "打开串口" ) )
+                }
+            }
+
+            ComboBox
+            {
+                anchors.top:guiOpenComBut.top
+                anchors.left: guiOpenComBut.right
+                anchors.leftMargin: 3
+                id:serialNumComboBox
+                width:80
+                model: serialConfigModelInstance.serialNumList
+                currentIndex: 1
+                onCurrentIndexChanged:
+                {
+                    serialConfigModelInstance.onSerialComboBoxSelect(currentIndex)
+                    if(currentIndex == 0)
                     {
-                        this.text = qsTr( "关闭串口" )
+                        currentIndex = 1;
                     }
-                    else
-                    {
-                        this.text = qsTr( "打开串口" )
-                    }
+                }
+                Component.onCompleted:
+                {
+                    onCurrentIndexChanged(currentIndex);
+                }
+            }
+
+            ComboBox
+            {
+                anchors.top:serialNumComboBox.top
+                anchors.left: serialNumComboBox.right
+                anchors.leftMargin: 3
+                id:baudComboBox
+                width:80
+                model: serialConfigModelInstance.baudList
+                currentIndex:0
+                onCurrentIndexChanged: serialConfigModelInstance.onBaudComboBoxSelect(currentIndex)
+                Component.onCompleted:
+                {
+                    onCurrentIndexChanged(currentIndex);
                 }
             }
 
             Button
             {
                 text:qsTr( "分析SPI数据" )
-                anchors.top:guiOpenComBut.top
-                anchors.left: guiOpenComBut.right
+                anchors.top:baudComboBox.top
+                anchors.left: baudComboBox.right
                 anchors.leftMargin: 3
                 width:100
                 id:guiAnalyseSpiBut

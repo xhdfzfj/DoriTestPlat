@@ -5,6 +5,7 @@
 #include <QQuickItem>
 #include <QtQuick/QQuickPaintedItem>
 #include <QPainter>
+#include <QImage>
 #include <map>
 #include "./HexDataClass.h"
 
@@ -21,6 +22,9 @@ public:
 private:
     void sub_HexDataDraw( void );
     int fun_CalcLineDisplayCount( int pWidth, int pHexDataWidth, int pSpaceWidth );
+    void sub_MergeHexDataS( void );
+    int fun_CalcDisplayHeight( int pStrHeight, int _pLineByteS );
+    void sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int pLineHeight, int pLineByteCount );
 
     /*********************************
      * 系统重载
@@ -30,6 +34,7 @@ public:
 
 private:
     QFont mFont;
+    QImage * mMainImageP;
 
     std::map< int, HexDataClass * > mHexDataS;
 };

@@ -7,6 +7,7 @@
 GuiDrawControl::GuiDrawControl(QQuickItem * pParent) : QQuickPaintedItem( pParent )
 {
     mFont = QFont( "SimSun", 16 );
+    mMainImageP = nullptr;
 }
 
 /**
@@ -26,6 +27,50 @@ GuiDrawControl::~GuiDrawControl()
         }
 
         mHexDataS.clear();
+    }
+
+    if( mMainImageP != nullptr )
+    {
+        delete mMainImageP;
+    }
+}
+
+/**
+ * @brief GuiDrawControl::sub_MergeHexDataS
+ *      合并HEX连续址址的数据
+ */
+void GuiDrawControl::sub_MergeHexDataS( void )
+{
+    bool _mergeFlag;
+    HexDataClass * _hexDataObjP;
+    HexDataClass * _prevHexDataObjP;
+    uint8_t * _tmpP;
+    int _tmpLen;
+
+    _hexDataObjP = nullptr;
+    _prevHexDataObjP = nullptr;
+    if( !mHexDataS.empty() )
+    {
+        for( auto _tmpItm : mHexDataS )
+        {
+            _mergeFlag = false;
+            _hexDataObjP = _tmpItm.second;
+            if( _prevHexDataObjP != nullptr )
+            {
+                if( _prevHexDataObjP->GetHexDataEndAddress() == _hexDataObjP->GetStartOffset() )
+                {
+                    //合并两者
+                    _mergeFlag = true;
+                    _tmpP = _hexDataObjP->GetDataAndLen( _tmpLen );
+                    _prevHexDataObjP->sub_AddData( _tmpP, _tmpLen );
+                }
+            }
+
+            if( !_mergeFlag )
+            {
+                _prevHexDataObjP = _hexDataObjP;
+            }
+        }
     }
 }
 
@@ -92,11 +137,76 @@ int GuiDrawControl::fun_CalcLineDisplayCount( int pWidth, int pHexDataWidth, int
 }
 
 /**
+ * @brief GuiDrawControl::fun_CalcDisplayHeight
+ *      计算出实际进行显示所要的高度
+ * @return
+ */
+int GuiDrawControl::fun_CalcDisplayHeight( int pStrHeight, int _pLineByteS )
+{
+    int _retValue;
+    int _lines;
+    HexDataClass * _hexDataObjP;
+
+    _retValue = 0;
+
+    if( !mHexDataS.empty() )
+    {
+        for( auto _tmpItm : mHexDataS )
+        {
+            _hexDataObjP = _tmpItm.second;
+            _lines = _hexDataObjP->GetDataLen();
+            _lines += ( _pLineByteS - 1 );
+            _lines /= _pLineByteS;
+
+            _retValue += ( _lines * pStrHeight );
+        }
+    }
+
+    return _retValue;
+}
+
+/**
+ * @brief GuiDrawControl::sub_DrawHexDataToImage
+ */
+void GuiDrawControl::sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int pLineHeight, int pLineByteCount )
+{
+    int _imageWidth, _imageHeight;
+    char _tmpTransferBuf[ 32 ];
+
+    if( ( mMainImageP != nullptr ) && ( !mHexDataS.empty() ) )
+    {
+        uint32_t _tmpU32Value;
+        int _currentX, _currentY;
+        QPainter _tmpPainter( mMainImageP );
+        HexDataClass * _hexDataObjP;
+        QString _tmpQStr;
+        int _tmpLen;
+
+        _currentX = pColonWidth;
+        _currentY = 0;
+        _imageWidth = mMainImageP->width();
+        _imageHeight = mMainImageP->height();
+
+        for( auto _tmpItm : mHexDataS )
+        {
+            _hexDataObjP = _tmpItm.second;
+
+            _tmpU32Value = _hexDataObjP->GetStartOffset();
+            _tmpLen = _hexDataObjP->GetDataLen();
+
+            sprintf( _tmpTransferBuf, "%08X", _tmpU32Value );
+            _tmpQStr = QString::fromStdString( std::string( _tmpTransferBuf ) );
+        }
+    }
+}
+
+/**
  * @brief GuiDrawControl::sub_HexDataDraw
  */
 void GuiDrawControl::sub_HexDataDraw( void )
 {
     int _width, _height;
+    int _ActualHeight, _strHeight;
     int _tmpWidth;
     int _stringWidth;
     int _spaceWidth;
@@ -112,6 +222,8 @@ void GuiDrawControl::sub_HexDataDraw( void )
 
     _tmpTestString = "F";
     _spaceWidth = _tmpFm.horizontalAdvance( _tmpTestString );
+
+    _strHeight = _tmpFm.height();
 
     _tmpTestString = ":";
     _colonWidth = _tmpFm.horizontalAdvance( _tmpTestString );
@@ -130,15 +242,26 @@ void GuiDrawControl::sub_HexDataDraw( void )
     }
 
     _startOffset = -1;
-    if( !mHexDataS.empty() )
+
+    sub_MergeHexDataS();
+
+    _ActualHeight = fun_CalcDisplayHeight( _strHeight, _lineBytes );
+    if( _ActualHeight < _height )
     {
-        for( auto _tmpItm : mHexDataS )
-        {
-            _hDataObjP = _tmpItm.second;
-
-
-        }
+        _ActualHeight = _height;
     }
+
+    if( mMainImageP != nullptr )
+    {
+        delete mMainImageP;
+    }
+
+    mMainImageP = new QImage( _width, _ActualHeight, QImage::Format_ARGB32 );
+    mMainImageP->fill( fillColor() );
+
+    //mMainImageP->save( "test.jpg" );
+
+    sub_DrawHexDataToImage( _stringWidth, _colonWidth, _ActualHeight, _lineBytes );
 }
 
 /**
@@ -148,4 +271,8 @@ void GuiDrawControl::sub_HexDataDraw( void )
 void GuiDrawControl::paint( QPainter * pPainter )
 {
     //paint( pPainter );  //调用基类的重绘函数
+    if( mMainImageP != nullptr )
+    {
+        pPainter->drawImage( 0, 0, *mMainImageP );
+    }
 }

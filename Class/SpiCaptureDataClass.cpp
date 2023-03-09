@@ -318,7 +318,7 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
                     i -= 1;     //由于循环时会加1
 
                     _testCount += 1;
-                    if( _testCount > 15 )
+                    if( _testCount > 4 )
                     {
                         DebugStopFlag = true;
                     }

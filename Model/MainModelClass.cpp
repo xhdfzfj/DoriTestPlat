@@ -167,6 +167,7 @@ void MainModelClass::sub_EventHandle( void )
             _tmpEventObjP = mEventQ.front();
             mEventQLock.lock();
             mEventQ.pop();
+            qDebug() << "sys event queue:" << mEventQ.size();
             mEventQLock.unlock();
 
             if( _tmpEventObjP->mEventType_e == EventType_e::logInfoType )
@@ -190,5 +191,13 @@ void MainModelClass::sub_EventHandle( void )
             }
         }
     }
+}
+
+/**
+ * @brief MainModelClass::sub_TestButClick
+ */
+void MainModelClass::sub_TestButClick()
+{
+    mSpiAnalyseGuiObjP->sub_TestFunction();
 }
 

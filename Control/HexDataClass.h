@@ -14,6 +14,7 @@ public:
     uint8_t * GetDataAndLen( int & pRetLen ) { pRetLen = mDataLen; return mDataP; }
     void sub_AddData( uint8_t * pDataP, int pLen );
     int GetDataLen() { return mDataLen; }
+    uint8_t * GetDataBuf() { return mDataP; }
 private:
     uint8_t * mDataP;
     int mDataLen;

@@ -45,6 +45,7 @@ void GuiDrawControl::sub_MergeHexDataS( void )
     HexDataClass * _hexDataObjP;
     HexDataClass * _prevHexDataObjP;
     uint8_t * _tmpP;
+    std::list< int > mDelKeyS;
     int _tmpLen;
 
     _hexDataObjP = nullptr;
@@ -63,6 +64,7 @@ void GuiDrawControl::sub_MergeHexDataS( void )
                     _mergeFlag = true;
                     _tmpP = _hexDataObjP->GetDataAndLen( _tmpLen );
                     _prevHexDataObjP->sub_AddData( _tmpP, _tmpLen );
+                    mDelKeyS.push_back( _tmpItm.first );
                 }
             }
 
@@ -70,6 +72,16 @@ void GuiDrawControl::sub_MergeHexDataS( void )
             {
                 _prevHexDataObjP = _hexDataObjP;
             }
+        }
+
+        if( !mDelKeyS.empty() )
+        {
+            for( auto _key : mDelKeyS )
+            {
+                mHexDataS.erase( _key );
+            }
+
+            mDelKeyS.clear();
         }
     }
 }
@@ -93,6 +105,8 @@ void GuiDrawControl::sub_HexDataInput( uint8_t * pDataP, int pDataLen, int pStar
     }
 
     mHexDataS[ pStartOffset ] = _hexDataObjP;
+
+    qDebug() << "mHexDataS count " << mHexDataS.size();
 
     sub_HexDataDraw();
 }
@@ -181,11 +195,17 @@ void GuiDrawControl::sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int
         HexDataClass * _hexDataObjP;
         QString _tmpQStr;
         int _tmpLen;
+        int i;
+        QPen _tmpPen;
 
         _currentX = pColonWidth;
         _currentY = 0;
         _imageWidth = mMainImageP->width();
         _imageHeight = mMainImageP->height();
+
+        _tmpPainter.setFont( mFont );
+        _tmpPainter.setRenderHint( QPainter::Antialiasing );
+        _tmpPen.setColor( Qt::black );
 
         for( auto _tmpItm : mHexDataS )
         {
@@ -194,10 +214,89 @@ void GuiDrawControl::sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int
             _tmpU32Value = _hexDataObjP->GetStartOffset();
             _tmpLen = _hexDataObjP->GetDataLen();
 
-            sprintf( _tmpTransferBuf, "%08X", _tmpU32Value );
-            _tmpQStr = QString::fromStdString( std::string( _tmpTransferBuf ) );
+            i = 0;
+            while( i < _tmpLen )
+            {
+                _currentX = 0;
+                _currentY += pLineHeight;
+                sprintf( _tmpTransferBuf, "%08X", _tmpU32Value );
+                _tmpQStr = QString::fromStdString( std::string( _tmpTransferBuf ) );
+
+                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+                _currentX += ( pStrWidth * 4 );
+                _tmpQStr = ":";
+                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+                _currentX += pColonWidth;
+
+                _tmpQStr = fun_GetDataToHexDisplayStr( _hexDataObjP->GetDataBuf(), i, pLineByteCount );
+                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+
+                _tmpU32Value += pLineByteCount;
+                i += pLineByteCount;
+            }
+
+            if( i > _tmpLen )
+            {
+                //是有尾数没有显示出来
+                _currentX = 0;
+                _currentY += pLineHeight;
+
+                i -= pLineByteCount;
+                _tmpLen = _tmpLen - i;
+
+                _tmpU32Value -= pLineByteCount;
+
+                sprintf( _tmpTransferBuf, "%08X", _tmpU32Value );
+                _tmpQStr = QString::fromStdString( std::string( _tmpTransferBuf ) );
+
+                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+                _currentX += ( pStrWidth * 4 );
+                _tmpQStr = ":";
+                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+                _currentX += pColonWidth;
+
+                _tmpQStr = fun_GetDataToHexDisplayStr( _hexDataObjP->GetDataBuf(), i, _tmpLen );
+                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+            }
         }
     }
+}
+
+/**
+ * @brief GuiDrawControl::fun_GetDataToHexDisplayStr
+ * @param pDataP
+ *      止标数据缓冲区
+ * @param pOffset
+ *      开始的偏移
+ * @param pLen
+ *      要获取的长度
+ * @return
+ */
+QString GuiDrawControl::fun_GetDataToHexDisplayStr( uint8_t * pDataP, int pOffset, int pLen )
+{
+    QString _retStr;
+    char * _tmpCharBufP;
+
+    _tmpCharBufP = new char [ pLen * 2 + pLen ];
+
+    int i;
+    int j;
+
+    j = 0;
+    for( i = 0; i < pLen; i++ )
+    {
+        if( i != 0 )
+        {
+            _tmpCharBufP[ j ] = ' ';
+            j += 1;
+        }
+        sprintf( &_tmpCharBufP[ j ], "%02X", pDataP[ i + pOffset ] );
+        j += 2;
+    }
+
+    _retStr = QString::fromStdString( std::string( _tmpCharBufP ) );
+    delete [] _tmpCharBufP;
+    return _retStr;
 }
 
 /**
@@ -246,6 +345,7 @@ void GuiDrawControl::sub_HexDataDraw( void )
     sub_MergeHexDataS();
 
     _ActualHeight = fun_CalcDisplayHeight( _strHeight, _lineBytes );
+    _ActualHeight += 3; //底部的间隔
     if( _ActualHeight < _height )
     {
         _ActualHeight = _height;
@@ -257,11 +357,23 @@ void GuiDrawControl::sub_HexDataDraw( void )
     }
 
     mMainImageP = new QImage( _width, _ActualHeight, QImage::Format_ARGB32 );
-    mMainImageP->fill( fillColor() );
+    mMainImageP->fill( Qt::white );
+
+    sub_DrawHexDataToImage( _stringWidth, _colonWidth, _strHeight, _lineBytes );
 
     //mMainImageP->save( "test.jpg" );
+    //update();
+}
 
-    sub_DrawHexDataToImage( _stringWidth, _colonWidth, _ActualHeight, _lineBytes );
+/**
+ * @brief GuiDrawControl::sub_TestFunction
+ */
+void GuiDrawControl::sub_TestFunction()
+{
+   if( mMainImageP != nullptr )
+   {
+       mMainImageP->save( "test.jpg" );
+   }
 }
 
 /**
@@ -273,6 +385,7 @@ void GuiDrawControl::paint( QPainter * pPainter )
     //paint( pPainter );  //调用基类的重绘函数
     if( mMainImageP != nullptr )
     {
+        pPainter->setRenderHint( QPainter::Antialiasing );
         pPainter->drawImage( 0, 0, *mMainImageP );
     }
 }

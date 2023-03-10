@@ -95,6 +95,20 @@ Window {
                     onGuiAnalyseSpiClick()
                 }
             }
+
+            Button
+            {
+                text:qsTr( "测试按键" )
+                anchors.top:guiAnalyseSpiBut.top
+                anchors.left: guiAnalyseSpiBut.right
+                anchors.leftMargin: 30
+                width:100
+                id:guiTestBut
+                onClicked:
+                {
+                    onTestButClick()
+                }
+            }
         }
 
         Grid
@@ -248,5 +262,11 @@ Window {
         }
     }
 
-
+    function onTestButClick()
+    {
+        //if( workState === 1 )
+        //{
+            MainModelObj.sub_TestButClick();
+        //}
+    }
 }

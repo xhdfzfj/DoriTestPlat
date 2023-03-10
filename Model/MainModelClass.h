@@ -26,6 +26,8 @@ public:
     Q_INVOKABLE void sub_ClearSelf();
     Q_INVOKABLE void sub_GetDrawObjectFromQml( QObject * pObjectP );
 
+    Q_INVOKABLE void sub_TestButClick();
+
     void sub_ChildObjectEventHandle( void * pEventP );
     void sub_EventHandle( void );
 

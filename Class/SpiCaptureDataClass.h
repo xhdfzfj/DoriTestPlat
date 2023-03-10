@@ -30,6 +30,7 @@ protected:
 private:
     spiCmdStruct_S * fun_FindSpiCmdInArray( uint8_t pData );
     int fun_SpiCmdAnalyse( uint8_t * pSpiCmdDataP, int pDataLen, spiCmdStruct_S * pDestSpiCmdStructP, int pStartOffsetInFile );
+    void sub_GetSpiReadData( uint8_t * pSaveBufP, uint8_t * pSpiCmdStartP, uint16_t pLen );
     //void sub_Test() { mParentEventInf( nullptr ); }
 
 private:
@@ -45,7 +46,7 @@ private:
      * 以下调试用
      * ************************/
 private:
-    bool DebugStopFlag = false;
+//    bool DebugStopFlag = false;
 };
 
 #endif // SPICAPTUREDATACLASS_H

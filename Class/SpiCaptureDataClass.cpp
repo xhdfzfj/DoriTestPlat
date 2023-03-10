@@ -72,6 +72,24 @@ void SpiCaptureDataClass::sub_StartAnalyse()
 }
 
 /**
+ * @brief SpiCaptureDataClass::sub_GetSpiReadData
+ * @param pSaveBufP
+ * @param pSpiCmdStartP
+ * @param pLen
+ */
+void SpiCaptureDataClass::sub_GetSpiReadData( uint8_t * pSaveBufP, uint8_t * pSpiCmdStartP, uint16_t pLen )
+{
+    uint8_t * _tmpP;
+    uint16_t i;
+
+    _tmpP = ( pSpiCmdStartP + 8 + 1 );
+    for( i = 0; i < pLen; i++ )
+    {
+        pSaveBufP[ i ] = _tmpP[ i * 2 ];
+    }
+}
+
+/**
  * @brief SpiCaptureDataClass::fun_SpiCmdAnalyse
  *      处理捕捉到的SPI指令
  * @param pCmdDataP
@@ -208,7 +226,8 @@ int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen
                         uint8_t * _tmpP;
 
                         _tmpP = new uint8_t [ _tmpLen ];        //不用进行释放,释放EVENT时会释入该内存
-                        memcpy( _tmpP, &pCmdDataP[ 4 ], _tmpLen );
+
+                        sub_GetSpiReadData( _tmpP, &( pCmdDataP[ 0 ] ), _tmpLen );
 
                         _tmpEventObjP = new PrivateEventClass( EventType_e::HexDataDisplayType, DataType_e::DataType, Sender_e::SpiCapture,
                                                                ( void * )_tmpP, _tmpLen, _tmpAddr );
@@ -317,11 +336,11 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
                     i += j;
                     i -= 1;     //由于循环时会加1
 
-                    _testCount += 1;
-                    if( _testCount > 4 )
-                    {
-                        DebugStopFlag = true;
-                    }
+//                    _testCount += 1;
+//                    if( _testCount > 40 )
+//                    {
+//                        DebugStopFlag = true;
+//                    }
                 }
             }
             else
@@ -363,10 +382,10 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
             _FileOffset += _retValue;
         }
 
-        if( DebugStopFlag )
-        {
-            break;
-        }
+//        if( DebugStopFlag )
+//        {
+//            break;
+//        }
     }
 
     sub_SpiDataAnalyseHandle_exit:

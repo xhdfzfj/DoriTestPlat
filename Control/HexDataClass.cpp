@@ -44,4 +44,5 @@ void HexDataClass::sub_AddData( uint8_t *pDataP, int pLen )
 
     memcpy( &_tmpP[ mDataLen ], pDataP, pLen );
     mDataLen += pLen;
+    mDataP = _tmpP;
 }

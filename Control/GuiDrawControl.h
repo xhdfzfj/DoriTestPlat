@@ -19,12 +19,15 @@ public:
 
     void sub_HexDataInput( uint8_t * pDataP, int pDataLen, int pStartOffset );
 
+    void sub_TestFunction();
+
 private:
     void sub_HexDataDraw( void );
     int fun_CalcLineDisplayCount( int pWidth, int pHexDataWidth, int pSpaceWidth );
     void sub_MergeHexDataS( void );
     int fun_CalcDisplayHeight( int pStrHeight, int _pLineByteS );
     void sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int pLineHeight, int pLineByteCount );
+    QString fun_GetDataToHexDisplayStr( uint8_t * pDataP, int pOffset, int pLen );
 
     /*********************************
      * 系统重载

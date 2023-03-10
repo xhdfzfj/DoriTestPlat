@@ -90,7 +90,7 @@ Rectangle
 //                        _retWidth = ( _tmpWidth / 5 ) * 2;
 //                    }
 
-                    console.log( "spi width:", _retWidth, " colum:", column );
+                    //console.log( "spi width:", _retWidth, " colum:", column );
                     return _retWidth;
                 }
 

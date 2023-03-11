@@ -189,6 +189,15 @@ void MainModelClass::sub_EventHandle( void )
 
                 delete _tmpEventObjP;
             }
+            else if( _tmpEventObjP->mEventType_e == EventType_e::ReDrawHexData )
+            {
+                if( _tmpEventObjP->mSender_e == Sender_e::SpiCapture )
+                {
+                    mSpiAnalyseGuiObjP->sub_ReDrawHexData();
+                }
+
+                delete _tmpEventObjP;
+            }
         }
     }
 }

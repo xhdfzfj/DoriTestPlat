@@ -8,6 +8,7 @@ typedef enum __EventType_e
     logInfoType,
     SpiCmdInfoType,
     HexDataDisplayType,
+    ReDrawHexData,
 }EventType_e;
 
 typedef enum __DataType_e

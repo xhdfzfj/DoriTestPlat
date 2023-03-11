@@ -6,6 +6,7 @@
 #include <QtQuick/QQuickPaintedItem>
 #include <QPainter>
 #include <QImage>
+#include <QTimer>
 #include <map>
 #include "./HexDataClass.h"
 
@@ -18,7 +19,7 @@ public:
     virtual ~GuiDrawControl();
 
     void sub_HexDataInput( uint8_t * pDataP, int pDataLen, int pStartOffset );
-
+    void sub_ReDrawHexData();
     void sub_TestFunction();
 
 private:
@@ -28,6 +29,9 @@ private:
     int fun_CalcDisplayHeight( int pStrHeight, int _pLineByteS );
     void sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int pLineHeight, int pLineByteCount );
     QString fun_GetDataToHexDisplayStr( uint8_t * pDataP, int pOffset, int pLen );
+
+public slots:
+    void sub_SlotReDrawHexDataTimeOut();
 
     /*********************************
      * 系统重载
@@ -40,6 +44,10 @@ private:
     QImage * mMainImageP;
 
     std::map< int, HexDataClass * > mHexDataS;
+
+    //由于调入时使用了std thread所以QT的一此东东无法使用
+//    QTimer * mRedrawTimerP;
+//    bool mRedrawTimerFlag;
 };
 
 #endif // GUIDRAWCONTROL_H

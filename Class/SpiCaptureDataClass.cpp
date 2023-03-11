@@ -401,6 +401,11 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
         mParentEventInf( ( void * )_tmpEventObjP );
     }
 
+    _tmpEventObjP = new PrivateEventClass( EventType_e::ReDrawHexData, DataType_e::DataType, Sender_e::SpiCapture, nullptr );    //不用清理,接口处清理
+    if( mParentEventInf )
+    {
+        mParentEventInf( ( void * )_tmpEventObjP );
+    }
 }
 
 /**

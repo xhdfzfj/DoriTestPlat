@@ -96,12 +96,13 @@ void GuiDrawControl::sub_MergeHexDataS( void )
 void GuiDrawControl::sub_HexDataInput( uint8_t * pDataP, int pDataLen, int pStartOffset )
 {
     HexDataClass * _hexDataObjP;
+    HexDataClass * _oldHexDataObjP;
 
     _hexDataObjP = new HexDataClass( pDataP, pDataLen, pStartOffset );
     if( mHexDataS.count( pStartOffset ) )
     {
-        _hexDataObjP = mHexDataS.at( pStartOffset );
-        delete _hexDataObjP;
+        _oldHexDataObjP = mHexDataS.at( pStartOffset );
+        delete _oldHexDataObjP;
     }
 
     mHexDataS[ pStartOffset ] = _hexDataObjP;
@@ -351,15 +352,15 @@ void GuiDrawControl::sub_HexDataDraw( void )
         _ActualHeight = _height;
     }
 
-    if( mMainImageP != nullptr )
-    {
-        delete mMainImageP;
-    }
+//    if( mMainImageP != nullptr )
+//    {
+//        delete mMainImageP;
+//    }
 
-    mMainImageP = new QImage( _width, _ActualHeight, QImage::Format_ARGB32 );
-    mMainImageP->fill( Qt::white );
+//    mMainImageP = new QImage( _width, _ActualHeight, QImage::Format_ARGB32 );
+//    mMainImageP->fill( Qt::white );
 
-    sub_DrawHexDataToImage( _stringWidth, _colonWidth, _strHeight, _lineBytes );
+    //sub_DrawHexDataToImage( _stringWidth, _colonWidth, _strHeight, _lineBytes );
 
     //mMainImageP->save( "test.jpg" );
     //update();
@@ -385,7 +386,7 @@ void GuiDrawControl::paint( QPainter * pPainter )
     //paint( pPainter );  //调用基类的重绘函数
     if( mMainImageP != nullptr )
     {
-        pPainter->setRenderHint( QPainter::Antialiasing );
-        pPainter->drawImage( 0, 0, *mMainImageP );
+        //pPainter->setRenderHint( QPainter::Antialiasing );
+        //pPainter->drawImage( 0, 0, *mMainImageP );
     }
 }

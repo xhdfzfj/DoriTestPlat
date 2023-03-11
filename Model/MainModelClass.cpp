@@ -164,8 +164,8 @@ void MainModelClass::sub_EventHandle( void )
         }
         while( !mEventQ.empty() )
         {
-            _tmpEventObjP = mEventQ.front();
             mEventQLock.lock();
+            _tmpEventObjP = mEventQ.front();
             mEventQ.pop();
             qDebug() << "sys event queue:" << mEventQ.size();
             mEventQLock.unlock();

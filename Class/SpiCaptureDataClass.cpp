@@ -220,7 +220,7 @@ int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen
                         mParentEventInf( ( void * )_tmpEventObjP );
                     }
 
-                    if( ( pDestSpiCmdStructP->mCmd == 0x03 ) || ( pDestSpiCmdStructP->mCmd == 0x02 ) )
+                    if( pDestSpiCmdStructP->mCmd == 0x03 )
                     {
                         //要向显示控件发送事件
                         uint8_t * _tmpP;
@@ -235,6 +235,10 @@ int SpiCaptureDataClass::fun_SpiCmdAnalyse( uint8_t * pCmdDataP, int pCmdDataLen
                         {
                             mParentEventInf( ( void * )_tmpEventObjP );
                         }
+                    }
+                    else if ( pDestSpiCmdStructP->mCmd == 0x02 )
+                    {
+                        //写操作
                     }
                 }
 

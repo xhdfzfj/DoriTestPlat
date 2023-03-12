@@ -9,6 +9,9 @@ GuiDrawControl::GuiDrawControl(QQuickItem * pParent) : QQuickPaintedItem( pParen
     mFont = QFont( "SimSun", 16 );
     mMainImageP = nullptr;
 //    mRedrawTimerP = nullptr;
+    mGuiThreadP = this->thread();
+
+    connect( this, SIGNAL( sub_SignalReDrawSignal() ), this, SLOT( sub_SlotReDraw() ), Qt::QueuedConnection );
 }
 
 /**
@@ -119,7 +122,6 @@ void GuiDrawControl::sub_HexDataInput( uint8_t * pDataP, int pDataLen, int pStar
     qDebug() << "mHexDataS count " << mHexDataS.size();
 
     sub_MergeHexDataS();
-    //sub_HexDataDraw();
 }
 
 /**
@@ -379,13 +381,16 @@ void GuiDrawControl::sub_HexDataDraw( void )
         delete mMainImageP;
     }
 
-    mMainImageP = new QImage( _width, _ActualHeight, QImage::Format_ARGB32 );
+    //mMainImageP = new QImage( _width, _ActualHeight, QImage::Format_ARGB32 );
+    mMainImageP = new QImage( _width, _height, QImage::Format_ARGB32 );
     mMainImageP->fill( Qt::white );
 
     sub_DrawHexDataToImage( _stringWidth, _colonWidth, _strHeight, _lineBytes );
 
-//    mMainImageP->save( "test.jpg" );
-    update( QRect( 0, 0, _width, _height ) );
+    mMainImageP->save( "test.jpg" );
+    //update();
+
+    emit sub_SignalReDrawSignal();
 }
 
 /**
@@ -399,11 +404,9 @@ void GuiDrawControl::sub_ReDrawHexData()
 /**
  * @brief GuiDrawControl::sub_SlotReDrawHexDataTimeOut
  */
-void GuiDrawControl::sub_SlotReDrawHexDataTimeOut()
+void GuiDrawControl::sub_SlotReDraw()
 {
-//    mRedrawTimerP->stop();
-//    delete mRedrawTimerP;
-//    mRedrawTimerP = nullptr;
+    update();
 }
 
 /**

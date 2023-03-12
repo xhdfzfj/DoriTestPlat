@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QImage>
 #include <QTimer>
+#include <QThread>
 #include <map>
 #include "./HexDataClass.h"
 
@@ -30,8 +31,11 @@ private:
     void sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int pLineHeight, int pLineByteCount );
     QString fun_GetDataToHexDisplayStr( uint8_t * pDataP, int pOffset, int pLen );
 
+signals:
+    void sub_SignalReDrawSignal();
+
 public slots:
-    void sub_SlotReDrawHexDataTimeOut();
+    void sub_SlotReDraw();
 
     /*********************************
      * 系统重载
@@ -40,6 +44,8 @@ public:
     void paint( QPainter *painter ) override;
 
 private:
+    QThread * mGuiThreadP;
+
     QFont mFont;
     QImage * mMainImageP;
 

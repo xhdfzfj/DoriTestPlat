@@ -6,6 +6,16 @@ import xhd.controls.guidrawcontrol 1.0
 Rectangle
 {
     anchors.fill: parent
+    Timer
+    {
+        id:guiSizeChangeTimer
+        repeat: false
+        onTriggered:
+        {
+            console.log( "sizeChange!!!" );
+            guiSpiDrawControl.sub_SizeChanage();
+        }
+    }
 
     Grid
     {
@@ -109,6 +119,28 @@ Rectangle
                 height: parent.height
 
                 fillColor: "red"
+
+                onWidthChanged:
+                {
+                    console.log( "DrawControl width:", width )
+                    if( guiSizeChangeTimer.running )
+                    {
+                        guiSizeChangeTimer.stop();
+                    }
+                    guiSizeChangeTimer.interval = 3;
+                    guiSizeChangeTimer.start();
+                }
+
+                onHeightChanged:
+                {
+                    console.log( "DrawControl height", height )
+                    if( guiSizeChangeTimer.running )
+                    {
+                        guiSizeChangeTimer.stop();
+                    }
+                    guiSizeChangeTimer.interval = 3;
+                    guiSizeChangeTimer.start();
+                }
             }
 
             ScrollBar
@@ -121,11 +153,12 @@ Rectangle
                 visible: true
                 enabled: true
                 orientation: Qt.Vertical
-//                onPositionChanged:
-//                {
-//                    console.log( "scrollbar ", position );
-//                    guiDrawControl.sub_ScrollBarChanage( position );
-//                }
+
+                onPositionChanged:
+                {
+                    console.log( "scrollbar ", position );
+                    guiDrawControl.sub_ScrollBarChanage( position );
+                }
             }
 
         }

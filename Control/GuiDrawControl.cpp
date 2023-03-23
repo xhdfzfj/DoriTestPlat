@@ -154,6 +154,7 @@ int GuiDrawControl::fun_CalcLineDisplayCount( int pWidth, int pHexDataWidth, int
         _tmpValue = i * pHexDataWidth + ( i - 1 ) * pSpaceWidth;
         if( _tmpValue > pWidth )
         {
+            j = i / 2;
             break;
         }
         i *= 2;
@@ -348,6 +349,9 @@ void GuiDrawControl::sub_HexDataDraw( void )
     _tmpWidth = _width - 2 * _colonWidth - 4 * _stringWidth;
 
     _lineBytes = fun_CalcLineDisplayCount( _tmpWidth, _stringWidth, _spaceWidth );
+
+    qDebug() << "line bytes:" << _lineBytes;
+
     if( _lineBytes < 0 )
     {
         return;
@@ -387,9 +391,25 @@ void GuiDrawControl::sub_HexDataDraw( void )
 
     sub_DrawHexDataToImage( _stringWidth, _colonWidth, _strHeight, _lineBytes );
 
-    mMainImageP->save( "test.jpg" );
+    //mMainImageP->save( "test.jpg" );
     //update();
 
+    emit sub_SignalReDrawSignal();
+}
+
+/**
+ * @brief GuiDrawControl::sub_SizeChanage
+ *   QML调用控件大小发生了变化
+ */
+void GuiDrawControl::sub_SizeChanage()
+{
+    if( mMainImageP != nullptr )
+    {
+        delete mMainImageP;
+        mMainImageP = nullptr;
+    }
+
+    sub_HexDataDraw();
     emit sub_SignalReDrawSignal();
 }
 

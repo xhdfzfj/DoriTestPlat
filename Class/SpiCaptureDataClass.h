@@ -46,7 +46,7 @@ private:
      * 以下调试用
      * ************************/
 private:
-//    bool DebugStopFlag = false;
+    bool DebugStopFlag = false;
 };
 
 #endif // SPICAPTUREDATACLASS_H

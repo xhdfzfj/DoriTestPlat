@@ -9,10 +9,21 @@ Window {
     height: 1080
     visible: true
     title: qsTr("功能测试软件")
+    id:guiMainWindow
 
     onClosing:
     {
         MainModelObj.sub_ClearSelf();
+    }
+
+    onWidthChanged:
+    {
+        console.log( "onWidthChanged:", guiMainWindow.width );
+    }
+
+    onHeightChanged:
+    {
+        console.log( "onHeightChanged:", guiMainWindow.height );
     }
 
     property int workState: 0
@@ -264,9 +275,21 @@ Window {
 
     function onTestButClick()
     {
+        if( guiLoader.status === Loader.Ready )
+        {
+            //卸载被LOADER的元素
+            guiLoader.active = false
+        }
+
+        if( workState === 1 )
+        {
+            //分析SPI文件状态
+            workState = 0;  //回到初始状态
+        }
+
         //if( workState === 1 )
         //{
-            MainModelObj.sub_TestButClick();
+        //    MainModelObj.sub_TestButClick();
         //}
     }
 }

@@ -340,11 +340,11 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
                     i += j;
                     i -= 1;     //由于循环时会加1
 
-//                    _testCount += 1;
-//                    if( _testCount > 40 )
-//                    {
-//                        DebugStopFlag = true;
-//                    }
+                    _testCount += 1;
+                    if( _testCount > 400 )
+                    {
+                        DebugStopFlag = true;
+                    }
                 }
             }
             else
@@ -386,10 +386,10 @@ void SpiCaptureDataClass::sub_SpiDataAnalyseHandle()
             _FileOffset += _retValue;
         }
 
-//        if( DebugStopFlag )
-//        {
-//            break;
-//        }
+        if( DebugStopFlag )
+        {
+            break;
+        }
     }
 
     sub_SpiDataAnalyseHandle_exit:

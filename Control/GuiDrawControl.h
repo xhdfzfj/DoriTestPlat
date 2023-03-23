@@ -23,6 +23,10 @@ public:
     void sub_ReDrawHexData();
     void sub_TestFunction();
 
+    Q_INVOKABLE void sub_SizeChanage();
+    Q_INVOKABLE void sub_ScrollBarChanage( real pPosition );
+
+
 private:
     void sub_HexDataDraw( void );
     int fun_CalcLineDisplayCount( int pWidth, int pHexDataWidth, int pSpaceWidth );

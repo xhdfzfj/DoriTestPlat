@@ -24,7 +24,7 @@ public:
     void sub_TestFunction();
 
     Q_INVOKABLE void sub_SizeChanage();
-    Q_INVOKABLE void sub_ScrollBarChanage( real pPosition );
+    Q_INVOKABLE void sub_ScrollBarChanage( qreal pPosition );
 
 
 private:
@@ -54,6 +54,9 @@ private:
     QImage * mMainImageP;
 
     std::map< int, HexDataClass * > mHexDataS;
+
+    int mDrawActualHeight;
+    int mDrawActualWidth;
 
     //由于调入时使用了std thread所以QT的一此东东无法使用
 //    QTimer * mRedrawTimerP;

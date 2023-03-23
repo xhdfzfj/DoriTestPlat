@@ -12,6 +12,9 @@ GuiDrawControl::GuiDrawControl(QQuickItem * pParent) : QQuickPaintedItem( pParen
     mGuiThreadP = this->thread();
 
     connect( this, SIGNAL( sub_SignalReDrawSignal() ), this, SLOT( sub_SlotReDraw() ), Qt::QueuedConnection );
+
+    mDrawActualHeight = 0;
+    mDrawActualWidth = 0;
 }
 
 /**
@@ -183,11 +186,16 @@ int GuiDrawControl::fun_CalcDisplayHeight( int pStrHeight, int _pLineByteS )
         {
             _hexDataObjP = _tmpItm.second;
             _lines = _hexDataObjP->GetDataLen();
-            _lines += ( _pLineByteS - 1 );
-            _lines /= _pLineByteS;
+//            _lines += ( _pLineByteS - 1 );
+//            _lines /= _pLineByteS;
 
-            _retValue += ( _lines * pStrHeight );
+//            _retValue += ( _lines * pStrHeight );
         }
+
+        _lines += ( _pLineByteS - 1 );
+        _lines /= _pLineByteS;
+
+        _retValue = _lines * pStrHeight;
     }
 
     return _retValue;
@@ -366,6 +374,9 @@ void GuiDrawControl::sub_HexDataDraw( void )
         _ActualHeight = _height;
     }
 
+    mDrawActualHeight = _ActualHeight;
+    mDrawActualWidth = _width;
+
 //    if( mRedrawTimerP == nullptr )
 //    {
 //        mRedrawTimerP = new QTimer( this );
@@ -391,7 +402,7 @@ void GuiDrawControl::sub_HexDataDraw( void )
 
     sub_DrawHexDataToImage( _stringWidth, _colonWidth, _strHeight, _lineBytes );
 
-    //mMainImageP->save( "test.jpg" );
+    mMainImageP->save( "test.jpg" );
     //update();
 
     emit sub_SignalReDrawSignal();
@@ -411,6 +422,18 @@ void GuiDrawControl::sub_SizeChanage()
 
     sub_HexDataDraw();
     emit sub_SignalReDrawSignal();
+}
+
+/**
+ * @brief GuiDrawControl::sub_ScrollBarChanage
+ * @param pPosition
+ *      当前游标的位置
+ */
+void GuiDrawControl::sub_ScrollBarChanage( qreal pPosition )
+{
+    int _tmpX;
+
+    _tmpX = mDrawActualHeight * pPosition;
 }
 
 /**

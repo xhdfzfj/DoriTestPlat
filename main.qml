@@ -26,7 +26,7 @@ Window {
         console.log( "onHeightChanged:", guiMainWindow.height );
     }
 
-    property int workState: 0
+    property int workState: 0   //1:spi分析 2:通用的内存显示
 
     Grid
     {
@@ -109,9 +109,32 @@ Window {
 
             Button
             {
-                text:qsTr( "测试按键" )
+                text:qsTr( "启动串行FLASH" )
                 anchors.top:guiAnalyseSpiBut.top
                 anchors.left: guiAnalyseSpiBut.right
+                anchors.leftMargin: 3
+                width:130
+                id:guiFlashSimBut
+                onClicked:
+                {
+                    workState = 2
+                    if( text === "启动串行FLASH" )
+                    {
+                        text = "停止串行FLASH";
+                    }
+                    else
+                    {
+                        text = "启动串行FLASH"
+                    }
+                    fun_LoaderSpiFlash();
+                }
+            }
+
+            Button
+            {
+                text:qsTr( "测试按键" )
+                anchors.top:guiFlashSimBut.top
+                anchors.left: guiFlashSimBut.right
                 anchors.leftMargin: 30
                 width:100
                 id:guiTestBut
@@ -291,5 +314,19 @@ Window {
         //{
         //    MainModelObj.sub_TestButClick();
         //}
+    }
+
+    function fun_LoaderSpiFlash()
+    {
+        if( guiLoader.status === Loader.Ready )
+        {
+            //卸载被LOADER的元素
+            guiLoader.active = false
+        }
+
+        if( workState == 2 )
+        {
+            guiLoader.source = "flashSim.qml"
+        }
     }
 }

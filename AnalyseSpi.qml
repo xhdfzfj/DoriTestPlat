@@ -118,7 +118,7 @@ Rectangle
                 width: parent.width - 16
                 height: parent.height
 
-                fillColor: "red"
+                //fillColor: "red"
 
                 onWidthChanged:
                 {
@@ -157,7 +157,7 @@ Rectangle
                 onPositionChanged:
                 {
                     console.log( "scrollbar ", position );
-                    guiDrawControl.sub_ScrollBarChanage( position );
+                    guiSpiDrawControl.sub_ScrollBarChanage( position );
                 }
             }
 

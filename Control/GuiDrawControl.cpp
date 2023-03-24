@@ -15,6 +15,9 @@ GuiDrawControl::GuiDrawControl(QQuickItem * pParent) : QQuickPaintedItem( pParen
 
     mDrawActualHeight = 0;
     mDrawActualWidth = 0;
+    mCurrDisplayEndY = -1;
+    mCurrDisplayStartY = -1;
+    mPrevScrollPosition = 0;
 }
 
 /**
@@ -179,13 +182,14 @@ int GuiDrawControl::fun_CalcDisplayHeight( int pStrHeight, int _pLineByteS )
     HexDataClass * _hexDataObjP;
 
     _retValue = 0;
+    _lines = 0;
 
     if( !mHexDataS.empty() )
     {
         for( auto _tmpItm : mHexDataS )
         {
             _hexDataObjP = _tmpItm.second;
-            _lines = _hexDataObjP->GetDataLen();
+            _lines += _hexDataObjP->GetDataLen();
 //            _lines += ( _pLineByteS - 1 );
 //            _lines /= _pLineByteS;
 
@@ -219,7 +223,9 @@ void GuiDrawControl::sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int
         int _tmpLen;
         int i;
         QPen _tmpPen;
+        bool _exitFlag;
 
+        _exitFlag = false;
         _currentX = pColonWidth;
         _currentY = 0;
         _imageWidth = mMainImageP->width();
@@ -228,6 +234,15 @@ void GuiDrawControl::sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int
         _tmpPainter.setFont( mFont );
         _tmpPainter.setRenderHint( QPainter::Antialiasing );
         _tmpPen.setColor( Qt::black );
+
+        if( mCurrDisplayStartY == -1 )
+        {
+            mCurrDisplayStartY = 0;
+        }
+        if( mCurrDisplayEndY == -1 )
+        {
+            mCurrDisplayEndY = mCurrDisplayStartY + mMainImageP->height();
+        }
 
         for( auto _tmpItm : mHexDataS )
         {
@@ -240,21 +255,42 @@ void GuiDrawControl::sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int
             while( i < _tmpLen )
             {
                 _currentX = 0;
+
+                if( _currentY > mCurrDisplayEndY )
+                {
+                    _exitFlag = true;
+                    break;
+                }
+
                 _currentY += pLineHeight;
+
+                if( _currentY < mCurrDisplayStartY )
+                {
+                    //为了快速进入大循环，不执行尾数没有显示部份代码
+                    i += pLineByteCount;
+                    _tmpU32Value += pLineByteCount;
+                    continue;
+                }
+
                 sprintf( _tmpTransferBuf, "%08X", _tmpU32Value );
                 _tmpQStr = QString::fromStdString( std::string( _tmpTransferBuf ) );
 
-                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+                _tmpPainter.drawText( _currentX, _currentY - mCurrDisplayStartY, _tmpQStr );
                 _currentX += ( pStrWidth * 4 );
                 _tmpQStr = ":";
-                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+                _tmpPainter.drawText( _currentX, _currentY - mCurrDisplayStartY, _tmpQStr );
                 _currentX += pColonWidth;
 
                 _tmpQStr = fun_GetDataToHexDisplayStr( _hexDataObjP->GetDataBuf(), i, pLineByteCount );
-                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+                _tmpPainter.drawText( _currentX, _currentY - mCurrDisplayStartY, _tmpQStr );
 
                 _tmpU32Value += pLineByteCount;
                 i += pLineByteCount;
+            }
+
+            if( _exitFlag )
+            {
+                break;
             }
 
             if( i > _tmpLen )
@@ -271,14 +307,14 @@ void GuiDrawControl::sub_DrawHexDataToImage( int pStrWidth, int pColonWidth, int
                 sprintf( _tmpTransferBuf, "%08X", _tmpU32Value );
                 _tmpQStr = QString::fromStdString( std::string( _tmpTransferBuf ) );
 
-                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+                _tmpPainter.drawText( _currentX, _currentY - mCurrDisplayStartY, _tmpQStr );
                 _currentX += ( pStrWidth * 4 );
                 _tmpQStr = ":";
-                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+                _tmpPainter.drawText( _currentX, _currentY - mCurrDisplayStartY, _tmpQStr );
                 _currentX += pColonWidth;
 
                 _tmpQStr = fun_GetDataToHexDisplayStr( _hexDataObjP->GetDataBuf(), i, _tmpLen );
-                _tmpPainter.drawText( _currentX, _currentY, _tmpQStr );
+                _tmpPainter.drawText( _currentX, _currentY - mCurrDisplayStartY, _tmpQStr );
             }
         }
     }
@@ -402,7 +438,7 @@ void GuiDrawControl::sub_HexDataDraw( void )
 
     sub_DrawHexDataToImage( _stringWidth, _colonWidth, _strHeight, _lineBytes );
 
-    mMainImageP->save( "test.jpg" );
+    //mMainImageP->save( "test.jpg" );
     //update();
 
     emit sub_SignalReDrawSignal();
@@ -421,7 +457,6 @@ void GuiDrawControl::sub_SizeChanage()
     }
 
     sub_HexDataDraw();
-    emit sub_SignalReDrawSignal();
 }
 
 /**
@@ -431,9 +466,46 @@ void GuiDrawControl::sub_SizeChanage()
  */
 void GuiDrawControl::sub_ScrollBarChanage( qreal pPosition )
 {
-    int _tmpX;
+    int _tmpY;
+    int _tmpValue;
 
-    _tmpX = mDrawActualHeight * pPosition;
+    _tmpY = mDrawActualHeight * pPosition;
+    mCurrDisplayEndY = -1;
+
+    if( ( _tmpY != mPrevScrollPosition ) && ( mMainImageP != nullptr ) )
+    {
+        _tmpValue = _tmpY - mPrevScrollPosition;
+        mPrevScrollPosition = _tmpY;
+
+        if( _tmpValue > 0 )
+        {
+            if( _tmpValue > mMainImageP->height() )
+            {
+                //超过了一屏
+                mCurrDisplayStartY = _tmpY - 10;
+            }
+            else
+            {
+                mCurrDisplayStartY += _tmpValue;
+            }
+        }
+        else
+        {
+            _tmpValue = 0 - _tmpValue;
+            if( _tmpValue > mMainImageP->height() )
+            {
+                mCurrDisplayStartY = _tmpY + 10;
+            }
+            else
+            {
+                mCurrDisplayStartY -= _tmpValue;
+            }
+        }
+
+
+
+        sub_HexDataDraw();
+    }
 }
 
 /**

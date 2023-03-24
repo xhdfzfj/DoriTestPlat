@@ -57,6 +57,10 @@ private:
 
     int mDrawActualHeight;
     int mDrawActualWidth;
+    int mCurrDisplayStartY;
+    int mCurrDisplayEndY;
+
+    int mPrevScrollPosition;
 
     //由于调入时使用了std thread所以QT的一此东东无法使用
 //    QTimer * mRedrawTimerP;

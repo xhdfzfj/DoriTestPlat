@@ -80,6 +80,10 @@ Item
             width: parent.width - ( parent.width / 3 )
             height: parent.height
             color: "red"
+            SimFlashDrawControl
+            {
+                
+            }
         }
     }
 

@@ -8,6 +8,8 @@ SOURCES += \
         Class/FileAnalyseBaseClass.cpp \
         Class/PrivateEventClass.cpp \
         Class/SelfClearInterFaceClass.cpp \
+        Class/SimFlash/FlashSimClass.cpp \
+        Class/SimFlash/SimFlashDrawControl.cpp \
         Class/SpiCaptureDataClass.cpp \
         Class/SpiCmdInfoClass.cpp \
         Control/GuiDrawControl.cpp \
@@ -41,6 +43,8 @@ HEADERS += \
     Class/FileAnalyseBaseClass.h \
     Class/PrivateEventClass.h \
     Class/SelfClearInterFaceClass.h \
+    Class/SimFlash/FlashSimClass.h \
+    Class/SimFlash/SimFlashDrawControl.h \
     Class/SpiCaptureDataClass.h \
     Class/SpiCmdInfoClass.h \
     Control/GuiDrawControl.h \

@@ -7,6 +7,7 @@
 
 #include "./Control/GuiDrawControl.h"
 #include "Model/MainModelClass.h"
+#include "Class/SimFlash/SimFlashDrawControl.h"
 
 MainModelClass * gMainModelObjP;
 
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
     }
 
     qmlRegisterType< GuiDrawControl >( "xhd.controls.guidrawcontrol", 1, 0, "GuiDrawControl" );
+    qmlRegisterType< SimFlashDrawControl >( "xhd.controls.simflashddrawcontrol", 1, 0, "SimFlashDrawControl" );
 
     gMainModelObjP = new MainModelClass();
 

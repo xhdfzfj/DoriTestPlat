@@ -12,6 +12,9 @@ public:
     FlashSimClass();
     virtual ~FlashSimClass();
 
+protected:
+    int fun_GetData( int pStartOffset, int pGetCount, char * & pSaveP );
+
 private:
     uint8_t * mSimFlashP;
     uint32_t mSimFlashSize;

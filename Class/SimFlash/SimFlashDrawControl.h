@@ -33,6 +33,10 @@ private:
     QColor mAddressTableBackColor;
     QColor mBackColor;
 
+    int mCurrDisplayIndex;
+    int mCurrDisplayEndIndex;
+    int mLineByteS;
+
     QImage * mMainImageP;
 
 signals:

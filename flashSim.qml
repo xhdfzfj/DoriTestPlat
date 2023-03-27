@@ -77,7 +77,7 @@ Item
 
         Rectangle
         {
-            width: parent.width - ( parent.width / 3 )
+            width: parent.width - ( parent.width / 3 ) - 16;
             height: parent.height
             SimFlashDrawControl
             {
@@ -89,7 +89,37 @@ Item
                 MouseArea
                 {
                     anchors.fill: parent
+                    onWheel:
+                    {
+                        //if( wheel.modifiers && Qt.ControlModifier )
+                        //{
+                            if( wheel.angleDelta.y > 0 )
+                            {
+                                console.log("+++++")
+                            }
+                            else
+                            {
+                                console.log( "-----" )
+                            }
+                        //}
+                    }
+                }
+            }
 
+            ScrollBar
+            {
+                id: guiSimFlashScrollBar
+                width: 16;
+                height: parent.height
+                anchors.left: guiSimFlashControl.right
+                opacity: 1
+                visible: true
+                enabled: true
+                orientation: Qt.Vertical
+
+                onPositionChanged:
+                {
+                    guiSimFlashControl.sub_ScrollBarChanage( position );
                 }
             }
         }
@@ -100,5 +130,6 @@ Item
 //        console.log( "guiFlashSimGrid width:", guiFlashSimGrid.width )
 //        console.log( "guiFlashSimGrid height:", guiFlashSimGrid.height )
         guiSimFlashControl.sub_QmlLoadered();
+
     }
 }

@@ -5,6 +5,10 @@ SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedIt
     mFont = QFont( "SimSun", 16 );
     mFontSize = 16;
 
+    mCurrDisplayIndex = 0;
+    mCurrDisplayEndIndex = 0;
+    mLineByteS = 0;
+
     mAddressTableFontColor = Qt::white;
     mAddressTableBackColor = Qt::black;
     mBackColor = Qt::cyan;
@@ -44,7 +48,23 @@ int SimFlashDrawControl::fun_CalcLineDisplayByteS( int pWidth, int pDataDisplayW
 
     _retValue = 0;
 
+    int i, j, _tmpU32Value;
 
+    i = 4;
+    j = 0;
+    _tmpU32Value = i * pDataDisplayWidth + ( i - 1 ) * pAscDisplayWidth + i * pAscDisplayWidth;
+
+    while( _tmpU32Value <= pWidth )
+    {
+        j = i;
+        i *= 2;
+        _tmpU32Value = i * pDataDisplayWidth + ( i - 1 ) * pAscDisplayWidth + i * pAscDisplayWidth;
+    }
+
+    if( j != 0 )
+    {
+        _retValue = j;
+    }
 
     return _retValue;
 }
@@ -76,6 +96,8 @@ void SimFlashDrawControl::sub_DataToImage()
         mMainImageP->fill( mBackColor );
     }
 
+    QPainter _tmpPainter( mMainImageP );
+    int _stringHeight;
     int _SignalDataWidth;
     int _SingleAscWidth;
     int _AddressStringWidth;
@@ -83,6 +105,8 @@ void SimFlashDrawControl::sub_DataToImage()
     QString _testString;
 
     QFontMetrics _tmpFm( mFont );
+
+    _tmpPainter.setFont( mFont );
 
     _testString = "FF";
     _SignalDataWidth = _tmpFm.horizontalAdvance( _testString );
@@ -92,13 +116,77 @@ void SimFlashDrawControl::sub_DataToImage()
     _colonStringWidth = _tmpFm.horizontalAdvance( _testString );
     _testString = "A";
     _SingleAscWidth = _tmpFm.horizontalAdvance( _testString );
+    _stringHeight = _tmpFm.height();
 
-    int _tmpWidth = _width - _AddressStringWidth - _colonStringWidth - 3 - 3;
+    int _tmpWidth = _width - _AddressStringWidth - _colonStringWidth - 3 - 3 - _colonStringWidth;
     int _lineByteS = fun_CalcLineDisplayByteS( _tmpWidth, _SignalDataWidth, _SingleAscWidth  );
 
     if( _lineByteS != 0 )
     {
+        int _x, _y;
+        int i, j;
+        char * _tmpDisplayBufP;
+        char _tmpTransferBuf[ 256 ];
 
+        mLineByteS = _lineByteS;
+
+        _y = 3; //上边间隔
+
+        _tmpDisplayBufP = new char [ _lineByteS ];
+
+        j = 0;
+        _y = 0;
+        while( _y < _height )
+        {
+            _y += _stringHeight;
+            i = fun_GetData( mCurrDisplayIndex + j, _lineByteS, _tmpDisplayBufP );
+            if( i > 0 )
+            {
+                mCurrDisplayEndIndex += i;
+                _x = 3; //左边间隔
+
+                sprintf( _tmpTransferBuf, "%08X", ( mCurrDisplayIndex + j ) );
+                _testString = QString::fromStdString( _tmpTransferBuf );
+                _tmpPainter.drawText( _x, _y, _testString );
+                _x += _SignalDataWidth * 4;
+
+                _testString = ":";
+                _tmpPainter.drawText( _x, _y, _testString );
+                _x += _colonStringWidth;
+
+                for( int z = 0; z < i; z++ )
+                {
+                    sprintf( _tmpTransferBuf, "%02X", ( uint8_t )( _tmpDisplayBufP[ z ] ) );
+                    _testString = QString::fromStdString( _tmpTransferBuf );
+                    _tmpPainter.drawText( _x, _y, _testString );
+                    _x += _SignalDataWidth;
+
+                    _testString = " ";
+                    _tmpPainter.drawText( _x, _y, _testString );
+                    _x += _SingleAscWidth;
+                }
+
+                _x += _colonStringWidth;
+
+                for( int z = 0; z < i; z++ )
+                {
+                    _tmpTransferBuf[ 0 ] = _tmpDisplayBufP[ z ];
+                    _tmpTransferBuf[ 1 ] = 0;
+                    _testString = QString::fromStdString( _tmpTransferBuf );
+                    _tmpPainter.drawText( _x, _y, _testString );
+                    _x += _SingleAscWidth;
+
+                }
+
+            }
+            else
+            {
+                break;
+            }
+            j += i;
+        }
+
+        delete [] _tmpDisplayBufP;
     }
 }
 

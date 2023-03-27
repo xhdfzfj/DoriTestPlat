@@ -4,6 +4,8 @@
 #include "./FlashSimClass.h"
 #include <QQuickItem>
 #include <QQuickPaintedItem>
+#include <QPainter>
+#include <QImage>
 
 class SimFlashDrawControl : public QQuickPaintedItem, public FlashSimClass
 {
@@ -15,6 +17,8 @@ public:
     Q_INVOKABLE void sub_QmlLoadered();
 
 private:
+    void sub_DataToImage();
+    int fun_CalcLineDisplayByteS( int pWidth, int pDataDisplayWidth, int pAscDisplayWidth );
 
     /*********************************
      * 系统重载
@@ -27,6 +31,7 @@ private:
     QFont mFont;
     QColor mAddressTableFontColor;
     QColor mAddressTableBackColor;
+    QColor mBackColor;
 
     QImage * mMainImageP;
 

@@ -5,13 +5,36 @@
 #include <QQuickItem>
 #include <QQuickPaintedItem>
 
-class SimFlashDrawControl : public QQuickPaintedItem, FlashSimClass
+class SimFlashDrawControl : public QQuickPaintedItem, public FlashSimClass
 {
     Q_OBJECT
 public:
-    SimFlashDrawControl();
+    SimFlashDrawControl( QQuickItem * pParent = nullptr );
+    virtual ~SimFlashDrawControl();
+
+    Q_INVOKABLE void sub_QmlLoadered();
+
+private:
+
+    /*********************************
+     * 系统重载
+     * ******************************/
+public:
+    void paint( QPainter *painter ) override;
+
+private:
+    int mFontSize;
+    QFont mFont;
+    QColor mAddressTableFontColor;
+    QColor mAddressTableBackColor;
+
+    QImage * mMainImageP;
 
 signals:
+    void sub_SignalReDraw();
+
+public slots:
+    void sub_SlotReDraw();
 
 };
 

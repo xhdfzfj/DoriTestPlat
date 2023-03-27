@@ -79,7 +79,19 @@ Item
         {
             width: parent.width - ( parent.width / 3 )
             height: parent.height
-            color: "red"
+            SimFlashDrawControl
+            {
+                id:guiSimFlashControl
+                width: parent.width
+                height: parent.height
+                fillColor: "red"
+
+                MouseArea
+                {
+                    anchors.fill: parent
+
+                }
+            }
         }
     }
 
@@ -87,5 +99,6 @@ Item
     {
 //        console.log( "guiFlashSimGrid width:", guiFlashSimGrid.width )
 //        console.log( "guiFlashSimGrid height:", guiFlashSimGrid.height )
+        guiSimFlashControl.sub_QmlLoadered();
     }
 }

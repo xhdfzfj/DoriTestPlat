@@ -24,7 +24,7 @@ Item
             ScrollView
             {
                 topPadding: 8
-                anchors.leftMargin: 12
+                x:10
 
                 ColumnLayout
                 {
@@ -89,19 +89,32 @@ Item
                 MouseArea
                 {
                     anchors.fill: parent
+                    acceptedButtons: Qt.AllButtons
                     onWheel:
                     {
                         //if( wheel.modifiers && Qt.ControlModifier )
                         //{
                             if( wheel.angleDelta.y > 0 )
                             {
-                                console.log("+++++")
+                                guiSimFlashControl.sub_WheelEvent( 1 );
                             }
                             else
                             {
-                                console.log( "-----" )
+                                guiSimFlashControl.sub_WheelEvent( 0 );
                             }
                         //}
+                    }
+
+                    onPositionChanged:
+                    {
+                        //console.log( "X:", mouse.x, "Y:", mouse.y )
+                        guiSimFlashControl.sub_MouseDrag( mouse.x, mouse.y )
+                    }
+
+                    onReleased:
+                    {
+                        console.log( "release" );
+                        guiSimFlashControl.sub_MouseRelease();
                     }
                 }
             }
@@ -125,11 +138,13 @@ Item
         }
     }
 
+
     Component.onCompleted:
     {
 //        console.log( "guiFlashSimGrid width:", guiFlashSimGrid.width )
 //        console.log( "guiFlashSimGrid height:", guiFlashSimGrid.height )
-        guiSimFlashControl.sub_QmlLoadered();
+
+        guiSimFlashControl.sub_QmlLoadered( guiSimFlashScrollBar );
 
     }
 }

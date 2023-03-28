@@ -13,7 +13,7 @@ Window {
 
     onClosing:
     {
-        MainModelObj.sub_ClearSelf();
+        //MainModelObj.sub_ClearSelf();
     }
 
     onWidthChanged:

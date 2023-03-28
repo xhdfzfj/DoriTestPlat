@@ -7,7 +7,7 @@
 FlashSimClass::FlashSimClass()
 {
     mSimFlashSize = 16 * 1024 * 1024;
-
+    //mSimFlashSize = 2 * 1024;
     mSimFlashP = new uint8_t [ mSimFlashSize ];
 
     for( int i = 0; i < mSimFlashSize; i++ )

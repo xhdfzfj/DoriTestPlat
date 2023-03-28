@@ -12,6 +12,8 @@ public:
     FlashSimClass();
     virtual ~FlashSimClass();
 
+    uint32_t GetSimFlashSize() { return mSimFlashSize; }
+
 protected:
     int fun_GetData( int pStartOffset, int pGetCount, char * & pSaveP );
 

@@ -47,5 +47,9 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty( "serialConfigModelInstance", gMainModelObjP->mSerialConfigModelObjP);
     engine.load(url);
 
-    return app.exec();
+    int i = app.exec();
+
+    delete gMainModelObjP;
+
+    return i;
 }

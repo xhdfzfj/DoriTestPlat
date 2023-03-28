@@ -1,8 +1,10 @@
-﻿#include "SimFlashDrawControl.h"
+﻿#include <QQmlProperty>
+#include "SimFlashDrawControl.h"
 
 SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedItem( pParent )
 {
     mFont = QFont( "SimSun", 16 );
+    //mFont.setStyleStrategy( QFont::NoAntialias );
     mFontSize = 16;
 
     mCurrDisplayIndex = 0;
@@ -13,6 +15,13 @@ SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedIt
     mAddressTableBackColor = Qt::black;
     mBackColor = Qt::cyan;
     mMainImageP = nullptr;
+    mScrollBarP = nullptr;
+
+    mStopScrollChanageFlag = false;
+
+    mDragFlag = false;
+    mDragSelectFlag = false;
+    mSaveDragRectImageP = nullptr;
 
     connect( this, SIGNAL( sub_SignalReDraw() ), this, SLOT( sub_SlotReDraw() ), Qt::QueuedConnection );
 
@@ -21,17 +30,125 @@ SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedIt
 
 SimFlashDrawControl::~SimFlashDrawControl()
 {
-
+    if( mMainImageP != nullptr )
+    {
+        delete mMainImageP;
+    }
 }
 
 /**
  * @brief SimFlashDrawControl::sub_QmlLoadered
  *      Qml装载完成
  */
-void SimFlashDrawControl::sub_QmlLoadered()
+void SimFlashDrawControl::sub_QmlLoadered( QObject * pObjectP )
 {
     qDebug() << "simflash width " << width();
+    mScrollBarP = pObjectP;
+    mMainImageP = new QImage( width(), height(), QImage::Format_ARGB32 );
+    mMainImageP->fill( mBackColor );
     sub_DataToImage();
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_ChanageScrollValue
+ */
+void SimFlashDrawControl::sub_ChanageScrollValue()
+{
+    float _tmpValue;
+
+    _tmpValue = ( float )mCurrDisplayIndex / ( float )GetSimFlashSize();
+    mStopScrollChanageFlag = true;
+    QQmlProperty::write( mScrollBarP, "position", _tmpValue );
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_WheelEvent
+ * @param pDirect
+ *      0 代表向下
+ *      1 代表向上
+ */
+void SimFlashDrawControl::sub_WheelEvent( int pDirect )
+{
+    int _tmpValue;
+    int i;
+
+    if( pDirect == 0 )
+    {
+        //向下
+        i = 3;
+        _tmpValue = mCurrDisplayIndex;
+        if( mCurrDisplayEndIndex < GetSimFlashSize() )
+        {
+            _tmpValue += ( i * mLineByteS );
+            while( _tmpValue >= GetSimFlashSize() )
+            {
+                i -= 1;
+                if( i == 0 )
+                {
+                    _tmpValue = 0;
+                    break;
+                }
+                _tmpValue = mCurrDisplayIndex;
+                _tmpValue += ( i * mLineByteS );
+            }
+            if( _tmpValue != 0 )
+            {
+                mCurrDisplayIndex = _tmpValue;
+                sub_ChanageScrollValue();
+                mCurrDisplayEndIndex = 0;
+                mMainImageP->fill( mBackColor );
+                sub_DataToImage();
+                update();
+            }
+        }
+    }
+    else
+    {
+        if( mCurrDisplayIndex > 0 )
+        {
+            i = 3;
+            _tmpValue = mCurrDisplayIndex;
+            _tmpValue -= ( i * mLineByteS );
+            while( _tmpValue < 0 )
+            {
+                i -= 1;
+                if( i == 0 )
+                {
+                    _tmpValue = 0;
+                    break;
+                }
+                _tmpValue = mCurrDisplayIndex;
+                _tmpValue -= ( i * mLineByteS );
+            }
+
+            if( _tmpValue >= 0 )
+            {
+                mCurrDisplayIndex = _tmpValue;
+                sub_ChanageScrollValue();
+                mCurrDisplayEndIndex = 0;
+                mMainImageP->fill( mBackColor );
+                sub_DataToImage();
+                update();
+            }
+        }
+    }
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_ChanageScrollValue
+ * @param pValue
+ */
+void SimFlashDrawControl::sub_ScrollBarChanage( qreal pValue )
+{
+    if( !mStopScrollChanageFlag )
+    {
+
+    }
+    else
+    {
+        //qDebug() << "stop chanage";
+        mStopScrollChanageFlag = false;
+    }
 }
 
 /**
@@ -91,12 +208,15 @@ void SimFlashDrawControl::sub_DataToImage()
         if( ( mMainImageP->width() != _width ) || ( mMainImageP->height() != _height ) )
         {
             delete mMainImageP;
+
+            mMainImageP = new QImage( _width, _height, QImage::Format_ARGB32 );
+            mMainImageP->fill( mBackColor );
         }
-        mMainImageP = new QImage( _width, _height, QImage::Format_ARGB32 );
-        mMainImageP->fill( mBackColor );
     }
 
     QPainter _tmpPainter( mMainImageP );
+    //_tmpPainter.setRenderHint( QPainter::TextAntialiasing, true );
+    //_tmpPainter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing, true );
     int _stringHeight;
     int _SignalDataWidth;
     int _SingleAscWidth;
@@ -177,7 +297,6 @@ void SimFlashDrawControl::sub_DataToImage()
                     _x += _SingleAscWidth;
 
                 }
-
             }
             else
             {
@@ -186,7 +305,120 @@ void SimFlashDrawControl::sub_DataToImage()
             j += i;
         }
 
+        if( mCurrDisplayEndIndex != 0 )
+        {
+            mCurrDisplayEndIndex += mCurrDisplayIndex;
+        }
+
         delete [] _tmpDisplayBufP;
+    }
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_MouseDrag
+ * @param pX
+ * @param pY
+ */
+void SimFlashDrawControl::sub_MouseDrag( qreal pX, qreal pY )
+{
+    int _width, _height;
+
+    if( mMainImageP != nullptr )
+    {
+        QPainter _tmpPainter( mMainImageP );
+        QPen _tmpPen( Qt::red, 2 );
+        _tmpPainter.setPen( _tmpPen );
+
+        _tmpPainter.setRenderHint( QPainter::Antialiasing );
+
+        if( mDragFlag == false )
+        {
+            mDragFlag = true;
+            mCurrMouseX = pX;
+            mCurrMouseY = pY;
+
+            if( mDragSelectFlag )
+            {
+                mSaveDragRectImageP->save( "save.jpg" );
+
+                _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
+
+                mDragSelectFlag = false;
+
+                delete mSaveDragRectImageP;
+                mSaveDragRectImageP = nullptr;
+
+                update( mSaveDragRect );
+            }
+        }
+        else
+        {
+            int _startX, _startY;
+            int _endX, _endY;
+
+            if( pX < mCurrMouseX )
+            {
+                _startX = pX;
+                _endX = mCurrMouseX;
+            }
+            else
+            {
+                _startX = mCurrMouseX;
+                _endX = pX;
+            }
+
+            if( pY < mCurrMouseY )
+            {
+                _startY = pY;
+                _endY = mCurrMouseY;
+            }
+            else
+            {
+                _startY = mCurrMouseY;
+                _endY = pY;
+            }
+
+            _tmpPainter.setRenderHint( QPainter::Antialiasing );
+
+            _width = _endX - _startX;
+            _height = _endY - _startY;
+
+            if( ( _width > 20 ) && ( _height > 20 ) )
+            {
+                QRect _tmpRect( _startX, _startY, _width, _height );
+
+                if( mSaveDragRectImageP != nullptr )
+                {
+                    _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
+                    delete mSaveDragRectImageP;
+                }
+
+                mSaveDragRectImageP = new QImage( _width + 4 , _height + 4, QImage::Format_ARGB32 );
+                mSaveDragRect.setX( _tmpRect.x() - 2 );
+                mSaveDragRect.setY( _tmpRect.y() - 2 );
+                mSaveDragRect.setWidth( _width + 3 );
+                mSaveDragRect.setHeight( _height + 3 );
+                *mSaveDragRectImageP = mMainImageP->copy( _tmpRect.x() - 2, _tmpRect.y() - 2, _width + 3, _height + 3 );
+
+                //mSaveDragRectImageP->save( "save.jpg" );
+
+                _tmpPainter.drawRect( _tmpRect );
+
+                update( mSaveDragRect );
+            }
+        }
+    }
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_MouseRelease
+ */
+void SimFlashDrawControl::sub_MouseRelease()
+{
+    if( mDragFlag )
+    {
+        mDragFlag = false;
+        mDragSelectFlag = true;
     }
 }
 

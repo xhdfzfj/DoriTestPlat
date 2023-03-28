@@ -52,6 +52,7 @@ private:
     qreal mCurrMouseY;
     QImage * mSaveDragRectImageP;
     QRect mSaveDragRect;
+    int mPrevDragWidth;
 
 signals:
     void sub_SignalReDraw();

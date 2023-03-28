@@ -22,6 +22,7 @@ SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedIt
     mDragFlag = false;
     mDragSelectFlag = false;
     mSaveDragRectImageP = nullptr;
+    mPrevDragWidth = 0;
 
     connect( this, SIGNAL( sub_SignalReDraw() ), this, SLOT( sub_SlotReDraw() ), Qt::QueuedConnection );
 
@@ -33,6 +34,11 @@ SimFlashDrawControl::~SimFlashDrawControl()
     if( mMainImageP != nullptr )
     {
         delete mMainImageP;
+    }
+
+    if( mSaveDragRectImageP != nullptr )
+    {
+        delete mSaveDragRectImageP;
     }
 }
 
@@ -327,6 +333,8 @@ void SimFlashDrawControl::sub_MouseDrag( qreal pX, qreal pY )
     {
         QPainter _tmpPainter( mMainImageP );
         QPen _tmpPen( Qt::red, 2 );
+
+        _tmpPainter.begin( mMainImageP );
         _tmpPainter.setPen( _tmpPen );
 
         _tmpPainter.setRenderHint( QPainter::Antialiasing );
@@ -379,34 +387,47 @@ void SimFlashDrawControl::sub_MouseDrag( qreal pX, qreal pY )
             }
 
             _tmpPainter.setRenderHint( QPainter::Antialiasing );
-
             _width = _endX - _startX;
             _height = _endY - _startY;
 
-            if( ( _width > 20 ) && ( _height > 20 ) )
+            if( mSaveDragRectImageP != nullptr )
+            {
+                _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
+                delete mSaveDragRectImageP;
+                mSaveDragRectImageP = nullptr;
+
+//                if( mPrevDragWidth > _width )
+//                {
+//                    update();
+//                    return;
+//                }
+            }
+
+            //if( ( _width > 20 ) && ( _height > 20 ) )
             {
                 QRect _tmpRect( _startX, _startY, _width, _height );
 
-                if( mSaveDragRectImageP != nullptr )
-                {
-                    _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
-                    delete mSaveDragRectImageP;
-                }
-
-                mSaveDragRectImageP = new QImage( _width + 4 , _height + 4, QImage::Format_ARGB32 );
+                mSaveDragRectImageP = new QImage( _width + 6 , _height + 6, QImage::Format_ARGB32 );
                 mSaveDragRect.setX( _tmpRect.x() - 2 );
                 mSaveDragRect.setY( _tmpRect.y() - 2 );
-                mSaveDragRect.setWidth( _width + 3 );
-                mSaveDragRect.setHeight( _height + 3 );
-                *mSaveDragRectImageP = mMainImageP->copy( _tmpRect.x() - 2, _tmpRect.y() - 2, _width + 3, _height + 3 );
-
-                //mSaveDragRectImageP->save( "save.jpg" );
+                mSaveDragRect.setWidth( _width + 4 );
+                mSaveDragRect.setHeight( _height + 4 );
+                *mSaveDragRectImageP = mMainImageP->copy( _tmpRect.x() - 2, _tmpRect.y() - 2, _width + 4, _height + 4 );
 
                 _tmpPainter.drawRect( _tmpRect );
 
-                update( mSaveDragRect );
+//                if( mPrevDragWidth > _width )
+//                {
+//                    mSaveDragRectImageP->save( "save.jpg" );
+//                    _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
+//                }
+
+                mPrevDragWidth = _width;
             }
         }
+
+        _tmpPainter.end();
+        update();
     }
 }
 

@@ -111,10 +111,21 @@ Item
                         guiSimFlashControl.sub_MouseDrag( mouse.x, mouse.y )
                     }
 
+                    onClicked:
+                    {
+                        if( mouse.button === Qt.RightButton )
+                        {
+                            console.log( "mouse right button x:", mouse.x, " y:", mouse.y );
+                        }
+                    }
+
                     onReleased:
                     {
-                        console.log( "release" );
-                        guiSimFlashControl.sub_MouseRelease();
+                        if( mouse.button === Qt.LeftButton )
+                        {
+                            console.log( "release" );
+                            guiSimFlashControl.sub_MouseRelease();
+                        }
                     }
                 }
             }

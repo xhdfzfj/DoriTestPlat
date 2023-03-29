@@ -13,7 +13,7 @@ SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedIt
 
     mAddressTableFontColor = Qt::white;
     mAddressTableBackColor = Qt::black;
-    mBackColor = Qt::cyan;
+    mBackColor = Qt::white;
     mMainImageP = nullptr;
     mScrollBarP = nullptr;
 
@@ -77,6 +77,14 @@ void SimFlashDrawControl::sub_WheelEvent( int pDirect )
 {
     int _tmpValue;
     int i;
+
+    if( mSaveDragRectImageP != nullptr )
+    {
+        delete mSaveDragRectImageP;
+        mSaveDragRectImageP = nullptr;
+        mDragFlag = false;
+        mDragSelectFlag = false;
+    }
 
     if( pDirect == 0 )
     {
@@ -244,7 +252,13 @@ void SimFlashDrawControl::sub_DataToImage()
     _SingleAscWidth = _tmpFm.horizontalAdvance( _testString );
     _stringHeight = _tmpFm.height();
 
-    int _tmpWidth = _width - _AddressStringWidth - _colonStringWidth - 3 - 3 - _colonStringWidth;
+    mFontHeight = _stringHeight;
+    mDataFontWidth = _SignalDataWidth;
+    mColonFontWidth = _colonStringWidth;
+    mSingleAscWidth = _SingleAscWidth;
+    mAddressStringWidth = _AddressStringWidth;
+
+    int _tmpWidth = _width - _AddressStringWidth - _colonStringWidth - mSpaceValue - mSpaceValue - _colonStringWidth;
     int _lineByteS = fun_CalcLineDisplayByteS( _tmpWidth, _SignalDataWidth, _SingleAscWidth  );
 
     if( _lineByteS != 0 )
@@ -256,7 +270,7 @@ void SimFlashDrawControl::sub_DataToImage()
 
         mLineByteS = _lineByteS;
 
-        _y = 3; //上边间隔
+        _y = mSpaceValue; //上边间隔
 
         _tmpDisplayBufP = new char [ _lineByteS ];
 
@@ -269,7 +283,7 @@ void SimFlashDrawControl::sub_DataToImage()
             if( i > 0 )
             {
                 mCurrDisplayEndIndex += i;
-                _x = 3; //左边间隔
+                _x = mSpaceValue; //左边间隔
 
                 sprintf( _tmpTransferBuf, "%08X", ( mCurrDisplayIndex + j ) );
                 _testString = QString::fromStdString( _tmpTransferBuf );
@@ -440,7 +454,128 @@ void SimFlashDrawControl::sub_MouseRelease()
     {
         mDragFlag = false;
         mDragSelectFlag = true;
+
+        sub_AdjustDragSelectRect();
     }
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_AdjustDragSelectRect
+ *
+ */
+void SimFlashDrawControl::sub_AdjustDragSelectRect()
+{
+    QRect _tmpRect;
+
+    _tmpRect = mSaveDragRect;
+    _tmpRect.setX( _tmpRect.x() + 2 );
+    _tmpRect.setY( _tmpRect.y() + 2 );
+    _tmpRect.setWidth( _tmpRect.width() - 4 );
+    _tmpRect.setHeight( _tmpRect.height() - 4 );
+
+    int _wdith = width();
+    int _height = height();
+    int _tmpValue;
+    int _line;
+    int _col;
+    int _endLine;
+    int _endCol;
+
+    int _newX, _newY;
+    int _newEndX, _newEndY;
+
+    _tmpValue = _tmpRect.y() - mSpaceValue;
+    _line = ( _tmpValue ) / mFontHeight;
+
+    if( ( _line * mFontHeight ) < _tmpValue )
+    {
+        _line += 1;
+        if( ( ( _line * mFontHeight ) - _tmpValue ) < 5 )
+        {
+            _line += 1;
+        }
+    }
+    if( _line == 0 )
+    {
+        _line = 1;
+    }
+
+    qDebug() << "select line:" << _line;
+
+    _newY = ( _line - 1 ) * mFontHeight + mSpaceValue + 2;
+    _tmpRect.setY( _newY );
+
+    _tmpValue = _tmpRect.x() - mSpaceValue;
+    _tmpValue -= ( mAddressStringWidth + mColonFontWidth );
+
+    _col = _tmpValue / ( mDataFontWidth + mSingleAscWidth );
+    if( ( _col * ( mDataFontWidth + mSingleAscWidth ) ) < _tmpValue )
+    {
+        _col += 1;
+        if( ( _col * ( mDataFontWidth + mSingleAscWidth ) - mSingleAscWidth ) < _tmpValue )
+        {
+            _col += 1;
+        }
+    }
+    if( _col <= 0 )
+    {
+        _col = 1;
+    }
+    _newX = ( _col - 1 ) * ( mDataFontWidth + mSingleAscWidth ) + ( mAddressStringWidth + mColonFontWidth );
+    _tmpRect.setX( _newX );
+
+    qDebug() << "select col:" << _col;
+
+    _tmpValue = _tmpRect.y() + _tmpRect.height() - mSpaceValue;
+    _endLine = ( _tmpValue + ( mFontHeight / 2 ) ) / mFontHeight;
+    if( _endLine == 0 )
+    {
+        _endLine = 1;
+    }
+
+    qDebug() << "select end line:" << _endLine;
+    _newEndY = _endLine * mFontHeight + mSpaceValue + 2;
+    _tmpRect.setHeight( _newEndY - _newY );
+
+    _tmpValue = _tmpRect.x() + _tmpRect.width() - mSpaceValue;
+    _tmpValue -= ( mAddressStringWidth + mColonFontWidth );
+
+    _endCol = ( _tmpValue + ( ( mDataFontWidth + mSingleAscWidth ) / 2 ) ) / ( mDataFontWidth + mSingleAscWidth );
+    if( _endCol <= 0 )
+    {
+        _endCol = 1;
+    }
+
+    qDebug() << "select end col:" << _endCol;
+    _newEndX = _endCol * ( mDataFontWidth + mSingleAscWidth ) + ( mAddressStringWidth + mColonFontWidth );
+    _tmpRect.setWidth( _newEndX - _newX );
+
+    mSelectRect = _tmpRect;
+
+    QPainter _tmpPainter( mMainImageP );
+    QPen _tmpPen( Qt::darkGreen, 2 );
+    _tmpPainter.setPen( _tmpPen );
+
+    _tmpPainter.begin( mMainImageP );
+
+    if( mSaveDragRectImageP != nullptr )
+    {
+        _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
+        delete mSaveDragRectImageP;
+    }
+
+    mSaveDragRectImageP = new QImage( _tmpRect.width() + 6 , _tmpRect.height() + 6, QImage::Format_ARGB32 );
+    mSaveDragRect.setX( _tmpRect.x() - 2 );
+    mSaveDragRect.setY( _tmpRect.y() - 2 );
+    mSaveDragRect.setWidth( _tmpRect.width() + 4 );
+    mSaveDragRect.setHeight( _tmpRect.height() + 4 );
+    *mSaveDragRectImageP = mMainImageP->copy( _tmpRect.x() - 2, _tmpRect.y() - 2,
+                                              mSaveDragRect.width() + 4, mSaveDragRect.height() + 4 );
+    _tmpPainter.drawRect( _tmpRect );
+
+    _tmpPainter.end();
+
+    update();
 }
 
 /**

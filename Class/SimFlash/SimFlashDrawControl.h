@@ -24,6 +24,7 @@ private:
     void sub_DataToImage();
     int fun_CalcLineDisplayByteS( int pWidth, int pDataDisplayWidth, int pAscDisplayWidth );
     void sub_ChanageScrollValue();
+    void sub_AdjustDragSelectRect();
 
     /*********************************
      * 系统重载
@@ -32,11 +33,17 @@ public:
     void paint( QPainter *painter ) override;
 
 private:
+    const int mSpaceValue = 3;
     int mFontSize;
     QFont mFont;
     QColor mAddressTableFontColor;
     QColor mAddressTableBackColor;
     QColor mBackColor;
+    int mFontHeight;
+    int mDataFontWidth;
+    int mColonFontWidth;
+    int mSingleAscWidth;
+    int mAddressStringWidth;
 
     int mCurrDisplayIndex;
     int mCurrDisplayEndIndex;
@@ -52,6 +59,7 @@ private:
     qreal mCurrMouseY;
     QImage * mSaveDragRectImageP;
     QRect mSaveDragRect;
+    QRect mSelectRect;
     int mPrevDragWidth;
 
 signals:

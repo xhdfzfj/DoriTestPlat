@@ -6,6 +6,8 @@ QT += serialport
 
 SOURCES += \
         Class/FileAnalyseBaseClass.cpp \
+        Class/MenuClass/PrivateMenuClass.cpp \
+        Class/MenuClass/PrivateMenuItemClass.cpp \
         Class/PrivateEventClass.cpp \
         Class/SelfClearInterFaceClass.cpp \
         Class/SimFlash/FlashSimClass.cpp \
@@ -42,6 +44,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     Class/FileAnalyseBaseClass.h \
+    Class/MenuClass/PrivateMenuClass.h \
+    Class/MenuClass/PrivateMenuItemClass.h \
     Class/PrivateEventClass.h \
     Class/SelfClearInterFaceClass.h \
     Class/SimFlash/FlashSimClass.h \

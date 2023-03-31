@@ -89,6 +89,7 @@ Item
                 MouseArea
                 {
                     anchors.fill: parent
+                    propagateComposedEvents:true
                     acceptedButtons: Qt.AllButtons
                     onWheel:
                     {

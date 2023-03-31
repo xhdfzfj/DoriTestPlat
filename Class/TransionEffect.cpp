@@ -1,4 +1,4 @@
-#include "TransionEffect.h"
+﻿#include "TransionEffect.h"
 
 TransionEffect::TransionEffect()
 {
@@ -18,6 +18,19 @@ TransionEffect::~TransionEffect()
             mEffectImageS.pop();
             delete _tmpImageP;
         }
+    }
+
+    if( !mDestoryImageS.empty() )
+    {
+        std::list< QImage * >::iterator _itm;
+
+        for( _itm = mDestoryImageS.begin(); _itm != mDestoryImageS.end(); _itm++ )
+        {
+            _tmpImageP = *_itm;
+            delete _tmpImageP;
+        }
+
+        mDestoryImageS.clear();
     }
 }
 
@@ -52,7 +65,34 @@ QImage * TransionEffect::fun_GetEffectImage()
     {
         _retP = mEffectImageS.front();
         mEffectImageS.pop();
+
+        mDestoryImageS.push_back( _retP );
+
+        if( mDestoryImageS.size() > 50 )
+        {
+            std::list< QImage * >::iterator _itm;
+            QImage * _tmpImageP;
+
+            for( _itm = mDestoryImageS.begin(); _itm != mDestoryImageS.end(); _itm++ )
+            {
+                _tmpImageP = *_itm;
+                delete _tmpImageP;
+            }
+        }
     }
 
     return _retP;
+}
+
+/**
+ * @brief TransionEffect::fun_SetUpLevelInterface
+ * @param pInf
+ * @return
+ */
+bool TransionEffect::fun_SetUpLevelInterface( std::function< int( void * )> pInf )
+{
+    mUpLevelInf = pInf;
+
+    //mUpLevelInf( nullptr );
+    return true;
 }

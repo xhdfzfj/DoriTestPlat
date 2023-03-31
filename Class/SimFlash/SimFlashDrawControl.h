@@ -7,6 +7,8 @@
 #include <QPainter>
 #include <QImage>
 #include <QString>
+#include "../MenuClass/PrivateMenuClass.h"
+#include "../TransionEffect.h"
 
 class SimFlashDrawControl : public QQuickPaintedItem, public FlashSimClass
 {
@@ -23,7 +25,13 @@ public:
     Q_INVOKABLE void sub_MouseLeftButtonClick( qreal pX, qreal pY );
     Q_INVOKABLE void sub_MouseRightButtonClick( qreal pX, qreal pY );
 
-    Q_PROPERTY( QString flashSize READ flashSize WRITE setFlashSize NOTIFY flashSizeChanaged );
+    Q_PROPERTY( QString flashSize READ flashSize WRITE setFlashSize NOTIFY flashSizeChanaged )
+
+    int fun_LowLevelInterface( void * );
+
+
+    void hoverMoveEvent( QHoverEvent * event );
+
 
 private:
     void sub_DataToImage();
@@ -91,9 +99,13 @@ private:
     QRect mSelectRect;
     int mPrevDragWidth;
 
+    TransionEffect * mEffectObjP;
+    PrivateMenuClass * mContentMenuP;
+    QRect * mContentItemRectP;
+    int mContentItemRectCount;
+
 signals:
     void sub_SignalReDraw();
-    void SingalTest();
     void flashSizeChanaged();
 
 public slots:

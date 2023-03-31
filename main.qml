@@ -249,6 +249,10 @@ Window {
                     {
 
                     }
+                    else
+                    {
+
+                    }
                 }
             }
 
@@ -329,4 +333,5 @@ Window {
             guiLoader.source = "flashSim.qml"
         }
     }
+
 }

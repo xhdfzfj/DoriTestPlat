@@ -43,7 +43,7 @@ Item
                             id: guiFlashSimSize
                             Layout.alignment: Qt.AlignCenter
                             font.pixelSize: 22
-                            text: "16"
+                            text: guiSimFlashControl.flashSize
                             background: Rectangle
                             {
                                 color:"ghostwhite"
@@ -108,7 +108,9 @@ Item
                     onPositionChanged:
                     {
                         //console.log( "X:", mouse.x, "Y:", mouse.y )
+
                         guiSimFlashControl.sub_MouseDrag( mouse.x, mouse.y )
+
                     }
 
                     onClicked:
@@ -116,6 +118,20 @@ Item
                         if( mouse.button === Qt.RightButton )
                         {
                             console.log( "mouse right button x:", mouse.x, " y:", mouse.y );
+                            guiSimFlashControl.sub_MouseRightButtonClick( mouse.x, mouse.y )
+                        }
+
+                        if( mouse.button === Qt.LeftButton )
+                        {
+                            //guiSimFlashControl.sub_MouseLeftButtonClick( mouse.x, mouse.y )
+                        }
+                    }
+
+                    onPressed:
+                    {
+                        if( mouse.button === Qt.LeftButton )
+                        {
+                            guiSimFlashControl.sub_MouseLeftButtonClick( mouse.x, mouse.y )
                         }
                     }
 

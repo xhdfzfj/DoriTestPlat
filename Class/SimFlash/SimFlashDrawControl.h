@@ -6,12 +6,13 @@
 #include <QQuickPaintedItem>
 #include <QPainter>
 #include <QImage>
+#include <QString>
 
 class SimFlashDrawControl : public QQuickPaintedItem, public FlashSimClass
 {
     Q_OBJECT
 public:
-    SimFlashDrawControl( QQuickItem * pParent = nullptr );
+    explicit SimFlashDrawControl( QQuickItem * pParent = nullptr );
     virtual ~SimFlashDrawControl();
 
     Q_INVOKABLE void sub_QmlLoadered( QObject * pObjectP );
@@ -19,12 +20,40 @@ public:
     Q_INVOKABLE void sub_ScrollBarChanage( qreal pValue );
     Q_INVOKABLE void sub_MouseDrag( qreal pX, qreal pY );
     Q_INVOKABLE void sub_MouseRelease();
+    Q_INVOKABLE void sub_MouseLeftButtonClick( qreal pX, qreal pY );
+    Q_INVOKABLE void sub_MouseRightButtonClick( qreal pX, qreal pY );
+
+    Q_PROPERTY( QString flashSize READ flashSize WRITE setFlashSize NOTIFY flashSizeChanaged );
 
 private:
     void sub_DataToImage();
     int fun_CalcLineDisplayByteS( int pWidth, int pDataDisplayWidth, int pAscDisplayWidth );
     void sub_ChanageScrollValue();
     void sub_AdjustDragSelectRect();
+
+public:
+    QString flashSize()
+    {
+        int _tmpValue;
+        QString _retStr;
+
+        _tmpValue = ( int )GetSimFlashSize();
+
+        _retStr = QString::number( _tmpValue );
+        return _retStr;
+    }
+
+    void setFlashSize( QString pValue )
+    {
+        int _tmpValue;
+
+        _tmpValue = pValue.toInt();
+
+        //
+        //未编码
+        //
+        emit flashSizeChanaged();
+    }
 
     /*********************************
      * 系统重载
@@ -64,6 +93,8 @@ private:
 
 signals:
     void sub_SignalReDraw();
+    void SingalTest();
+    void flashSizeChanaged();
 
 public slots:
     void sub_SlotReDraw();

@@ -12,6 +12,7 @@ SOURCES += \
         Class/SimFlash/SimFlashDrawControl.cpp \
         Class/SpiCaptureDataClass.cpp \
         Class/SpiCmdInfoClass.cpp \
+        Class/TransionEffect.cpp \
         Control/GuiDrawControl.cpp \
         Control/HexDataClass.cpp \
         Model/LogViewModel.cpp \
@@ -47,6 +48,7 @@ HEADERS += \
     Class/SimFlash/SimFlashDrawControl.h \
     Class/SpiCaptureDataClass.h \
     Class/SpiCmdInfoClass.h \
+    Class/TransionEffect.h \
     Control/GuiDrawControl.h \
     Control/HexDataClass.h \
     Include/CommonStruct.h \

@@ -335,6 +335,62 @@ void SimFlashDrawControl::sub_DataToImage()
 }
 
 /**
+ * @brief SimFlashDrawControl::sub_MouseLeftButtonClick
+ */
+void SimFlashDrawControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
+{
+    if( mDragFlag == false )
+    {
+        QPainter _tmpPainter( mMainImageP );
+        QPen _tmpPen( Qt::red, 2 );
+
+        _tmpPainter.setPen( _tmpPen );
+
+        _tmpPainter.setRenderHint( QPainter::Antialiasing );
+        mDragFlag = true;
+
+        mCurrMouseX = pX;
+        mCurrMouseY = pY;
+
+        if( mDragSelectFlag )
+        {
+            //mSaveDragRectImageP->save( "save.jpg" );
+
+            _tmpPainter.begin( mMainImageP );
+
+            _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
+
+            _tmpPainter.end();
+
+            mDragSelectFlag = false;
+
+            delete mSaveDragRectImageP;
+            mSaveDragRectImageP = nullptr;
+
+            update( mSaveDragRect );
+        }
+    }
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_MouseRightButtonClick
+ * @param pX
+ * @param pY
+ */
+void SimFlashDrawControl::sub_MouseRightButtonClick( qreal pX, qreal pY )
+{
+    if( mDragSelectFlag )
+    {
+        QPoint _tmpPoint( pX, pY );
+
+        if( mSelectRect.contains( _tmpPoint ) )
+        {
+            qDebug() << "point in select rect";
+        }
+    }
+}
+
+/**
  * @brief SimFlashDrawControl::sub_MouseDrag
  * @param pX
  * @param pY
@@ -343,38 +399,18 @@ void SimFlashDrawControl::sub_MouseDrag( qreal pX, qreal pY )
 {
     int _width, _height;
 
-    if( mMainImageP != nullptr )
+    if( mDragFlag )
     {
-        QPainter _tmpPainter( mMainImageP );
-        QPen _tmpPen( Qt::red, 2 );
-
-        _tmpPainter.begin( mMainImageP );
-        _tmpPainter.setPen( _tmpPen );
-
-        _tmpPainter.setRenderHint( QPainter::Antialiasing );
-
-        if( mDragFlag == false )
+        if( mMainImageP != nullptr )
         {
-            mDragFlag = true;
-            mCurrMouseX = pX;
-            mCurrMouseY = pY;
+            QPainter _tmpPainter( mMainImageP );
+            QPen _tmpPen( Qt::red, 2 );
 
-            if( mDragSelectFlag )
-            {
-                mSaveDragRectImageP->save( "save.jpg" );
+            _tmpPainter.begin( mMainImageP );
+            _tmpPainter.setPen( _tmpPen );
 
-                _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
+            _tmpPainter.setRenderHint( QPainter::Antialiasing );
 
-                mDragSelectFlag = false;
-
-                delete mSaveDragRectImageP;
-                mSaveDragRectImageP = nullptr;
-
-                update( mSaveDragRect );
-            }
-        }
-        else
-        {
             int _startX, _startY;
             int _endX, _endY;
 
@@ -410,11 +446,11 @@ void SimFlashDrawControl::sub_MouseDrag( qreal pX, qreal pY )
                 delete mSaveDragRectImageP;
                 mSaveDragRectImageP = nullptr;
 
-//                if( mPrevDragWidth > _width )
-//                {
-//                    update();
-//                    return;
-//                }
+    //                if( mPrevDragWidth > _width )
+    //                {
+    //                    update();
+    //                    return;
+    //                }
             }
 
             //if( ( _width > 20 ) && ( _height > 20 ) )
@@ -430,18 +466,18 @@ void SimFlashDrawControl::sub_MouseDrag( qreal pX, qreal pY )
 
                 _tmpPainter.drawRect( _tmpRect );
 
-//                if( mPrevDragWidth > _width )
-//                {
-//                    mSaveDragRectImageP->save( "save.jpg" );
-//                    _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
-//                }
+    //                if( mPrevDragWidth > _width )
+    //                {
+    //                    mSaveDragRectImageP->save( "save.jpg" );
+    //                    _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
+    //                }
 
                 mPrevDragWidth = _width;
             }
-        }
 
-        _tmpPainter.end();
-        update();
+            _tmpPainter.end();
+            update();
+        }
     }
 }
 

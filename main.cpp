@@ -6,8 +6,8 @@
 #include <QTranslator>
 
 #include "./Control/GuiDrawControl.h"
-#include "Model/MainModelClass.h"
-#include "Class/SimFlash/SimFlashDrawControl.h"
+#include "./Model/MainModelClass.h"
+#include "./Class/SimFlash/SimFlashDrawControl.h"
 
 MainModelClass * gMainModelObjP;
 

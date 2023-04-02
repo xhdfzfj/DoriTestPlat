@@ -16,6 +16,7 @@ public:
 
 protected:
     int fun_GetData( int pStartOffset, int pGetCount, char * & pSaveP );
+    int fun_SetData( int pStartOffset, int pSetCount, char * pDataBufP );
 
 private:
     uint8_t * mSimFlashP;

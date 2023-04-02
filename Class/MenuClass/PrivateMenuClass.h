@@ -21,6 +21,8 @@ public:
     QRect * fun_GetDisplayMenuItemRect( int & pCount );
     void sub_SetSelectItem( int pIndex );
 
+    int GetSelectIndex() { return mSelectIndex; }
+
 private:
     QFont mFont;
     int mFontSize;

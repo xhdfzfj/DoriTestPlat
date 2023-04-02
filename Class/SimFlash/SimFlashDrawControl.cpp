@@ -1,5 +1,6 @@
 ﻿#include <QQmlProperty>
 #include "SimFlashDrawControl.h"
+#include "../PrivateEventClass.h"
 
 SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedItem( pParent )
 {
@@ -37,6 +38,10 @@ SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedIt
 
     mContentMenuP->sub_AddMenuItem( "设置内容" );
     mContentMenuP->sub_AddMenuItem( "重置内容" );
+    mContentMenuP->sub_AddMenuItem( "测试菜单1" );
+    mContentMenuP->sub_AddMenuItem( "测试菜单2" );
+    mContentMenuP->sub_AddMenuItem( "测试菜单3" );
+    mContentMenuP->sub_AddMenuItem( "测试菜单4" );
 
     mContentItemRectCount = 0;
     mContentItemRectP = nullptr;
@@ -60,6 +65,11 @@ SimFlashDrawControl::~SimFlashDrawControl()
 
     delete mEffectObjP;
     delete mContentMenuP;
+
+    if( mContentItemRectP != nullptr )
+    {
+        delete [] mContentItemRectP;
+    }
 }
 
 /**
@@ -377,6 +387,14 @@ void SimFlashDrawControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
         {
             //mSaveDragRectImageP->save( "save.jpg" );
 
+            mContentMenuP->sub_SetDisplayPoint( QPoint( -1, -1 ) );
+            if( mContentItemRectCount != 0 )
+            {
+                delete [] mContentItemRectP;
+                mContentItemRectP = nullptr;
+                mContentItemRectCount = 0;
+            }
+
             _tmpPainter.begin( mMainImageP );
 
             _tmpPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
@@ -409,6 +427,8 @@ void SimFlashDrawControl::sub_MouseRightButtonClick( qreal pX, qreal pY )
             mContentMenuP->sub_SetDisplayPoint( _tmpPoint );
 
             mContentItemRectP = mContentMenuP->fun_GetDisplayMenuItemRect( mContentItemRectCount );
+
+            mEffectObjP->fun_CreateEffect( mMainImageP, mContentMenuP->GetMenuImage(), _tmpPoint, 10, 1, 60 );
 
             update();
         }
@@ -644,16 +664,28 @@ void SimFlashDrawControl::sub_AdjustDragSelectRect()
  */
 void SimFlashDrawControl::sub_SlotReDraw()
 {
-
+    update();
 }
 
 /**
  * @brief SimFlashDrawControl::fun_LowLevelInterface
  * @return
  */
-int SimFlashDrawControl::fun_LowLevelInterface( void * )
+int SimFlashDrawControl::fun_LowLevelInterface( void * pParamP )
 {
     qDebug() << "low level interface";
+
+    PrivateEventClass * _tmpEventP;
+
+    _tmpEventP = ( PrivateEventClass * )pParamP;
+    if( _tmpEventP->mEventType_e == EventType_e::GuiTransionEffect )
+    {
+        delete _tmpEventP;
+
+        emit sub_SignalReDraw();
+    }
+
+    return 1;
 }
 
 
@@ -696,7 +728,10 @@ void SimFlashDrawControl::paint( QPainter * pPainter )
     }
 }
 
-
+/**
+ * @brief SimFlashDrawControl::hoverMoveEvent
+ * @param pEventP
+ */
 void SimFlashDrawControl::hoverMoveEvent( QHoverEvent * pEventP )
 {
     QRect _tmpRect;
@@ -706,7 +741,7 @@ void SimFlashDrawControl::hoverMoveEvent( QHoverEvent * pEventP )
 
         QPoint _tmpPoint = pEventP->pos();
 
-        qDebug() << "hover x:" << _tmpPoint.x();
+        //qDebug() << "hover x:" << _tmpPoint.x();
 
         if( ( mContentItemRectCount != 0 ) && ( mContentItemRectP != nullptr ) )
         {
@@ -715,7 +750,13 @@ void SimFlashDrawControl::hoverMoveEvent( QHoverEvent * pEventP )
                 _tmpRect = mContentItemRectP[ i ];
                 if( _tmpRect.contains( _tmpPoint ) )
                 {
-                    mContentMenuP->sub_SetSelectItem( i );
+                    if( mContentMenuP->GetSelectIndex() != i )
+                    {
+                        mContentMenuP->sub_SetSelectItem( i );
+
+                        qDebug() << "hover select:" << i;
+                        update();
+                    }
                     break;
                 }
             }

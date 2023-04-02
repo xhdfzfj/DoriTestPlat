@@ -59,7 +59,7 @@ void PrivateMenuClass::sub_AddMenuItem( QString pMenuName )
     if( mMenuRect == QRect( -1, -1, -1, -1 ) )
     {
         mMenuRect = QRect( 0, 0, _width, _height + 5 + 5 );
-        _tmpRect = QRect( 5, _height, _width, _height + 5 + 5 );
+        _tmpRect = QRect( 5, 5, _width - 5 - 5, _height );
         _tmpMenuItemP = new PrivateMenuItemClass( pMenuName, _tmpRect );
     }
     else
@@ -71,7 +71,7 @@ void PrivateMenuClass::sub_AddMenuItem( QString pMenuName )
 
         _rectHeight = mMenuRect.height();
 
-        _tmpRect = QRect( 5, _rectHeight + _height, mMenuRect.width(), _rectHeight + 5 + _height );
+        _tmpRect = QRect( 5, _rectHeight, mMenuRect.width() - 5 - 5, _height );
 
         _tmpMenuItemP = new PrivateMenuItemClass( pMenuName, _tmpRect );
 
@@ -103,7 +103,16 @@ void PrivateMenuClass::sub_SetDisplayPoint( QPoint pPoint )
 
         sub_DrawMenuItem();
     }
+    else
+    {
+        if( mMenuImageP != nullptr )
+        {
+            delete mMenuImageP;
+            mMenuImageP = nullptr;
+        }
+    }
     mDisplayPoint = pPoint;
+    mSelectIndex = -1;
 }
 
 /**
@@ -132,7 +141,9 @@ void PrivateMenuClass::sub_DrawMenuItem()
         _tmpPen.setColor( _tmpColor );
         _tmpPainter.setPen( _tmpPen );
 
-        _tmpPainter.drawText( _tmpRect.x(), _tmpRect.y(), _tmpItemP->GetMenuItemName() );
+        //_tmpPainter.fillRect( _tmpRect, QBrush( Qt::blue ) );
+        _tmpPainter.drawText( _tmpRect.x(), _tmpRect.y() + _tmpRect.height() - 5, _tmpItemP->GetMenuItemName() );
+
     }
     _tmpPainter.end();
 }
@@ -165,8 +176,13 @@ QRect * PrivateMenuClass::fun_GetDisplayMenuItemRect( int & pRetCount )
             _tmpItmP = *_Itm;
             _retRectArrayP[ i ] = _tmpItmP->GetItemRect();
 
+            int _width = _retRectArrayP[ i ].width();
+            int _height = _retRectArrayP[ i ].height();
+
             _retRectArrayP[ i ].setX( _retRectArrayP[ i ].x() + mDisplayPoint.x() );
             _retRectArrayP[ i ].setY( _retRectArrayP[ i ].y() + mDisplayPoint.y() );
+            _retRectArrayP[ i ].setWidth( _width );
+            _retRectArrayP[ i ].setHeight( _height );
             i += 1;
         }
     }
@@ -180,5 +196,46 @@ QRect * PrivateMenuClass::fun_GetDisplayMenuItemRect( int & pRetCount )
  */
 void PrivateMenuClass::sub_SetSelectItem( int pIndex )
 {
+    if( pIndex != -1 )
+    {
+        mSelectIndex = pIndex;
 
+        PrivateMenuItemClass * _itemP;
+        int i = 0;
+        std::list< PrivateMenuItemClass * >::iterator _itm;
+        for( _itm = mItemS.begin(); _itm != mItemS.end(); _itm++ )
+        {
+            if( i == mSelectIndex )
+            {
+                _itemP = *_itm;
+
+                mMenuImageP->fill( mColor );
+
+                sub_DrawMenuItem();
+
+                QBrush _tmpBrush( Qt::blue );
+                QPen _tmpPen( Qt::blue, 2 );
+                QRect _tmpRect;
+                QColor _tmpColor;
+                QPainter _tmpPainter( mMenuImageP );
+
+                _tmpRect = _itemP->GetItemRect();
+
+                _tmpPainter.begin( mMenuImageP );
+
+                _tmpPainter.setPen( _tmpPen );
+                _tmpPainter.fillRect( _tmpRect, _tmpBrush );
+
+                _tmpColor = _itemP->GetFrontColor();
+                _tmpPen.setColor( _tmpColor );
+                _tmpPainter.setPen( _tmpPen );
+
+                _tmpPainter.drawText( _tmpRect.x(), _tmpRect.y() + _tmpRect.height() - 5, _itemP->GetMenuItemName() );
+                _tmpPainter.end();
+
+                break;
+            }
+            i += 1;
+        }
+    }
 }

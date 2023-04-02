@@ -7,8 +7,8 @@
 #include <QPainter>
 #include <QImage>
 #include <QString>
-#include "../MenuClass/PrivateMenuClass.h"
 #include "../TransionEffect.h"
+#include "../MenuClass/PrivateMenuClass.h"
 
 class SimFlashDrawControl : public QQuickPaintedItem, public FlashSimClass
 {
@@ -30,7 +30,7 @@ public:
     int fun_LowLevelInterface( void * );
 
 
-    void hoverMoveEvent( QHoverEvent * event );
+    void hoverMoveEvent( QHoverEvent * event ) override;
 
 
 private:
@@ -100,6 +100,7 @@ private:
     int mPrevDragWidth;
 
     TransionEffect * mEffectObjP;
+
     PrivateMenuClass * mContentMenuP;
     QRect * mContentItemRectP;
     int mContentItemRectCount;

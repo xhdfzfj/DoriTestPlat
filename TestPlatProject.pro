@@ -5,6 +5,7 @@ QT += serialport
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        Class/AsyncTimerClass.cpp \
         Class/FileAnalyseBaseClass.cpp \
         Class/MenuClass/PrivateMenuClass.cpp \
         Class/MenuClass/PrivateMenuItemClass.cpp \
@@ -43,6 +44,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    Class/AsyncTimerClass.h \
     Class/FileAnalyseBaseClass.h \
     Class/MenuClass/PrivateMenuClass.h \
     Class/MenuClass/PrivateMenuItemClass.h \

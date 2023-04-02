@@ -63,3 +63,31 @@ int FlashSimClass::fun_GetData( int pStartOffset, int pGetCount, char * & pSaveP
 
     return _retValue;
 }
+
+/**
+ * @brief FlashSimClass::fun_SetData
+ * @param pStartOffset
+ * @param pSetCount
+ * @param pDataBufP
+ * @return
+ */
+int FlashSimClass::fun_SetData( int pStartOffset, int pSetCount, char * pDataBufP )
+{
+    int _retValue;
+    int _tmpValue;
+
+    _tmpValue = pStartOffset + pSetCount;
+    if( _tmpValue > mSimFlashSize )
+    {
+        _tmpValue = mSimFlashSize - pStartOffset;
+    }
+    else
+    {
+        _tmpValue = pSetCount;
+    }
+
+    memcpy( &mSimFlashP[ pStartOffset ], pDataBufP, _tmpValue );
+    _retValue = _tmpValue;
+
+    return _retValue;
+}

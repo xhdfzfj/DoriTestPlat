@@ -11,11 +11,6 @@ Window {
     title: qsTr("功能测试软件")
     id:guiMainWindow
 
-    onClosing:
-    {
-        //MainModelObj.sub_ClearSelf();
-    }
-
     onWidthChanged:
     {
         console.log( "onWidthChanged:", guiMainWindow.width );
@@ -32,73 +27,74 @@ Window {
     {
         id:guiMainGrid
         anchors.fill: parent
-        rows: 2 //行数
+        rows: 3 //行数
         spacing: 3
         Rectangle
         {
             width: parent.width
             height: 60
+            border.width: 2
+            border.color:"darkgray"
             //color:"red"
 
-            Button
-            {
-                anchors.verticalCenter: parent.verticalCenter
-                x:3
-                width:80
-                text:serialConfigModelInstance.serialStatus === 0?qsTr( "打开串口" ):qsTr( "关闭串口" )
-                id:guiOpenComBut
+//            Button
+//            {
+//                anchors.verticalCenter: parent.verticalCenter
+//                x:3
+//                width:80
+//                text:serialConfigModelInstance.serialStatus === 0?qsTr( "打开串口" ):qsTr( "关闭串口" )
+//                id:guiOpenComBut
 
-                onClicked:
-                {
-                    MainModelObj.sub_OpenSerialPortClick( this.text );
-                }
-            }
+//                onClicked:
+//                {
+//                    MainModelObj.sub_OpenSerialPortClick( this.text );
+//                }
+//            }
 
-            ComboBox
-            {
-                anchors.top:guiOpenComBut.top
-                anchors.left: guiOpenComBut.right
-                anchors.leftMargin: 3
-                id:serialNumComboBox
-                width:80
-                model: serialConfigModelInstance.serialNumList
-                currentIndex: 1
-                onCurrentIndexChanged:
-                {
-                    serialConfigModelInstance.onSerialComboBoxSelect(currentIndex)
-                    if(currentIndex == 0)
-                    {
-                        currentIndex = 1;
-                    }
-                }
-                Component.onCompleted:
-                {
-                    onCurrentIndexChanged(currentIndex);
-                }
-            }
+//            ComboBox
+//            {
+//                anchors.top:guiOpenComBut.top
+//                anchors.left: guiOpenComBut.right
+//                anchors.leftMargin: 3
+//                id:serialNumComboBox
+//                width:80
+//                model: serialConfigModelInstance.serialNumList
+//                currentIndex: 1
+//                onCurrentIndexChanged:
+//                {
+//                    serialConfigModelInstance.onSerialComboBoxSelect(currentIndex)
+//                    if(currentIndex == 0)
+//                    {
+//                        currentIndex = 1;
+//                    }
+//                }
+//                Component.onCompleted:
+//                {
+//                    onCurrentIndexChanged(currentIndex);
+//                }
+//            }
 
-            ComboBox
-            {
-                anchors.top:serialNumComboBox.top
-                anchors.left: serialNumComboBox.right
-                anchors.leftMargin: 3
-                id:baudComboBox
-                width:80
-                model: serialConfigModelInstance.baudList
-                currentIndex:0
-                onCurrentIndexChanged: serialConfigModelInstance.onBaudComboBoxSelect(currentIndex)
-                Component.onCompleted:
-                {
-                    onCurrentIndexChanged(currentIndex);
-                }
-            }
+//            ComboBox
+//            {
+//                anchors.top:serialNumComboBox.top
+//                anchors.left: serialNumComboBox.right
+//                anchors.leftMargin: 3
+//                id:baudComboBox
+//                width:80
+//                model: serialConfigModelInstance.baudList
+//                currentIndex:0
+//                onCurrentIndexChanged: serialConfigModelInstance.onBaudComboBoxSelect(currentIndex)
+//                Component.onCompleted:
+//                {
+//                    onCurrentIndexChanged(currentIndex);
+//                }
+//            }
 
             Button
             {
                 text:qsTr( "分析SPI数据" )
-                anchors.top:baudComboBox.top
-                anchors.left: baudComboBox.right
-                anchors.leftMargin: 3
+                anchors.verticalCenter: parent.verticalCenter
+                x:6
                 width:100
                 id:guiAnalyseSpiBut
                 onClicked:
@@ -145,11 +141,24 @@ Window {
             }
         }
 
+        ScrollView
+        {
+            id:guiComSetup
+            width: parent.width
+            height: 160
+            Item
+            {
+                width:parent.width;
+                height: 2300
+
+            }
+        }
+
         Grid
         {
             id:guiDiplayAndInfoGrid
             width: parent.width
-            height: parent.height - 60
+            height: parent.height - 200
             columns: 2
 
             //LOG显示部份
@@ -157,6 +166,8 @@ Window {
             {
                 width: parent.width / 3
                 height: parent.height
+                border.width: 2
+                border.color: "darkslategray"
                 //color:"red"
                 TableView
                 {

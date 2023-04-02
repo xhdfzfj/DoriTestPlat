@@ -9,6 +9,7 @@ typedef enum __EventType_e
     SpiCmdInfoType,
     HexDataDisplayType,
     ReDrawHexData,
+    GuiTransionEffect,
 }EventType_e;
 
 typedef enum __DataType_e
@@ -20,6 +21,7 @@ typedef enum __DataType_e
 typedef enum __Sender_e
 {
     SpiCapture,
+    TransionEffector,
 }Sender_e;
 
 typedef enum __FreeParamType_e

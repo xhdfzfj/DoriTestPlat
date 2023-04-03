@@ -95,8 +95,6 @@ QImage * TransionEffect::fun_GetEffectImage()
         _retP = mEffectImageS.front();
         mEffectImageS.pop();
 
-        mDestoryImageS.push_back( _retP );
-
         PrivateEventClass * _tmpEventObjP = new PrivateEventClass( EventType_e::GuiTransionEffect, DataType_e::StringType, "");
         AsyncTimerClass * _tmpAsync = new AsyncTimerClass( mWaitMilliSecond, mUpLevelInf, ( void * )_tmpEventObjP );
 
@@ -113,8 +111,10 @@ QImage * TransionEffect::fun_GetEffectImage()
                 delete _tmpImageP;
             }
 
-            mDestoryImageS.clear();
+            mDestoryImageS.clear(); 
         }
+
+        mDestoryImageS.push_back( _retP );
     }
 
     return _retP;

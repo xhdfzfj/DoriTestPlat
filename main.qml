@@ -22,6 +22,7 @@ Window {
     }
 
     property int workState: 0   //1:spi分析 2:通用的内存显示
+    property int serialAddIndex : 0
 
     Grid
     {
@@ -128,15 +129,34 @@ Window {
 
             Button
             {
-                text:qsTr( "测试按键" )
+                id:guiAddComSetupBut
+                text:qsTr( "新增串口设置" )
                 anchors.top:guiFlashSimBut.top
                 anchors.left: guiFlashSimBut.right
+                anchors.leftMargin: 3
+                width:120
+                onClicked:
+                {
+                    serialAddIndex += 1;
+                    if( serialAddIndex < listItems.length )
+                    {
+                        guiDynamicComSetupModel.append( {"_id": serialAddIndex + 1, "_text":listItems[ serialAddIndex ] } )
+                    }
+                }
+            }
+
+            Button
+            {
+                text:qsTr( "测试按键" )
+                anchors.top:guiAddComSetupBut.top
+                anchors.left: guiAddComSetupBut.right
                 anchors.leftMargin: 30
                 width:100
                 id:guiTestBut
                 onClicked:
                 {
                     onTestButClick()
+
                 }
             }
         }
@@ -146,10 +166,79 @@ Window {
             id:guiComSetup
             width: parent.width
             height: 160
-            Item
+            ListView
             {
-                width:parent.width;
-                height: 2300
+                id:guiComSetupListView
+                model:guiDynamicComSetupModel
+                clip:true
+                width:parent.width
+                height:guiComSetupListView.contentHeight
+                delegate:Row
+                {
+                    width:parent.width
+                    height:50
+                    Text
+                    {
+                        id:guiComSetupName
+                        text:_text
+
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    ComboBox
+                    {
+                        id:serialNumComboBox
+
+                        width:120
+                        model: serialConfigModelInstance.serialNumList
+                        currentIndex: 1
+                        onCurrentIndexChanged:
+                        {
+                            serialConfigModelInstance.onSerialComboBoxSelect(currentIndex)
+                            if(currentIndex == 0)
+                            {
+                                currentIndex = 1;
+                            }
+                        }
+                        Component.onCompleted:
+                        {
+                            onCurrentIndexChanged(currentIndex);
+                        }
+                    }
+
+                    Text
+                    {
+
+                        text:qstr( "波特率:" )
+
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    ComboBox
+                    {
+                        id:baudComboBox
+
+                        width:120
+
+                        model: serialConfigModelInstance.baudList
+                        currentIndex:0
+                        onCurrentIndexChanged: serialConfigModelInstance.onBaudComboBoxSelect(currentIndex)
+                        Component.onCompleted:
+                        {
+                            onCurrentIndexChanged(currentIndex);
+                        }
+                    }
+                    Button
+                    {
+                        text:serialConfigModelInstance.serialStatus === 0?qsTr( "打开串口" ):qsTr( "关闭串口" )
+                        id:guiOpenComBut
+
+                        onClicked:
+                        {
+                            MainModelObj.sub_OpenSerialPortClick( this.text );
+                        }
+                    }
+                }
 
             }
         }
@@ -343,6 +432,23 @@ Window {
         {
             guiLoader.source = "flashSim.qml"
         }
+    }
+
+    property var listItems:
+    [
+        "模拟GPRS串口:",
+        "模拟FLASH串口:",
+    ]
+
+    ListModel
+    {
+        id:guiDynamicComSetupModel
+        ListElement
+        {
+            _id:1
+            _text:"模拟GPRS串口:"
+        }
+
     }
 
 }

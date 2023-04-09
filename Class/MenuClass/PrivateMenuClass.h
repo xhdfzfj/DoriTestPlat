@@ -22,6 +22,7 @@ public:
     void sub_SetSelectItem( int pIndex );
 
     int GetSelectIndex() { return mSelectIndex; }
+    bool isDisplay()    { return mMenuDisplayFlag; }
 
 private:
     QFont mFont;
@@ -32,6 +33,7 @@ private:
     QImage * mMenuImageP;
     std::list< PrivateMenuItemClass * > mItemS;
     int mSelectIndex;
+    bool mMenuDisplayFlag;
 
     void sub_DrawMenuItem();
 

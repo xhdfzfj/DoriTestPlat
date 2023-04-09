@@ -36,60 +36,6 @@ Window {
             height: 60
             border.width: 2
             border.color:"darkgray"
-            //color:"red"
-
-//            Button
-//            {
-//                anchors.verticalCenter: parent.verticalCenter
-//                x:3
-//                width:80
-//                text:serialConfigModelInstance.serialStatus === 0?qsTr( "打开串口" ):qsTr( "关闭串口" )
-//                id:guiOpenComBut
-
-//                onClicked:
-//                {
-//                    MainModelObj.sub_OpenSerialPortClick( this.text );
-//                }
-//            }
-
-//            ComboBox
-//            {
-//                anchors.top:guiOpenComBut.top
-//                anchors.left: guiOpenComBut.right
-//                anchors.leftMargin: 3
-//                id:serialNumComboBox
-//                width:80
-//                model: serialConfigModelInstance.serialNumList
-//                currentIndex: 1
-//                onCurrentIndexChanged:
-//                {
-//                    serialConfigModelInstance.onSerialComboBoxSelect(currentIndex)
-//                    if(currentIndex == 0)
-//                    {
-//                        currentIndex = 1;
-//                    }
-//                }
-//                Component.onCompleted:
-//                {
-//                    onCurrentIndexChanged(currentIndex);
-//                }
-//            }
-
-//            ComboBox
-//            {
-//                anchors.top:serialNumComboBox.top
-//                anchors.left: serialNumComboBox.right
-//                anchors.leftMargin: 3
-//                id:baudComboBox
-//                width:80
-//                model: serialConfigModelInstance.baudList
-//                currentIndex:0
-//                onCurrentIndexChanged: serialConfigModelInstance.onBaudComboBoxSelect(currentIndex)
-//                Component.onCompleted:
-//                {
-//                    onCurrentIndexChanged(currentIndex);
-//                }
-//            }
 
             Button
             {
@@ -177,6 +123,7 @@ Window {
                 {
                     width:parent.width
                     height:50
+                    leftPadding:5
                     Text
                     {
                         id:guiComSetupName

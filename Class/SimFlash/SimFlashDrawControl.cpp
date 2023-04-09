@@ -387,6 +387,18 @@ void SimFlashDrawControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
         {
             //mSaveDragRectImageP->save( "save.jpg" );
 
+            if( mContentMenuP != nullptr )
+            {
+                if( mContentMenuP->isDisplay() )
+                {
+                    int _index = mContentMenuP->GetSelectIndex();
+                    if( _index != -1 )
+                    {
+                        sub_MenuItemHandle( _index );
+                    }
+                }
+            }
+
             mContentMenuP->sub_SetDisplayPoint( QPoint( -1, -1 ) );
             if( mContentItemRectCount != 0 )
             {
@@ -407,6 +419,10 @@ void SimFlashDrawControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
             mSaveDragRectImageP = nullptr;
 
             update( mSaveDragRect );
+        }
+        else
+        {
+
         }
     }
 }
@@ -657,6 +673,42 @@ void SimFlashDrawControl::sub_AdjustDragSelectRect()
     _tmpPainter.end();
 
     update();
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_SetFlashContent
+ *      处理修改选中的FLASH内容
+ * @param pSelectRect
+ */
+void SimFlashDrawControl::sub_SetFlashContent( QRect pSelectRect )
+{
+    int _tmpIndex;
+
+    _tmpIndex = pSelectRect.y();
+
+    _tmpIndex -= mSpaceValue;
+
+    _tmpIndex /= mFontHeight;
+    _tmpIndex *= mLineByteS;
+    _tmpIndex += mCurrDisplayIndex;
+
+    qDebug() << "select start offset:" << _tmpIndex;
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_MenuItemHandle
+ * @param pIndex
+ */
+void SimFlashDrawControl::sub_MenuItemHandle( int pIndex )
+{
+    if( pIndex != -1 )
+    {
+        if( pIndex == 0 )
+        {
+            //设置FLASH内容
+            sub_SetFlashContent( mSelectRect );
+        }
+    }
 }
 
 /**

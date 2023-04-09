@@ -12,6 +12,7 @@ PrivateMenuClass::PrivateMenuClass()
     mColor.setAlpha( 190 );
     mMenuImageP = nullptr;
     mSelectIndex = -1;
+    mMenuDisplayFlag = false;
 }
 
 
@@ -102,6 +103,8 @@ void PrivateMenuClass::sub_SetDisplayPoint( QPoint pPoint )
         mMenuImageP->fill( mColor );
 
         sub_DrawMenuItem();
+
+        mMenuDisplayFlag = true;
     }
     else
     {
@@ -110,6 +113,8 @@ void PrivateMenuClass::sub_SetDisplayPoint( QPoint pPoint )
             delete mMenuImageP;
             mMenuImageP = nullptr;
         }
+
+        mMenuDisplayFlag = false;
     }
     mDisplayPoint = pPoint;
     mSelectIndex = -1;

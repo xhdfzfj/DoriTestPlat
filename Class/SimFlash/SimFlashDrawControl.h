@@ -38,6 +38,8 @@ private:
     int fun_CalcLineDisplayByteS( int pWidth, int pDataDisplayWidth, int pAscDisplayWidth );
     void sub_ChanageScrollValue();
     void sub_AdjustDragSelectRect();
+    void sub_MenuItemHandle( int pIndex );
+    void sub_SetFlashContent( QRect pSelectRect );
 
 public:
     QString flashSize()

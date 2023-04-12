@@ -110,6 +110,7 @@ private:
 signals:
     void sub_SignalReDraw();
     void flashSizeChanaged();
+    void flashContentModify();
 
 public slots:
     void sub_SlotReDraw();

@@ -5,6 +5,15 @@ import xhd.controls.simflashddrawcontrol 1.0
 
 Item
 {
+    Connections
+    {
+        target:guiSimFlashControl
+        onFlashContentModify:
+        {
+            console.log( "single test" );
+        }
+    }
+
     anchors.fill: parent
 
     Grid
@@ -173,6 +182,7 @@ Item
 //        console.log( "guiFlashSimGrid height:", guiFlashSimGrid.height )
 
         guiSimFlashControl.sub_QmlLoadered( guiSimFlashScrollBar );
+
 
     }
 }

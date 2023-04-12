@@ -683,6 +683,9 @@ void SimFlashDrawControl::sub_AdjustDragSelectRect()
 void SimFlashDrawControl::sub_SetFlashContent( QRect pSelectRect )
 {
     int _tmpIndex;
+    int _preLineByte;
+    int _startOffset;
+    int _selectLineS;
 
     _tmpIndex = pSelectRect.y();
 
@@ -693,6 +696,22 @@ void SimFlashDrawControl::sub_SetFlashContent( QRect pSelectRect )
     _tmpIndex += mCurrDisplayIndex;
 
     qDebug() << "select start offset:" << _tmpIndex;
+
+    int _width;
+
+    _width = pSelectRect.width();
+    _preLineByte = _width / ( mDataFontWidth + mSingleAscWidth );
+
+    qDebug() << "line byte:" << _preLineByte;
+
+    _width = pSelectRect.x() - mSpaceValue - mAddressStringWidth - mColonFontWidth;
+    _startOffset = ( _width + ( mDataFontWidth + mSingleAscWidth ) - 1 ) / ( mDataFontWidth + mSingleAscWidth );
+
+    qDebug() << "start offset byte:" << _startOffset;
+
+    _selectLineS = pSelectRect.height() / mFontHeight;
+
+    emit flashContentModify();
 }
 
 /**

@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QImage>
 #include <QString>
+#include "./SimFlashListModelClass.h"
 #include "../TransionEffect.h"
 #include "../MenuClass/PrivateMenuClass.h"
 
@@ -29,9 +30,7 @@ public:
 
     int fun_LowLevelInterface( void * );
 
-
     void hoverMoveEvent( QHoverEvent * event ) override;
-
 
 private:
     void sub_DataToImage();
@@ -106,6 +105,9 @@ private:
     PrivateMenuClass * mContentMenuP;
     QRect * mContentItemRectP;
     int mContentItemRectCount;
+
+    //FLASH内客修改 MODEL
+    SimFlashListModelClass * mSimFlashModifyModelObjP;
 
 signals:
     void sub_SignalReDraw();

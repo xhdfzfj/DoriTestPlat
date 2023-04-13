@@ -34,6 +34,8 @@ SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedIt
     _tmpFunc = std::bind( &SimFlashDrawControl::fun_LowLevelInterface, this, std::placeholders::_1 );
     mEffectObjP->fun_SetUpLevelInterface( _tmpFunc );
 
+    mSimFlashModifyModelObjP = new SimFlashListModelClass();
+
     mContentMenuP = new PrivateMenuClass();
 
     mContentMenuP->sub_AddMenuItem( "设置内容" );
@@ -70,6 +72,8 @@ SimFlashDrawControl::~SimFlashDrawControl()
     {
         delete [] mContentItemRectP;
     }
+
+    delete mSimFlashModifyModelObjP;
 }
 
 /**

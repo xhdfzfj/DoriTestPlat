@@ -14,6 +14,22 @@ Item
         }
     }
 
+    ListModel {
+        id:testModel
+        ListElement {
+            name: "Bill Smith"
+            number: "555 3264"
+        }
+        ListElement {
+            name: "John Brown"
+            number: "555 8426"
+        }
+        ListElement {
+            name: "Sam Wise"
+            number: "555 0473"
+        }
+    }
+    id:guiFlashSimMainItem
     anchors.fill: parent
 
     Grid
@@ -29,6 +45,7 @@ Item
             width: parent.width / 3
             height:parent.height
             color:"ghostwhite"
+            id:guiMainRect
 
             ScrollView
             {
@@ -37,9 +54,10 @@ Item
 
                 ColumnLayout
                 {
-                    spacing: 8
+                    //spacing: 8
                     RowLayout
                     {
+                        id:guiSimFlashRow
                         Label
                         {
                             font.bold: true
@@ -80,6 +98,30 @@ Item
                             }
                         }
                     }
+
+                    Rectangle
+                    {
+
+                        width:guiFlashSimMainItem.width
+
+                        height:guiFlashSimMainItem.height - 8 - guiFlashSimSize.height - guiFlashSimSize.height - 50
+                        ListView
+                        {
+                            id:testListView
+                            anchors.fill: parent
+                            //model:guiSimFlashControl.mSimFlashModifyModelObjP
+                            model:testModel
+                            delegate: Row
+                            {
+                                TextField
+                                {
+                                   font.pixelSize: 16
+                                   text: name
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -175,14 +217,18 @@ Item
         }
     }
 
+    function fun_FlashContentModify()
+    {
+
+    }
 
     Component.onCompleted:
     {
-//        console.log( "guiFlashSimGrid width:", guiFlashSimGrid.width )
-//        console.log( "guiFlashSimGrid height:", guiFlashSimGrid.height )
+        //console.log( "guiFlashSimGrid width:", guiFlashSimMainItem.heigh )
+        //console.log( "guiFlashSimGrid height:", guiFlashSimSize.height )
 
         guiSimFlashControl.sub_QmlLoadered( guiSimFlashScrollBar );
-
+        testListView.model = guiSimFlashControl.mSimFlashModifyModelObjP
 
     }
 }

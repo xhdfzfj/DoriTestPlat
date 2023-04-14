@@ -14,7 +14,6 @@ public:
 
     uint32_t GetSimFlashSize() { return mSimFlashSize; }
 
-protected:
     int fun_GetData( int pStartOffset, int pGetCount, char * & pSaveP );
     int fun_SetData( int pStartOffset, int pSetCount, char * pDataBufP );
 

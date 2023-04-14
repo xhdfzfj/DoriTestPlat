@@ -1,4 +1,5 @@
 ﻿#include <QDebug>
+#include "../Class/SimFlash/SimFlashDrawControl.h"
 #include "MainModelClass.h"
 
 /**
@@ -155,10 +156,42 @@ void MainModelClass::sub_ClearEventQueue( void )
  */
 void MainModelClass::sub_SimFlashContentGuiReady( FlashModifyContent_s * pFlashModifyContentP, FlashSimClass * pDestFlashP )
 {
-    uint8_t * _tmpByteS;
-    uint32_t * _tmpAddress;
+    char * _tmpByteS;
+    uint32_t * _tmpAddressValue;
+    char _tmpTransferBuf[ 256 ];
+    QString mAddressStr;
+    QString mContentStr;
+    int _tmpAddress;
+    int i;
+    int mLineByteCount;
+    int _retValue;
 
-    _tmpByteS = new uint8_t [ pFlashModifyContentP->mLineByteCount ];
+    mLineByteCount = pFlashModifyContentP->mGuiLineDisplayByteCount;
+    //mSimFlashModifyModelObjP->sub_ClearContent();
+
+    for( i = 0; i < 1/*pFlashModifyContentP->mLineCount*/; i++ )
+    {
+        mContentStr = "";
+        _tmpByteS = new char [ pFlashModifyContentP->mLineByteCount ];
+        _tmpAddress = pFlashModifyContentP->mStartAddress + i * mLineByteCount + pFlashModifyContentP->mStartOffset;
+        _retValue = pDestFlashP->fun_GetData( _tmpAddress, pFlashModifyContentP->mLineByteCount, _tmpByteS );
+
+        sprintf( _tmpTransferBuf, "%08X", _tmpAddress );
+        mAddressStr = QString::fromStdString( _tmpTransferBuf );
+        mAddressStr += ":";
+
+        for( int z = 0; z < pFlashModifyContentP->mLineByteCount; z++ )
+        {
+            if( z != 0 )
+            {
+                mContentStr += ",";
+            }
+            sprintf( _tmpTransferBuf, "%02X", _tmpByteS[ z ] );
+            mContentStr += QString::fromStdString( _tmpTransferBuf );
+        }
+
+        mSimFlashModifyModelObjP->sub_AddContent( mAddressStr, mContentStr );
+    }
 }
 
 /**
@@ -220,6 +253,7 @@ void MainModelClass::sub_EventHandle( void )
                     sub_SimFlashContentGuiReady( ( FlashModifyContent_s * )_tmpEventObjP->mVoidParam1P, ( FlashSimClass * )_tmpEventObjP->mVoidParam2P );
 
                     delete ( FlashModifyContent_s * )_tmpEventObjP->mVoidParam1P;
+                    delete _tmpEventObjP;
                 }
             }
         }

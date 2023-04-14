@@ -112,6 +112,7 @@ Window {
             id:guiComSetup
             width: parent.width
             height: 160
+
             ListView
             {
                 id:guiComSetupListView
@@ -188,7 +189,8 @@ Window {
                 }
 
             }
-        }
+
+        } //guiComSetup
 
         Grid
         {

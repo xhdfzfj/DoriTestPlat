@@ -729,6 +729,7 @@ void SimFlashDrawControl::sub_SetFlashContent( QRect pSelectRect )
     _tmpModifyContentP->mLineCount = _selectLineS;
     _tmpModifyContentP->mStartAddress = _tmpIndex;
     _tmpModifyContentP->mStartOffset = _startOffset;
+    _tmpModifyContentP->mGuiLineDisplayByteCount = mLineByteS;
 
     _eventObjP = new PrivateEventClass( EventType_e::ModifySimFlashContent, DataType_e::DataType, Sender_e::SimFlash, ( void * )_tmpModifyContentP, ( void * )this );
     _eventObjP->SetFreeState( FreeParamType_e::StructPointType );

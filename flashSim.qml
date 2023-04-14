@@ -11,24 +11,16 @@ Item
         target:guiSimFlashControl
         onFlashContentModify:
         {
-            console.log( "single test" );
+            var _tmpi
+
+            _tmpi = guiSimFlashControl.fun_GetModelContentLineCount()
+            guiModifyModel.append( { "address":"test", "content":"testcontent" } )
         }
     }
 
-    ListModel {
-        id:testModel
-        ListElement {
-            name: "Bill Smith"
-            number: "555 3264"
-        }
-        ListElement {
-            name: "John Brown"
-            number: "555 8426"
-        }
-        ListElement {
-            name: "Sam Wise"
-            number: "555 0473"
-        }
+    ListModel
+    {
+        id:guiModifyModel
     }
     id:guiFlashSimMainItem
     anchors.fill: parent
@@ -111,13 +103,22 @@ Item
                             id:testListView
                             anchors.fill: parent
                             //model:guiSimFlashControl.mSimFlashModifyModelObjP
-                            model:simFlashModifyModelInstance
+                            //model:simFlashModifyModelInstance
+                            model:guiModifyModel
                             delegate: Row
                             {
+                                Label
+                                {
+                                    font.pixelSize: 16
+                                    text: address
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
                                 TextField
                                 {
                                    font.pixelSize: 16
-                                   text: name
+                                   text: content
+                                   anchors.verticalCenter: parent.verticalCenter
                                 }
                             }
                         }

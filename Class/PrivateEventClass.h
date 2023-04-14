@@ -10,6 +10,7 @@ typedef enum __EventType_e
     HexDataDisplayType,
     ReDrawHexData,
     GuiTransionEffect,
+    ModifySimFlashContent,
 }EventType_e;
 
 typedef enum __DataType_e
@@ -22,6 +23,7 @@ typedef enum __Sender_e
 {
     SpiCapture,
     TransionEffector,
+    SimFlash,
 }Sender_e;
 
 typedef enum __FreeParamType_e
@@ -29,13 +31,23 @@ typedef enum __FreeParamType_e
     NoFreeType,
     SpiCmdInfoClassType,
     Uint8ArrayType,
+    StructPointType,
 }FreeParamType_e;
+
+typedef struct __FlashModifyContent_s
+{
+    int mStartAddress;      //开始的地址一定是8字节对齐
+    int mStartOffset;       //从8字节对齐后的偏移
+    int mLineByteCount;     //每行选中的字节数
+    int mLineCount;         //有几行选中
+}FlashModifyContent_s;
 
 class PrivateEventClass
 {
 public:
     PrivateEventClass( EventType_e pEventType, DataType_e pDataType, std::string pStr );
     PrivateEventClass( EventType_e pEventType, DataType_e pDataType, Sender_e pSender, void * pParamP );
+    PrivateEventClass( EventType_e pEventType, DataType_e pDataType, Sender_e pSender, void * pParamP, void * pParam1P );
     PrivateEventClass( EventType_e pEventType, DataType_e pDataType, Sender_e pSender, void * pParamP, int pLen, int pStartOffset );
     virtual ~PrivateEventClass();
 
@@ -55,6 +67,8 @@ public:
     int mIntParam1;
 
     std::string mInfoStr;
+
+    void * mVoidParam2P;
 
 private:
     FreeParamType_e mFreeFlag;

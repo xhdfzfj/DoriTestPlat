@@ -2,6 +2,7 @@
 import QtQuick.Controls 2.14
 import QtQuick.Layouts 1.3
 import xhd.controls.simflashddrawcontrol 1.0
+import xhd.controls.simflaslistmodel 1.0
 
 Item
 {
@@ -110,7 +111,7 @@ Item
                             id:testListView
                             anchors.fill: parent
                             //model:guiSimFlashControl.mSimFlashModifyModelObjP
-                            model:testModel
+                            model:simFlashModifyModelInstance
                             delegate: Row
                             {
                                 TextField
@@ -228,7 +229,9 @@ Item
         //console.log( "guiFlashSimGrid height:", guiFlashSimSize.height )
 
         guiSimFlashControl.sub_QmlLoadered( guiSimFlashScrollBar );
-        testListView.model = guiSimFlashControl.mSimFlashModifyModelObjP
+        guiSimFlashControl.sub_SetMainModelObj( MainModelObj );
+        //testListView.model = guiSimFlashControl.fun_GetListModel();
+        //MainModelObj.sub_TestSelf();
 
     }
 }

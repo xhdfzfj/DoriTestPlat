@@ -13,6 +13,8 @@
 #include "../Control/GuiDrawControl.h"
 #include "./spiviewmodel.h"
 #include "./serialconfigmodel.h"
+#include "./Class/SimFlash/FlashSimClass.h"
+#include "./Class/SimFlash/SimFlashListModelClass.h"
 
 class MainModelClass : public QObject
 {
@@ -25,6 +27,7 @@ public:
     Q_INVOKABLE void sub_AnalyseSpiClick( QUrl pSpiFilePath );
     Q_INVOKABLE void sub_ClearSelf();
     Q_INVOKABLE void sub_GetDrawObjectFromQml( QObject * pObjectP );
+    Q_INVOKABLE void sub_TestSelf() { qDebug() << "Main Model test self"; }
 
     Q_INVOKABLE void sub_TestButClick();
 
@@ -33,11 +36,13 @@ public:
 
 private:
     void sub_ClearEventQueue( void );
+    void sub_SimFlashContentGuiReady( FlashModifyContent_s * pFlashModifyContentP, FlashSimClass * pDestFlashP );
 
 public: //将变量申明
     LogViewModel * mLogViewModelObjP;
     SpiViewModel * mSpiModelObjP;
     SerialConfigModel * mSerialConfigModelObjP;
+    SimFlashListModelClass * mSimFlashModifyModelObjP;
 
 private:
     SpiCaptureDataClass * mSpiAnalyseObjP;

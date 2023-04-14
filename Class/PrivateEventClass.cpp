@@ -38,6 +38,18 @@ PrivateEventClass::PrivateEventClass( EventType_e pEventType, DataType_e pDataTy
     mFreeFlag = Uint8ArrayType;
 }
 
+PrivateEventClass::PrivateEventClass( EventType_e pEventType, DataType_e pDataType, Sender_e pSender, void * pParamP, void * pParam1P )
+{
+    mEventType_e = pEventType;
+    mDataType_e = pDataType;
+    mSender_e = pSender;
+
+    mVoidParam1P = pParamP;
+    mVoidParam2P = pParam1P;
+
+    mFreeFlag = NoFreeType;
+}
+
 
 PrivateEventClass::~PrivateEventClass()
 {

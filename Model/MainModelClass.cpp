@@ -12,6 +12,7 @@ MainModelClass::MainModelClass(QObject *parent)
     mSpiAnalyseObjP = nullptr;
     mSpiModelObjP = new SpiViewModel( this );
     mSerialConfigModelObjP = new SerialConfigModel(this);
+    mSimFlashModifyModelObjP = new SimFlashListModelClass( this );
 
     mEventHandleThreadStopFlag = false;
 
@@ -41,6 +42,7 @@ MainModelClass::~MainModelClass()
     }
     delete mLogViewModelObjP;
     delete mSerialConfigModelObjP;
+    delete mSimFlashModifyModelObjP;
 }
 
 /**
@@ -147,6 +149,19 @@ void MainModelClass::sub_ClearEventQueue( void )
 }
 
 /**
+ * @brief MainModelClass::sub_SimFlashContentGuiReady
+ * @param pFlashModifyContentP
+ * @param pDestFlashP
+ */
+void MainModelClass::sub_SimFlashContentGuiReady( FlashModifyContent_s * pFlashModifyContentP, FlashSimClass * pDestFlashP )
+{
+    uint8_t * _tmpByteS;
+    uint32_t * _tmpAddress;
+
+    _tmpByteS = new uint8_t [ pFlashModifyContentP->mLineByteCount ];
+}
+
+/**
  * @brief MainModelClass::sub_EventHandle
  *      事件的线程处理
  */
@@ -197,6 +212,15 @@ void MainModelClass::sub_EventHandle( void )
                 }
 
                 delete _tmpEventObjP;
+            }
+            else if( _tmpEventObjP->mEventType_e == EventType_e::ModifySimFlashContent )
+            {
+                if( _tmpEventObjP->mSender_e == Sender_e::SimFlash )
+                {
+                    sub_SimFlashContentGuiReady( ( FlashModifyContent_s * )_tmpEventObjP->mVoidParam1P, ( FlashSimClass * )_tmpEventObjP->mVoidParam2P );
+
+                    delete ( FlashModifyContent_s * )_tmpEventObjP->mVoidParam1P;
+                }
             }
         }
     }

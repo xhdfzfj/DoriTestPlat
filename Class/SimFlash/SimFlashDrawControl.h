@@ -9,6 +9,7 @@
 #include <QString>
 #include "./SimFlashListModelClass.h"
 #include "../TransionEffect.h"
+#include "../../Model/MainModelClass.h"
 #include "../MenuClass/PrivateMenuClass.h"
 
 class SimFlashDrawControl : public QQuickPaintedItem, public FlashSimClass
@@ -25,6 +26,7 @@ public:
     Q_INVOKABLE void sub_MouseRelease();
     Q_INVOKABLE void sub_MouseLeftButtonClick( qreal pX, qreal pY );
     Q_INVOKABLE void sub_MouseRightButtonClick( qreal pX, qreal pY );
+    Q_INVOKABLE void sub_SetMainModelObj( QObject * pObjectP );
 
     Q_PROPERTY( QString flashSize READ flashSize WRITE setFlashSize NOTIFY flashSizeChanaged )
 
@@ -106,8 +108,7 @@ private:
     QRect * mContentItemRectP;
     int mContentItemRectCount;
 
-    //FLASH内客修改 MODEL
-    SimFlashListModelClass * mSimFlashModifyModelObjP;
+    MainModelClass * mMainModleObjP;
 
 signals:
     void sub_SignalReDraw();

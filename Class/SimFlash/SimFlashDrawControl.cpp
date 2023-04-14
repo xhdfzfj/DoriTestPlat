@@ -34,8 +34,6 @@ SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedIt
     _tmpFunc = std::bind( &SimFlashDrawControl::fun_LowLevelInterface, this, std::placeholders::_1 );
     mEffectObjP->fun_SetUpLevelInterface( _tmpFunc );
 
-    mSimFlashModifyModelObjP = new SimFlashListModelClass();
-
     mContentMenuP = new PrivateMenuClass();
 
     mContentMenuP->sub_AddMenuItem( "设置内容" );
@@ -72,8 +70,16 @@ SimFlashDrawControl::~SimFlashDrawControl()
     {
         delete [] mContentItemRectP;
     }
+}
 
-    delete mSimFlashModifyModelObjP;
+/**
+ * @brief SimFlashDrawControl::sub_SetMainModelObj
+ * @param pObjP
+ */
+void SimFlashDrawControl::sub_SetMainModelObj( QObject * pObjP )
+{
+    mMainModleObjP = ( MainModelClass * )pObjP;
+    mMainModleObjP->sub_TestSelf();
 }
 
 /**
@@ -714,6 +720,22 @@ void SimFlashDrawControl::sub_SetFlashContent( QRect pSelectRect )
     qDebug() << "start offset byte:" << _startOffset;
 
     _selectLineS = pSelectRect.height() / mFontHeight;
+
+    PrivateEventClass * _eventObjP;
+    FlashModifyContent_s * _tmpModifyContentP;
+
+    _tmpModifyContentP = new FlashModifyContent_s;
+    _tmpModifyContentP->mLineByteCount = _preLineByte;
+    _tmpModifyContentP->mLineCount = _selectLineS;
+    _tmpModifyContentP->mStartAddress = _tmpIndex;
+    _tmpModifyContentP->mStartOffset = _startOffset;
+
+    _eventObjP = new PrivateEventClass( EventType_e::ModifySimFlashContent, DataType_e::DataType, Sender_e::SimFlash, ( void * )_tmpModifyContentP, ( void * )this );
+    _eventObjP->SetFreeState( FreeParamType_e::StructPointType );
+    if( mMainModleObjP != nullptr )
+    {
+        mMainModleObjP->sub_ChildObjectEventHandle( ( void * )_eventObjP );
+    }
 
     emit flashContentModify();
 }

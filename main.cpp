@@ -7,6 +7,7 @@
 
 #include "./Control/GuiDrawControl.h"
 #include "./Model/MainModelClass.h"
+#include "./Class/SimFlash/SimFlashListModelClass.h"
 #include "./Class/SimFlash/SimFlashDrawControl.h"
 
 MainModelClass * gMainModelObjP;
@@ -30,6 +31,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType< GuiDrawControl >( "xhd.controls.guidrawcontrol", 1, 0, "GuiDrawControl" );
     qmlRegisterType< SimFlashDrawControl >( "xhd.controls.simflashddrawcontrol", 1, 0, "SimFlashDrawControl" );
+    qmlRegisterType< SimFlashListModelClass >( "xhd.controls.simflaslistmodel", 1, 0, "SimFlashListModelClass" );
 
     gMainModelObjP = new MainModelClass();
 
@@ -45,6 +47,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty( "logViewModelInstance", gMainModelObjP->mLogViewModelObjP );
     engine.rootContext()->setContextProperty( "spiCmdViewModelInstance", gMainModelObjP->mSpiModelObjP );
     engine.rootContext()->setContextProperty( "serialConfigModelInstance", gMainModelObjP->mSerialConfigModelObjP);
+    engine.rootContext()->setContextProperty( "simFlashModifyModelInstance", gMainModelObjP->mSimFlashModifyModelObjP );
     engine.load(url);
 
     int i = app.exec();

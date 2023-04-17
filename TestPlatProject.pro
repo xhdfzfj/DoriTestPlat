@@ -13,7 +13,6 @@ SOURCES += \
         Class/SelfClearInterFaceClass.cpp \
         Class/SimFlash/FlashSimClass.cpp \
         Class/SimFlash/SimFlashDrawControl.cpp \
-        Class/SimFlash/SimFlashListModelClass.cpp \
         Class/SpiCaptureDataClass.cpp \
         Class/SpiCmdInfoClass.cpp \
         Class/TransionEffect.cpp \
@@ -53,7 +52,6 @@ HEADERS += \
     Class/SelfClearInterFaceClass.h \
     Class/SimFlash/FlashSimClass.h \
     Class/SimFlash/SimFlashDrawControl.h \
-    Class/SimFlash/SimFlashListModelClass.h \
     Class/SpiCaptureDataClass.h \
     Class/SpiCmdInfoClass.h \
     Class/TransionEffect.h \

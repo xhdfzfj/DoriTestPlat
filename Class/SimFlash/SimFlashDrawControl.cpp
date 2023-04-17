@@ -36,6 +36,8 @@ SimFlashDrawControl::SimFlashDrawControl(QQuickItem * pParent) : QQuickPaintedIt
 
     mContentMenuP = new PrivateMenuClass();
 
+    mModifyContentP = nullptr;
+
     mContentMenuP->sub_AddMenuItem( "设置内容" );
     mContentMenuP->sub_AddMenuItem( "重置内容" );
     mContentMenuP->sub_AddMenuItem( "测试菜单1" );
@@ -70,6 +72,11 @@ SimFlashDrawControl::~SimFlashDrawControl()
     {
         delete [] mContentItemRectP;
     }
+
+    if( mModifyContentP != nullptr )
+    {
+        delete mModifyContentP;
+    }
 }
 
 /**
@@ -93,6 +100,203 @@ void SimFlashDrawControl::sub_QmlLoadered( QObject * pObjectP )
     mMainImageP = new QImage( width(), height(), QImage::Format_ARGB32 );
     mMainImageP->fill( mBackColor );
     sub_DataToImage();
+}
+
+/**
+ * @brief SimFlashDrawControl::fun_GetModifyContentLineCount
+ * @return
+ */
+int SimFlashDrawControl::fun_GetModifyContentLineCount()
+{
+    int _ret;
+
+    _ret = 0;
+    if( mModifyContentP != nullptr )
+    {
+        _ret = mModifyContentP->mLineCount;
+    }
+
+    return _ret;
+}
+
+/**
+ * @brief SimFlashDrawControl::fun_GetModifyAddress
+ * @param pIndex
+ * @return
+ */
+QString SimFlashDrawControl::fun_GetModifyAddress( int pIndex )
+{
+    int _tmpAddress;
+    int i;
+    char _tmpTransferBuf[ 256 ];
+    QString _tmpAddressStr;
+
+    _tmpAddress = mModifyContentP->mStartAddress + pIndex * mLineByteS + mModifyContentP->mStartOffset;
+    sprintf( _tmpTransferBuf, "%08X", _tmpAddress );
+    _tmpAddressStr = QString::fromStdString( _tmpTransferBuf );
+    _tmpAddressStr += ":";
+
+    return _tmpAddressStr;
+}
+
+/**
+ * @brief SimFlashDrawControl::fun_GetModifyContent
+ * @param pIndex
+ * @return
+ */
+QString SimFlashDrawControl::fun_GetModifyContent( int pIndex )
+{
+    int _tmpAddress;
+    int i;
+    char * _tmpByteS;
+    char _tmpTransferBuf[ 256 ];
+    QString _tmpContentStr;
+
+    _tmpAddress = mModifyContentP->mStartAddress + pIndex * mLineByteS + mModifyContentP->mStartOffset;
+    _tmpByteS = new char [ mModifyContentP->mLineByteCount ];
+    i = fun_GetData( _tmpAddress, mModifyContentP->mLineByteCount, _tmpByteS );
+    if( i > 0 )
+    {
+        for( i = 0; i < mModifyContentP->mLineByteCount; i++ )
+        {
+            if( i != 0 )
+            {
+                _tmpContentStr += ",";
+            }
+            sprintf( _tmpTransferBuf, "%02X", ( uint8_t )_tmpByteS[ i ] );
+            _tmpContentStr += QString::fromStdString( _tmpTransferBuf );
+        }
+    }
+
+    return _tmpContentStr;
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_DrawModifyContentImage
+ *      修改选中图像是的内容
+ */
+void SimFlashDrawControl::sub_DrawModifyContentImage( void )
+{
+    int _startX;
+    int _startY;
+    char * _tmpDisplayBufP;
+    char _tmpTransferBuf[ 256 ];
+    QString _tmpStr;
+    int i, _tmpAddress;
+
+
+    if( ( mSaveDragRectImageP != nullptr ) && ( mModifyContentP != nullptr ) )
+    {
+        _startX = 2;
+        _startY = 2;
+
+        QPainter _tmpPainter( mSaveDragRectImageP );
+        _tmpDisplayBufP = new char [ mModifyContentP->mLineByteCount ];
+
+        _tmpPainter.begin( mSaveDragRectImageP );
+        _tmpPainter.setFont( mFont );
+        _tmpPainter.setPen( Qt::red );
+
+        QBrush _tmpBrush( mBackColor );
+
+        QRect _tmpRect;
+
+        for( i = 0; i < mModifyContentP->mLineCount; i++ )
+        {
+            _tmpStr = "";
+            _startX = 4;
+            _startY = ( i + 1 ) * mFontHeight - 3;
+            _tmpAddress = mModifyContentP->mStartAddress + i * mLineByteS + mModifyContentP->mStartOffset;
+            fun_GetData( _tmpAddress, mModifyContentP->mLineByteCount, _tmpDisplayBufP );
+
+            _tmpRect.setRect( _startX, _startY - mFontHeight,
+                              mModifyContentP->mLineByteCount * ( mDataFontWidth + mSingleAscWidth ) - mSingleAscWidth,
+                             mFontHeight );
+            _tmpPainter.fillRect( _tmpRect, _tmpBrush );
+
+            for( int z = 0; z < mModifyContentP->mLineByteCount; z++ )
+            {
+                sprintf( _tmpTransferBuf, "%02X", ( uint8_t )( _tmpDisplayBufP[ z ] ) );
+                _tmpStr = QString::fromStdString( _tmpTransferBuf );
+                _tmpPainter.drawText( _startX, _startY, _tmpStr );
+
+                _startX += mDataFontWidth;
+
+                _tmpStr = " ";
+                _tmpPainter.drawText( _startX, _startY, _tmpStr );
+                _startX += mSingleAscWidth;
+            }
+        }
+        _tmpPainter.end();
+
+        QPainter _tmpMainPainter( mMainImageP );
+        _tmpMainPainter.begin( mMainImageP );
+
+        _tmpMainPainter.drawImage( mSaveDragRect.x(), mSaveDragRect.y(), *mSaveDragRectImageP );
+
+        _tmpMainPainter.end();
+
+        delete [] _tmpDisplayBufP;
+
+        //mSaveDragRectImageP->save( "endmodify.jpg" );
+
+        update( mSaveDragRect );
+    }
+}
+
+/**
+ * @brief SimFlashDrawControl::sub_ModifyFlashContent
+ * @param pIndex
+ * @param pContent
+ */
+void SimFlashDrawControl::sub_ModifyFlashContent( int pAddressValue, QString pContent )
+{
+    int i;
+    int _tmpAddress;
+    QStringList _tmpList;
+    uint8_t * _tmpBufP;
+
+    if( mModifyContentP != nullptr )
+    {
+        for( i = 0; i < mModifyContentP->mLineCount; i++ )
+        {
+            _tmpAddress = mModifyContentP->mStartAddress + i * mLineByteS + mModifyContentP->mStartOffset;
+            if( _tmpAddress == pAddressValue )
+            {
+                break;
+            }
+        }
+
+        if( i < mModifyContentP->mLineCount )
+        {
+            _tmpBufP = new uint8_t [ mModifyContentP->mLineByteCount ];
+            _tmpList = pContent.split( QLatin1String( "," ), Qt::SkipEmptyParts );
+
+            for( i = 0; i < _tmpList.size(); i++ )
+            {
+                _tmpBufP[ i ] = _tmpList[ i ].toUInt( nullptr, 16 );
+            }
+
+            if( i < mModifyContentP->mLineByteCount )
+            {
+                for( ; i < mModifyContentP->mLineByteCount; i++ )
+                {
+                    _tmpBufP[ i ] = 0xff;
+                }
+            }
+
+            fun_SetData( _tmpAddress, mModifyContentP->mLineByteCount, ( char * )_tmpBufP );
+
+            if( !mModifyContentP->mModifyFlag )
+            {
+                mModifyContentP->mModifyFlag = true;
+            }
+
+            sub_DrawModifyContentImage();
+
+            delete [] _tmpBufP;
+        }
+    }
 }
 
 
@@ -721,7 +925,7 @@ void SimFlashDrawControl::sub_SetFlashContent( QRect pSelectRect )
 
     _selectLineS = pSelectRect.height() / mFontHeight;
 
-    PrivateEventClass * _eventObjP;
+    //PrivateEventClass * _eventObjP;
     FlashModifyContent_s * _tmpModifyContentP;
 
     _tmpModifyContentP = new FlashModifyContent_s;
@@ -729,14 +933,22 @@ void SimFlashDrawControl::sub_SetFlashContent( QRect pSelectRect )
     _tmpModifyContentP->mLineCount = _selectLineS;
     _tmpModifyContentP->mStartAddress = _tmpIndex;
     _tmpModifyContentP->mStartOffset = _startOffset;
-    _tmpModifyContentP->mGuiLineDisplayByteCount = mLineByteS;
+    _tmpModifyContentP->mModifyFlag = false;
 
-    _eventObjP = new PrivateEventClass( EventType_e::ModifySimFlashContent, DataType_e::DataType, Sender_e::SimFlash, ( void * )_tmpModifyContentP, ( void * )this );
-    _eventObjP->SetFreeState( FreeParamType_e::StructPointType );
-    if( mMainModleObjP != nullptr )
+//    _eventObjP = new PrivateEventClass( EventType_e::ModifySimFlashContent, DataType_e::DataType, Sender_e::SimFlash, ( void * )_tmpModifyContentP, ( void * )this );
+//    _eventObjP->SetFreeState( FreeParamType_e::StructPointType );
+//    if( mMainModleObjP != nullptr )
+//    {
+//        mMainModleObjP->sub_ChildObjectEventHandle( ( void * )_eventObjP );
+//    }
+    if( mModifyContentP != nullptr )
     {
-        mMainModleObjP->sub_ChildObjectEventHandle( ( void * )_eventObjP );
+        delete mModifyContentP;
+        mModifyContentP = nullptr;
     }
+    mModifyContentP = _tmpModifyContentP;
+
+    //mSaveDragRectImageP->save( "select.jpg" );
 
     emit flashContentModify();
 }

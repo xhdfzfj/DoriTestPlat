@@ -7,10 +7,18 @@
 #include <QPainter>
 #include <QImage>
 #include <QString>
-#include "./SimFlashListModelClass.h"
 #include "../TransionEffect.h"
 #include "../../Model/MainModelClass.h"
 #include "../MenuClass/PrivateMenuClass.h"
+
+typedef struct __FlashModifyContent_s
+{
+    int mStartAddress;      //开始的地址一定是8字节对齐
+    int mStartOffset;       //从8字节对齐后的偏移
+    int mLineByteCount;     //每行选中的字节数
+    int mLineCount;         //有几行选中
+    bool mModifyFlag;       //是否修改标志
+}FlashModifyContent_s;
 
 class SimFlashDrawControl : public QQuickPaintedItem, public FlashSimClass
 {
@@ -27,6 +35,10 @@ public:
     Q_INVOKABLE void sub_MouseLeftButtonClick( qreal pX, qreal pY );
     Q_INVOKABLE void sub_MouseRightButtonClick( qreal pX, qreal pY );
     Q_INVOKABLE void sub_SetMainModelObj( QObject * pObjectP );
+    Q_INVOKABLE int fun_GetModifyContentLineCount( void );
+    Q_INVOKABLE QString fun_GetModifyAddress( int pIndex );
+    Q_INVOKABLE QString fun_GetModifyContent( int pIndex );
+    Q_INVOKABLE void sub_ModifyFlashContent( int pAddressValue, QString pContent );
 
     Q_PROPERTY( QString flashSize READ flashSize WRITE setFlashSize NOTIFY flashSizeChanaged )
 
@@ -41,6 +53,7 @@ private:
     void sub_AdjustDragSelectRect();
     void sub_MenuItemHandle( int pIndex );
     void sub_SetFlashContent( QRect pSelectRect );
+    void sub_DrawModifyContentImage( void );
 
 public:
     QString flashSize()
@@ -109,6 +122,8 @@ private:
     int mContentItemRectCount;
 
     MainModelClass * mMainModleObjP;
+
+    FlashModifyContent_s * mModifyContentP;
 
 signals:
     void sub_SignalReDraw();

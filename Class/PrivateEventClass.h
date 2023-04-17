@@ -34,14 +34,7 @@ typedef enum __FreeParamType_e
     StructPointType,
 }FreeParamType_e;
 
-typedef struct __FlashModifyContent_s
-{
-    int mStartAddress;      //开始的地址一定是8字节对齐
-    int mStartOffset;       //从8字节对齐后的偏移
-    int mLineByteCount;     //每行选中的字节数
-    int mLineCount;         //有几行选中
-    int mGuiLineDisplayByteCount;    //GUI上每行显示的个数
-}FlashModifyContent_s;
+
 
 class PrivateEventClass
 {

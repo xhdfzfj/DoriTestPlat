@@ -2,7 +2,7 @@
 import QtQuick.Controls 2.14
 import QtQuick.Layouts 1.3
 import xhd.controls.simflashddrawcontrol 1.0
-import xhd.controls.simflaslistmodel 1.0
+//import xhd.controls.simflaslistmodel 1.0
 
 Item
 {
@@ -12,9 +12,21 @@ Item
         onFlashContentModify:
         {
             var _tmpi
+            var i
+            var addressValue;
+            var contentValue;
 
-            _tmpi = guiSimFlashControl.fun_GetModelContentLineCount()
-            guiModifyModel.append( { "address":"test", "content":"testcontent" } )
+            guiModifyModel.clear();
+
+            _tmpi = guiSimFlashControl.fun_GetModifyContentLineCount();
+
+            for( i = 0; i < _tmpi; i++ )
+            {
+                addressValue = guiSimFlashControl.fun_GetModifyAddress( i );
+                contentValue = guiSimFlashControl.fun_GetModifyContent( i );
+
+                guiModifyModel.append( { "address":addressValue, "content":contentValue } );
+            }
         }
     }
 
@@ -100,7 +112,7 @@ Item
                         height:guiFlashSimMainItem.height - 8 - guiFlashSimSize.height - guiFlashSimSize.height - 50
                         ListView
                         {
-                            id:testListView
+                            id:guiModifyListView
                             anchors.fill: parent
                             //model:guiSimFlashControl.mSimFlashModifyModelObjP
                             //model:simFlashModifyModelInstance
@@ -119,10 +131,26 @@ Item
                                    font.pixelSize: 16
                                    text: content
                                    anchors.verticalCenter: parent.verticalCenter
+                                   onAccepted:
+                                   {
+                                       var addressStr
+                                       var addressValue
+                                       console.log( "modify content enter key", model.index )
+
+                                       addressStr = guiModifyModel.get( model.index ).address;
+                                       addressStr = addressStr.substring( 0, addressStr.length - 1 )
+                                       addressStr = "0x" + addressStr
+
+                                       addressValue = Number( addressStr )
+                                       console.log( "Address:", addressValue )
+                                       console.log( "content:", guiModifyModel.get( model.index ).content, "   ", text )
+
+                                       guiSimFlashControl.sub_ModifyFlashContent( addressValue, text );
+                                   }
                                 }
                             }
-                        }
-                    }
+                        } //ListView
+                    } //Rectangle
 
                 }
             }

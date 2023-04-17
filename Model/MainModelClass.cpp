@@ -13,7 +13,7 @@ MainModelClass::MainModelClass(QObject *parent)
     mSpiAnalyseObjP = nullptr;
     mSpiModelObjP = new SpiViewModel( this );
     mSerialConfigModelObjP = new SerialConfigModel(this);
-    mSimFlashModifyModelObjP = new SimFlashListModelClass( this );
+    //mSimFlashModifyModelObjP = new SimFlashListModelClass( this );
 
     mEventHandleThreadStopFlag = false;
 
@@ -43,7 +43,7 @@ MainModelClass::~MainModelClass()
     }
     delete mLogViewModelObjP;
     delete mSerialConfigModelObjP;
-    delete mSimFlashModifyModelObjP;
+    //delete mSimFlashModifyModelObjP;
 }
 
 /**
@@ -149,50 +149,50 @@ void MainModelClass::sub_ClearEventQueue( void )
     mEventQLock.unlock();
 }
 
-/**
- * @brief MainModelClass::sub_SimFlashContentGuiReady
- * @param pFlashModifyContentP
- * @param pDestFlashP
- */
-void MainModelClass::sub_SimFlashContentGuiReady( FlashModifyContent_s * pFlashModifyContentP, FlashSimClass * pDestFlashP )
-{
-    char * _tmpByteS;
-    uint32_t * _tmpAddressValue;
-    char _tmpTransferBuf[ 256 ];
-    QString mAddressStr;
-    QString mContentStr;
-    int _tmpAddress;
-    int i;
-    int mLineByteCount;
-    int _retValue;
+///**
+// * @brief MainModelClass::sub_SimFlashContentGuiReady
+// * @param pFlashModifyContentP
+// * @param pDestFlashP
+// */
+//void MainModelClass::sub_SimFlashContentGuiReady( FlashModifyContent_s * pFlashModifyContentP, FlashSimClass * pDestFlashP )
+//{
+//    char * _tmpByteS;
+//    uint32_t * _tmpAddressValue;
+//    char _tmpTransferBuf[ 256 ];
+//    QString mAddressStr;
+//    QString mContentStr;
+//    int _tmpAddress;
+//    int i;
+//    int mLineByteCount;
+//    int _retValue;
 
-    mLineByteCount = pFlashModifyContentP->mGuiLineDisplayByteCount;
-    //mSimFlashModifyModelObjP->sub_ClearContent();
+//    mLineByteCount = pFlashModifyContentP->mGuiLineDisplayByteCount;
+//    //mSimFlashModifyModelObjP->sub_ClearContent();
 
-    for( i = 0; i < 1/*pFlashModifyContentP->mLineCount*/; i++ )
-    {
-        mContentStr = "";
-        _tmpByteS = new char [ pFlashModifyContentP->mLineByteCount ];
-        _tmpAddress = pFlashModifyContentP->mStartAddress + i * mLineByteCount + pFlashModifyContentP->mStartOffset;
-        _retValue = pDestFlashP->fun_GetData( _tmpAddress, pFlashModifyContentP->mLineByteCount, _tmpByteS );
+//    for( i = 0; i < 1/*pFlashModifyContentP->mLineCount*/; i++ )
+//    {
+//        mContentStr = "";
+//        _tmpByteS = new char [ pFlashModifyContentP->mLineByteCount ];
+//        _tmpAddress = pFlashModifyContentP->mStartAddress + i * mLineByteCount + pFlashModifyContentP->mStartOffset;
+//        _retValue = pDestFlashP->fun_GetData( _tmpAddress, pFlashModifyContentP->mLineByteCount, _tmpByteS );
 
-        sprintf( _tmpTransferBuf, "%08X", _tmpAddress );
-        mAddressStr = QString::fromStdString( _tmpTransferBuf );
-        mAddressStr += ":";
+//        sprintf( _tmpTransferBuf, "%08X", _tmpAddress );
+//        mAddressStr = QString::fromStdString( _tmpTransferBuf );
+//        mAddressStr += ":";
 
-        for( int z = 0; z < pFlashModifyContentP->mLineByteCount; z++ )
-        {
-            if( z != 0 )
-            {
-                mContentStr += ",";
-            }
-            sprintf( _tmpTransferBuf, "%02X", _tmpByteS[ z ] );
-            mContentStr += QString::fromStdString( _tmpTransferBuf );
-        }
+//        for( int z = 0; z < pFlashModifyContentP->mLineByteCount; z++ )
+//        {
+//            if( z != 0 )
+//            {
+//                mContentStr += ",";
+//            }
+//            sprintf( _tmpTransferBuf, "%02X", _tmpByteS[ z ] );
+//            mContentStr += QString::fromStdString( _tmpTransferBuf );
+//        }
 
-        mSimFlashModifyModelObjP->sub_AddContent( mAddressStr, mContentStr );
-    }
-}
+//        //mSimFlashModifyModelObjP->sub_AddContent( mAddressStr, mContentStr );
+//    }
+//}
 
 /**
  * @brief MainModelClass::sub_EventHandle
@@ -250,7 +250,7 @@ void MainModelClass::sub_EventHandle( void )
             {
                 if( _tmpEventObjP->mSender_e == Sender_e::SimFlash )
                 {
-                    sub_SimFlashContentGuiReady( ( FlashModifyContent_s * )_tmpEventObjP->mVoidParam1P, ( FlashSimClass * )_tmpEventObjP->mVoidParam2P );
+                    //sub_SimFlashContentGuiReady( ( FlashModifyContent_s * )_tmpEventObjP->mVoidParam1P, ( FlashSimClass * )_tmpEventObjP->mVoidParam2P );
 
                     delete ( FlashModifyContent_s * )_tmpEventObjP->mVoidParam1P;
                     delete _tmpEventObjP;

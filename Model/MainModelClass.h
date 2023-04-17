@@ -14,7 +14,6 @@
 #include "./spiviewmodel.h"
 #include "./serialconfigmodel.h"
 #include "./Class/SimFlash/FlashSimClass.h"
-#include "./Class/SimFlash/SimFlashListModelClass.h"
 
 class MainModelClass : public QObject
 {
@@ -36,13 +35,13 @@ public:
 
 private:
     void sub_ClearEventQueue( void );
-    void sub_SimFlashContentGuiReady( FlashModifyContent_s * pFlashModifyContentP, FlashSimClass * pDestFlashP );
+    //void sub_SimFlashContentGuiReady( FlashModifyContent_s * pFlashModifyContentP, FlashSimClass * pDestFlashP );
 
 public: //将变量申明
     LogViewModel * mLogViewModelObjP;
     SpiViewModel * mSpiModelObjP;
     SerialConfigModel * mSerialConfigModelObjP;
-    SimFlashListModelClass * mSimFlashModifyModelObjP;
+    //SimFlashListModelClass * mSimFlashModifyModelObjP;
 
 private:
     SpiCaptureDataClass * mSpiAnalyseObjP;

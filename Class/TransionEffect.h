@@ -35,6 +35,7 @@ private:
 
 private:
     void sub_CreateBorderExpandEffect( QImage * pMainImageP, QImage * pEffectImageP, QPoint pInMainImage, int pFrameCount );
+    void sub_CreateExplosionEffect( QImage * pMainImageP, QImage * pEffectImageP, QPoint pInMainImage, int pFrameCount );
 
 };
 

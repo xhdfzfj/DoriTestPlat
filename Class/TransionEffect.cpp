@@ -159,6 +159,15 @@ bool TransionEffect::fun_CreateEffect( QImage * pMainImageP, QImage * pEffectIma
             mWaitMilliSecond = 1;
         }
     }
+    else if( pEffect == 2 )
+    {
+        sub_CreateExplosionEffect( pMainImageP, pEffectImageP, pInMainImage, pFrameCount );
+        mWaitMilliSecond = pEffectTimeLen / pFrameCount;
+        if( mWaitMilliSecond == 0 )
+        {
+            mWaitMilliSecond = 1;
+        }
+    }
 
     return true;
 }
@@ -205,4 +214,20 @@ void TransionEffect::sub_CreateBorderExpandEffect( QImage * pMainImageP, QImage 
 
         fun_AddEffectImage( _tmpImageP );
     }
+}
+
+/**
+ * @brief TransionEffect::sub_CreateExplosionEffect
+ *      模拟一个爆炸效果
+ * @param pMainImageP
+ * @param pEffectImageP
+ * @param pInMainImage
+ * @param pFrameCount
+ */
+void TransionEffect::sub_CreateExplosionEffect( QImage * pMainImageP, QImage * pEffectImageP, QPoint pInMainImage, int pFrameCount )
+{
+    QRect _tmpRect;
+    int _tmpValue;
+
+    _tmpRect = QRect( pInMainImage.x(), pInMainImage.y(), pEffectImageP->width(), pEffectImageP->height() );
 }

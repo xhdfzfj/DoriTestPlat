@@ -6,6 +6,7 @@ QT += serialport
 
 SOURCES += \
         Class/AsyncTimerClass.cpp \
+        Class/DifferentUpdata/DifferentUpdataControl.cpp \
         Class/FileAnalyseBaseClass.cpp \
         Class/MenuClass/PrivateMenuClass.cpp \
         Class/MenuClass/PrivateMenuItemClass.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
         Class/TransionEffect.cpp \
         Control/GuiDrawControl.cpp \
         Control/HexDataClass.cpp \
+        Control/HexDataDisplayControl.cpp \
         Model/LogViewModel.cpp \
         Model/MainModelClass.cpp \
         Model/serialconfigmodel.cpp \
@@ -45,6 +47,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     Class/AsyncTimerClass.h \
+    Class/DifferentUpdata/DifferentUpdataControl.h \
     Class/FileAnalyseBaseClass.h \
     Class/MenuClass/PrivateMenuClass.h \
     Class/MenuClass/PrivateMenuItemClass.h \
@@ -57,6 +60,7 @@ HEADERS += \
     Class/TransionEffect.h \
     Control/GuiDrawControl.h \
     Control/HexDataClass.h \
+    Control/HexDataDisplayControl.h \
     Include/CommonStruct.h \
     Model/LogViewModel.h \
     Model/MainModelClass.h \

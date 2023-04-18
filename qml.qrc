@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>AnalyseSpi.qml</file>
         <file>flashSim.qml</file>
+        <file>different.qml</file>
     </qresource>
 </RCC>

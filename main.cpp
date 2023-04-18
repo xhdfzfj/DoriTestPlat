@@ -8,6 +8,7 @@
 #include "./Control/GuiDrawControl.h"
 #include "./Model/MainModelClass.h"
 #include "./Class/SimFlash/SimFlashDrawControl.h"
+#include "./Class/DifferentUpdata/DifferentUpdataControl.h"
 
 MainModelClass * gMainModelObjP;
 
@@ -30,6 +31,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType< GuiDrawControl >( "xhd.controls.guidrawcontrol", 1, 0, "GuiDrawControl" );
     qmlRegisterType< SimFlashDrawControl >( "xhd.controls.simflashddrawcontrol", 1, 0, "SimFlashDrawControl" );
+    qmlRegisterType< DifferentUpdataControl >( "xhd.controls.differentupdatecontrol", 1, 0, "DifferentUpdataControl" );
     //qmlRegisterType< SimFlashListModelClass >( "xhd.controls.simflaslistmodel", 1, 0, "SimFlashListModelClass" );
 
     gMainModelObjP = new MainModelClass();

@@ -93,9 +93,24 @@ Window {
 
             Button
             {
-                text:qsTr( "测试按键" )
+                id:guiDifferentBut
+                text:qsTr( "差分生成" )
                 anchors.top:guiAddComSetupBut.top
                 anchors.left: guiAddComSetupBut.right
+                anchors.leftMargin: 3
+                width:120
+                onClicked:
+                {
+                    workState = 3
+                    fun_LoaderDifferent()
+                }
+            }
+
+            Button
+            {
+                text:qsTr( "测试按键" )
+                anchors.top:guiDifferentBut.top
+                anchors.left: guiDifferentBut.right
                 anchors.leftMargin: 30
                 width:100
                 id:guiTestBut
@@ -380,6 +395,15 @@ Window {
         if( workState == 2 )
         {
             guiLoader.source = "flashSim.qml"
+            //guiLoader.source = "different.qml"
+        }
+    }
+
+    function fun_LoaderDifferent()
+    {
+        if( workState == 3 )
+        {
+            guiLoader.source = "different.qml"
         }
     }
 

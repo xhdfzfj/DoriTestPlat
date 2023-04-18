@@ -11,7 +11,7 @@ Item
         onTriggered:
         {
             console.log( "sizeChange!!!" );
-            guiSimFlashControl1.sub_SizeChange();
+            guiDifferentUpdataControl1.sub_SizeChange();
         }
     }
 
@@ -45,11 +45,16 @@ Item
                     {
                         text:qsTr( "浏览" )
                         height: 20
+                        onClicked:
+                        {
+                            diffrentGuiIndex = 1;
+                            fds.open()
+                        }
                     }
                 }
                 DifferentUpdataControl
                 {
-                    id:guiSimFlashControl1
+                    id:guiDifferentUpdataControl1
                     width: parent.width
                     height: parent.height - guiSrcDiffFile.height
                     fillColor: "lightsteelblue"
@@ -105,7 +110,7 @@ Item
                 }
                 DifferentUpdataControl
                 {
-                    id:guiSimFlashControl2
+                    id:guiDifferentUpdataControl2
                     width: parent.width
                     height: parent.height - guiSrcDiffFile.height
                     fillColor: "lightblue"
@@ -139,7 +144,7 @@ Item
                 }
                 DifferentUpdataControl
                 {
-                    id:guiSimFlashControl3
+                    id:guiDifferentUpdataControl3
                     width: parent.width
                     height: parent.height - guiSrcDiffFile.height
                     fillColor: "lightsteelblue"
@@ -148,8 +153,21 @@ Item
         }
     }
 
+    function sub_OpenFile(pIndex, pFileUrl)
+    {
+        if( pIndex === 1 )
+        {
+            guiDifferentUpdataControl1.sub_DifferentFile( pFileUrl )
+        }
+    }
+
     Component.onCompleted:
     {
-
+        guiDifferentUpdataControl1.sub_DifferentType( 0 );
+        guiDifferentUpdataControl2.sub_DifferentType( 1 );
+        guiDifferentUpdataControl3.sub_DifferentType( 2 );
+        guiDifferentUpdataControl1.sub_SetMainModelObj( MainModelObj );
+        guiDifferentUpdataControl2.sub_SetMainModelObj( MainModelObj );
+        guiDifferentUpdataControl3.sub_SetMainModelObj( MainModelObj );
     }
 }

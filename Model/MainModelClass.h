@@ -14,6 +14,8 @@
 #include "./spiviewmodel.h"
 #include "./serialconfigmodel.h"
 #include "./Class/SimFlash/FlashSimClass.h"
+#include "./Class/DifferentUpdata/DifferentUpdataControl.h"
+
 
 class MainModelClass : public QObject
 {
@@ -24,7 +26,6 @@ public:
 
     Q_INVOKABLE void sub_OpenSerialPortClick( QString pButtonText );
     Q_INVOKABLE void sub_AnalyseSpiClick( QUrl pSpiFilePath );
-    Q_INVOKABLE void sub_ClearSelf();
     Q_INVOKABLE void sub_GetDrawObjectFromQml( QObject * pObjectP );
     Q_INVOKABLE void sub_TestSelf() { qDebug() << "Main Model test self"; }
 
@@ -54,6 +55,8 @@ private:
     bool mEventHandleThreadStopFlag;
     std::mutex mSynmtx;
     std::condition_variable mSynCv;
+
+    DifferentUpdataControl ** mDifferentUpdataObjSP;
 
 signals:
 

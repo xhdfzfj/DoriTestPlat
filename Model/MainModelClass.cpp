@@ -19,6 +19,7 @@ MainModelClass::MainModelClass(QObject *parent)
 
     mEventHandleThreadP = new std::thread( &MainModelClass::sub_EventHandle, this );
 
+    mDifferentUpdataObjSP = nullptr;
 }
 
 /**
@@ -43,17 +44,13 @@ MainModelClass::~MainModelClass()
     }
     delete mLogViewModelObjP;
     delete mSerialConfigModelObjP;
-    //delete mSimFlashModifyModelObjP;
+
+    if( mDifferentUpdataObjSP != nullptr )
+    {
+        delete [] mDifferentUpdataObjSP;
+    }
 }
 
-/**
- * @brief MainModelClass::sub_ClearSelf
- *      自清理
- */
-void MainModelClass::sub_ClearSelf()
-{
-   delete this;
-}
 
 /**
  * @brief MainModelClass::sub_OpenSerialPortClick
@@ -253,6 +250,33 @@ void MainModelClass::sub_EventHandle( void )
                     //sub_SimFlashContentGuiReady( ( FlashModifyContent_s * )_tmpEventObjP->mVoidParam1P, ( FlashSimClass * )_tmpEventObjP->mVoidParam2P );
 
                     delete ( FlashModifyContent_s * )_tmpEventObjP->mVoidParam1P;
+                    delete _tmpEventObjP;
+                }
+            }
+            else if( _tmpEventObjP->mEventType_e == EventType_e::RegisterObject )
+            {
+                if( _tmpEventObjP->mSender_e == Sender_e::DifferentUpdate )
+                {
+                    if( mDifferentUpdataObjSP == nullptr )
+                    {
+                        mDifferentUpdataObjSP = new DifferentUpdataControl * [ 3 ];
+                        mDifferentUpdataObjSP[ 0 ] = nullptr;
+                        mDifferentUpdataObjSP[ 1 ] = nullptr;
+                        mDifferentUpdataObjSP[ 2 ] = nullptr;
+                    }
+
+                    if( mDifferentUpdataObjSP[ 0 ] == nullptr )
+                    {
+                        mDifferentUpdataObjSP[ 0 ] = ( DifferentUpdataControl * )_tmpEventObjP->mVoidParam1P;
+                    }
+                    else if( mDifferentUpdataObjSP[ 1 ] == nullptr )
+                    {
+                        mDifferentUpdataObjSP[ 1 ] = ( DifferentUpdataControl * )_tmpEventObjP->mVoidParam1P;
+                    }
+                    else
+                    {
+                        mDifferentUpdataObjSP[ 2 ] = ( DifferentUpdataControl * )_tmpEventObjP->mVoidParam1P;
+                    }
                     delete _tmpEventObjP;
                 }
             }

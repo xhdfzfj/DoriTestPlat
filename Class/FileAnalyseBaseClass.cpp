@@ -13,6 +13,15 @@ FileAnalyseBaseClass::FileAnalyseBaseClass( string pFilePath )
     mReadedLen = 0;
 }
 
+
+FileAnalyseBaseClass::FileAnalyseBaseClass()
+{
+    mFilePath = "";
+    mCurrOffset = 0;
+    mActiveFlag = false;
+    mReadedLen = 0;
+}
+
 /**
  * @brief FileAnalyseBaseClass::~FileAnalyseBaseClass
  */

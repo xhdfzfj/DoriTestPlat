@@ -23,6 +23,7 @@ Window {
 
     property int workState: 0   //1:spi分析 2:通用的内存显示
     property int serialAddIndex : 0
+    property int diffrentGuiIndex : 0
 
     Grid
     {
@@ -343,7 +344,17 @@ Window {
         {
             //labels.text = fds.fileUrl;
             console.log("You chose: " + fds.fileUrl);
-            MainModelObj.sub_AnalyseSpiClick( fds.fileUrl );
+            if( workState === 3 )
+            {
+                if( diffrentGuiIndex === 1 )
+                {
+                    guiLoader.item.sub_OpenFile( diffrentGuiIndex, fds.fileUrl )
+                }
+            }
+            else
+            {
+                MainModelObj.sub_AnalyseSpiClick( fds.fileUrl );
+            }
         }
 
         onRejected:

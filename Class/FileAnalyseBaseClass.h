@@ -12,6 +12,7 @@ using namespace std;
 class FileAnalyseBaseClass : SelfClearInterFaceClass
 {
 public:
+    FileAnalyseBaseClass();
     FileAnalyseBaseClass( string pFilePath );
     virtual ~FileAnalyseBaseClass();
 

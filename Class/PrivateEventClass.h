@@ -11,6 +11,7 @@ typedef enum __EventType_e
     ReDrawHexData,
     GuiTransionEffect,
     ModifySimFlashContent,
+    RegisterObject,
 }EventType_e;
 
 typedef enum __DataType_e
@@ -24,6 +25,7 @@ typedef enum __Sender_e
     SpiCapture,
     TransionEffector,
     SimFlash,
+    DifferentUpdate
 }Sender_e;
 
 typedef enum __FreeParamType_e

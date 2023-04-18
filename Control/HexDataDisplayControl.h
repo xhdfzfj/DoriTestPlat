@@ -22,6 +22,22 @@ public:
 private:
     QImage * mMainImageP;
 
+protected:
+    const int mSpaceValue = 3;
+    int mFontSize;
+    QFont mFont;
+    QColor mFontColor;
+    QColor mBackColor;
+    int mFontHeight;
+    int mDataFontWidth;
+    int mColonFontWidth;
+    int mSingleAscWidth;
+    int mAddressStringWidth;
+    int mLineByteCount;
+
+protected:
+    void sub_DataToImage();
+
     /*********************************
      * 系统重载
      * ******************************/

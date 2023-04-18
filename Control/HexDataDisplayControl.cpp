@@ -4,6 +4,37 @@
 HexDataDisplayControl::HexDataDisplayControl( QQuickItem * pParent ) : QQuickPaintedItem( pParent )
 {
     mMainImageP = nullptr;
+
+    mFont = QFont( "SimSun", 16 );
+    mFontSize = 16;
+    mFontColor = Qt::black;
+
+    QFontMetrics _tmpFm( mFont );
+
+    int _stringHeight;
+    int _SignalDataWidth;
+    int _SingleAscWidth;
+    int _AddressStringWidth;
+    int _colonStringWidth;
+    QString _testString;
+
+    _testString = "FF";
+    _SignalDataWidth = _tmpFm.horizontalAdvance( _testString );
+    _testString = "FFFFFFFF";
+    _AddressStringWidth = _tmpFm.horizontalAdvance( _testString );
+    _testString = ":";
+    _colonStringWidth = _tmpFm.horizontalAdvance( _testString );
+    _testString = "A";
+    _SingleAscWidth = _tmpFm.horizontalAdvance( _testString );
+    _stringHeight = _tmpFm.height();
+
+    mFontHeight = _stringHeight;
+    mDataFontWidth = _SignalDataWidth;
+    mColonFontWidth = _colonStringWidth;
+    mSingleAscWidth = _SingleAscWidth;
+    mAddressStringWidth = _AddressStringWidth;
+
+    mLineByteCount = 0;
 }
 
 HexDataDisplayControl::~HexDataDisplayControl()

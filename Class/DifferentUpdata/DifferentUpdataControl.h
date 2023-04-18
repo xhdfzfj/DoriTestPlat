@@ -24,6 +24,9 @@ public:
     int GetDifferentDisplayType() { return mDifferentDisplayType; }
 
 private:
+    void sub_ReadyCreateGui( void );
+
+private:
     MainModelClass * mMainModelObjP;
     int mDifferentDisplayType;      //显示的类型 0 旧  1 新  2结果
 };

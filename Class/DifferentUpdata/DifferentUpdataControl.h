@@ -25,6 +25,10 @@ public:
 
 private:
     void sub_ReadyCreateGui( void );
+    void sub_DataToImage( void );
+
+    int mCurrDisplayStartY;
+    int mCurrDisplayEndY;
 
 private:
     MainModelClass * mMainModelObjP;

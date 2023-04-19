@@ -12,6 +12,7 @@ Item
         {
             console.log( "sizeChange!!!" );
             guiDifferentUpdataControl1.sub_SizeChange();
+            guiDifferentUpdataControl2.sub_SizeChange();
         }
     }
 
@@ -106,6 +107,11 @@ Item
                     {
                         text:qsTr( "浏览" )
                         height: 20
+                        onClicked:
+                        {
+                            diffrentGuiIndex = 2;
+                            fds.open()
+                        }
                     }
                 }
                 DifferentUpdataControl
@@ -129,16 +135,12 @@ Item
                     Label
                     {
                         id:guiResultDiffFile
-                        text:"结果文件:"
+                        text:"页大小为256"
                     }
-                    Label
-                    {
-                        id:guiResultDiffFilePath
-                        text:"                "
-                    }
+
                     Button
                     {
-                        text:qsTr( "浏览" )
+                        text:qsTr( "生成" )
                         height: 20
                     }
                 }
@@ -153,11 +155,33 @@ Item
         }
     }
 
-    function sub_OpenFile(pIndex, pFileUrl)
+    function sub_OpenFile(pIndex, pFileUrl, pFolder )
     {
+        var _len
+        var _len1
         if( pIndex === 1 )
         {
+            _len = pFileUrl.toString().length
+            _len1 = pFolder.toString().length
+
+            console.log( pFileUrl.toString() )
+            console.log( pFolder.toString() )
+
+            guiSrcDiffFilePath.text = pFileUrl.toString().substring( _len1 )
+
             guiDifferentUpdataControl1.sub_DifferentFile( pFileUrl )
+        }
+        else if( pIndex === 2 )
+        {
+            _len = pFileUrl.toString().length
+            _len1 = pFolder.toString().length
+
+            console.log( pFileUrl.toString() )
+            console.log( pFolder.toString() )
+
+            guiNewDiffFilePath.text = pFileUrl.toString().substring( _len1 )
+
+            guiDifferentUpdataControl2.sub_DifferentFile( pFileUrl )
         }
     }
 

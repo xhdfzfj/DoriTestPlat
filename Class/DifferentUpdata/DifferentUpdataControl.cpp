@@ -6,6 +6,8 @@
 DifferentUpdataControl::DifferentUpdataControl( QQuickItem * pParent ) : HexDataDisplayControl( pParent ), FileAnalyseBaseClass()
 {
     mMainModelObjP = nullptr;
+    mCurrDisplayStartY = -1;
+    mCurrDisplayEndY = -1;
 }
 
 DifferentUpdataControl::~DifferentUpdataControl()
@@ -87,7 +89,7 @@ void DifferentUpdataControl::sub_ReadyCreateGui( void )
     int i, j;
     int _tmpValue;
 
-    i = 4;
+    i = 8;
 
     _tmpValue = i * mDataFontWidth + ( i - 1 ) * mSingleAscWidth;
 
@@ -104,8 +106,49 @@ void DifferentUpdataControl::sub_ReadyCreateGui( void )
             _tmpValue = i * mDataFontWidth + ( i - 1 ) * mSingleAscWidth;
         }
 
-        _lineByteCount = i;
+        _lineByteCount = j;
     }
 
     mLineByteCount = _lineByteCount;
+}
+
+/**
+ * @brief DifferentUpdataControl::sub_DataToImage
+ */
+void DifferentUpdataControl::sub_DataToImage()
+{
+    uint8_t * _tmpLineBufP;
+    int _retValue;
+    int _y, _tmpOffset;
+    bool _flag;
+
+    _y = mFontHeight;
+    _tmpOffset = mCurrOffset;
+    _tmpLineBufP = new uint8_t [ mLineByteCount ];
+
+    _retValue = fun_GetFileData( _tmpLineBufP, mLineByteCount );
+
+    if( _retValue != 0 )
+    {
+        setXToInit();
+        _flag = fun_LineHexDataToImage( _tmpLineBufP, mLineByteCount, _tmpOffset );
+        _tmpOffset += _retValue;
+
+        while( !_flag )
+        {
+            _retValue = fun_GetFileData( _tmpLineBufP, mLineByteCount );
+            if( _retValue == 0 )
+            {
+                break;
+            }
+            setXToInit();
+            _flag = fun_LineHexDataToImage( _tmpLineBufP, mLineByteCount, _tmpOffset );
+            _tmpOffset += _retValue;
+        }
+
+        saveMainImageToJpg( "diffrent.jpg" );
+
+        emit sub_SignalReDraw();
+    }
+
 }

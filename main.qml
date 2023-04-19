@@ -5,8 +5,8 @@ import QtQuick.Dialogs 1.3
 //import Dori.TestPlat.ModelObject 1.0
 
 Window {
-    width: 1920
-    height: 1080
+    width: 2000
+    height: 1200
     visible: true
     title: qsTr("功能测试软件")
     id:guiMainWindow
@@ -218,7 +218,7 @@ Window {
             //LOG显示部份
             Rectangle
             {
-                width: parent.width / 3
+                width: parent.width / 4
                 height: parent.height
                 border.width: 2
                 border.color: "darkslategray"
@@ -305,7 +305,7 @@ Window {
             Loader
             {
                 id:guiLoader
-                width: parent.width - parent.width / 3
+                width: parent.width - parent.width / 4
                 height: parent.height
                 onLoaded:
                 {
@@ -346,9 +346,9 @@ Window {
             console.log("You chose: " + fds.fileUrl);
             if( workState === 3 )
             {
-                if( diffrentGuiIndex === 1 )
+                if( ( diffrentGuiIndex === 1 ) || ( diffrentGuiIndex === 2 ) )
                 {
-                    guiLoader.item.sub_OpenFile( diffrentGuiIndex, fds.fileUrl )
+                    guiLoader.item.sub_OpenFile( diffrentGuiIndex, fds.fileUrl, fds.folder )
                 }
             }
             else

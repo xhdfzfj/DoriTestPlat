@@ -19,6 +19,16 @@ public:
     HexDataDisplayControl( QQuickItem * pParent = nullptr );
     virtual ~HexDataDisplayControl();
 
+protected:
+    void setXToInit() { mCurrX = mSpaceValue; }
+    void setYToInit() { mCurrY = mSpaceValue; }
+    void saveMainImageToJpg( QString pFileName ) {
+                                                    if( mMainImageP != nullptr )
+                                                    {
+                                                        mMainImageP->save( pFileName );
+                                                    }
+                                                 }
+
 private:
     QImage * mMainImageP;
 
@@ -35,8 +45,17 @@ protected:
     int mAddressStringWidth;
     int mLineByteCount;
 
+    int mCurrY;
+    int mCurrX;
+
+signals:
+    void sub_SignalReDraw();
+
+public slots:
+    void sub_SlotReDraw();
+
 protected:
-    void sub_DataToImage();
+    bool fun_LineHexDataToImage( uint8_t * pDataBuf, int pDataLen, int pStartOffset );
 
     /*********************************
      * 系统重载

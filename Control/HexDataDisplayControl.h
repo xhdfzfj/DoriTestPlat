@@ -28,6 +28,16 @@ protected:
                                                         mMainImageP->save( pFileName );
                                                     }
                                                  }
+    void ClrMainImage() {
+                            if( mMainImageP != nullptr )
+                            {
+                                mMainImageP->fill( mBackColor );
+                            }
+                        }
+    void ResetCurrXY()  {
+                            mCurrX = mSpaceValue;
+                            mCurrY = mSpaceValue;
+                        }
 
 private:
     QImage * mMainImageP;

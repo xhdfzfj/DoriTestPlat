@@ -12,6 +12,7 @@ typedef enum __EventType_e
     GuiTransionEffect,
     ModifySimFlashContent,
     RegisterObject,
+    WheelEvent,
 }EventType_e;
 
 typedef enum __DataType_e

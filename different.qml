@@ -81,6 +81,24 @@ Item
                         guiSizeChangeTimer.interval = 3;
                         guiSizeChangeTimer.start();
                     }
+
+                    MouseArea
+                    {
+                        anchors.fill: parent
+                        propagateComposedEvents: true
+                        acceptedButtons: Qt.AllButtons
+                        onWheel:
+                        {
+                            if( wheel.angleDelta.y > 0 )
+                            {
+                                guiDifferentUpdataControl1.sub_WheelEvent( 1, 1 );
+                            }
+                            else
+                            {
+                                guiDifferentUpdataControl1.sub_WheelEvent( 0, 1 );
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -120,6 +138,24 @@ Item
                     width: parent.width
                     height: parent.height - guiSrcDiffFile.height
                     fillColor: "lightblue"
+
+                    MouseArea
+                    {
+                        anchors.fill: parent
+                        propagateComposedEvents: true
+                        acceptedButtons: Qt.AllButtons
+                        onWheel:
+                        {
+                            if( wheel.angleDelta.y > 0 )
+                            {
+                                guiDifferentUpdataControl2.sub_WheelEvent( 1, 1 );
+                            }
+                            else
+                            {
+                                guiDifferentUpdataControl2.sub_WheelEvent( 0, 1 );
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -142,6 +178,10 @@ Item
                     {
                         text:qsTr( "生成" )
                         height: 20
+                        onClicked:
+                        {
+                            guiDifferentUpdataControl3.sub_CreateBsDiffFile();
+                        }
                     }
                 }
                 DifferentUpdataControl

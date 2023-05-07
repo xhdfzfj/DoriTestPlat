@@ -192,6 +192,30 @@ void MainModelClass::sub_ClearEventQueue( void )
 //}
 
 /**
+ * @brief MainModelClass::sub_DifferentUpdataObjSyncWheel
+ *      同步差分生成窗口的同步滚动
+ * @param pSenderObjP
+ * @param pDirect
+ */
+void MainModelClass::sub_DifferentUpdataObjSyncWheel( void * pSenderObjP, int pDirect )
+{
+    if( mDifferentUpdataObjSP != nullptr )
+    {
+        for( int i = 0; i < 3; i++ )
+        {
+            if( ( ( void * )mDifferentUpdataObjSP[ i ] != pSenderObjP ) &&
+                ( mDifferentUpdataObjSP[ i ] != nullptr ) )
+            {
+                if( mDifferentUpdataObjSP[ i ]->GetDifferentDisplayType() != 2 )
+                {
+                    mDifferentUpdataObjSP[ i ]->sub_WheelEvent( pDirect, 0 );
+                }
+            }
+        }
+    }
+}
+
+/**
  * @brief MainModelClass::sub_EventHandle
  *      事件的线程处理
  */
@@ -278,6 +302,13 @@ void MainModelClass::sub_EventHandle( void )
                         mDifferentUpdataObjSP[ 2 ] = ( DifferentUpdataControl * )_tmpEventObjP->mVoidParam1P;
                     }
                     delete _tmpEventObjP;
+                }
+            }
+            else if( _tmpEventObjP->mEventType_e == EventType_e::WheelEvent )
+            {
+                if( _tmpEventObjP->mSender_e == Sender_e::DifferentUpdate )
+                {
+                    sub_DifferentUpdataObjSyncWheel( _tmpEventObjP->mVoidParam1P, _tmpEventObjP->mVoidParam1Len );
                 }
             }
         }

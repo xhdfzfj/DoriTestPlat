@@ -36,6 +36,7 @@ public:
 
 private:
     void sub_ClearEventQueue( void );
+    void sub_DifferentUpdataObjSyncWheel( void * pSenderObjP, int pDirect );
     //void sub_SimFlashContentGuiReady( FlashModifyContent_s * pFlashModifyContentP, FlashSimClass * pDestFlashP );
 
 public: //将变量申明

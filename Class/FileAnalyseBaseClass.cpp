@@ -43,6 +43,50 @@ void FileAnalyseBaseClass::sub_ClearHandle()
 }
 
 /**
+ * @brief FileAnalyseBaseClass::fun_FileSeek
+ * @param pStartOffset
+ * @return
+ */
+bool FileAnalyseBaseClass::fun_FileSeek( int pStartOffset )
+{
+    bool _ret;
+
+    _ret = false;
+
+    if( !mActiveFlag )
+    {
+        std::string _tmpFilePath;
+
+#ifdef Q_OS_WIN
+        _tmpFilePath = mFilePath.substr( 1, mFilePath.length() - 1 );
+#else
+        _tmpFilePath = mFilePath;
+#endif
+        mInFileStream.open( _tmpFilePath.c_str(), std::ios::binary );
+        if( mInFileStream )
+        {
+            mActiveFlag = true;
+            mInFileStream.seekg( 0, std::ios::end );
+            mFileLen = ( int )mInFileStream.tellg();
+            mInFileStream.seekg( 0, std::ios::beg );
+
+            mCurrOffset = 0;
+        }
+    }
+
+    if( mActiveFlag )
+    {
+        if( pStartOffset < mFileLen )
+        {
+            mInFileStream.seekg( pStartOffset, std::ios::beg );
+            mCurrOffset = pStartOffset;
+            _ret = true;
+        }
+    }
+    return _ret;
+}
+
+/**
  * @brief FileAnalyseBaseClass::fun_GetFileData
  * @param pLen
  * @param pStartOffset

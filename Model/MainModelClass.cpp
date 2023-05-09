@@ -216,6 +216,39 @@ void MainModelClass::sub_DifferentUpdataObjSyncWheel( void * pSenderObjP, int pD
 }
 
 /**
+ * @brief MainModelClass::sub_DifferentUpdataObjectGetOldFile
+ * @param pSenderObjP
+ * @param pCallBackP
+ */
+void MainModelClass::sub_DifferentUpdataObjectGetOldFile( void * pSenderObjP, void * pCallBackP )
+{
+    void( * _tmpCallBackP )( uint8_t *, int );
+    uint8_t * _tmpDataP;
+    int _tmpLen;
+
+    _tmpDataP = nullptr;
+    _tmpLen = 0;
+    _tmpCallBackP = ( void ( * )( uint8_t *, int ) )( pCallBackP );
+
+    if( _tmpCallBackP != nullptr )
+    {
+        if( mDifferentUpdataObjSP != nullptr )
+        {
+            if( mDifferentUpdataObjSP[ 0 ] != nullptr )
+            {
+                _tmpLen = mDifferentUpdataObjSP[ 0 ]->GetFileLen();
+                _tmpDataP = mDifferentUpdataObjSP[ 0 ]->fun_GetAllFileData();
+            }
+        }
+        _tmpCallBackP( _tmpDataP, _tmpLen );
+        if( _tmpDataP != nullptr )
+        {
+            delete _tmpDataP;
+        }
+    }
+}
+
+/**
  * @brief MainModelClass::sub_EventHandle
  *      事件的线程处理
  */
@@ -309,6 +342,15 @@ void MainModelClass::sub_EventHandle( void )
                 if( _tmpEventObjP->mSender_e == Sender_e::DifferentUpdate )
                 {
                     sub_DifferentUpdataObjSyncWheel( _tmpEventObjP->mVoidParam1P, _tmpEventObjP->mVoidParam1Len );
+                    delete _tmpEventObjP;
+                }
+            }
+            else if( _tmpEventObjP->mEventType_e == EventType_e::GetOldFileDataAndLen )
+            {
+                if( _tmpEventObjP->mSender_e == Sender_e::DifferentUpdate )
+                {
+                    sub_DifferentUpdataObjectGetOldFile( _tmpEventObjP->mVoidParam1P, _tmpEventObjP->mVoidParam2P );
+                    delete _tmpEventObjP;
                 }
             }
         }

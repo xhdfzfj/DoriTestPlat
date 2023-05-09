@@ -13,6 +13,7 @@ typedef enum __EventType_e
     ModifySimFlashContent,
     RegisterObject,
     WheelEvent,
+    GetOldFileDataAndLen,
 }EventType_e;
 
 typedef enum __DataType_e

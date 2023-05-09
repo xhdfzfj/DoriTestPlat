@@ -43,6 +43,29 @@ void FileAnalyseBaseClass::sub_ClearHandle()
 }
 
 /**
+ * @brief FileAnalyseBaseClass::fun_GetAllFileData
+ * @return
+ */
+uint8_t * FileAnalyseBaseClass::fun_GetAllFileData( void )
+{
+    uint8_t * _retP;
+    int _tmpOffset;
+
+    _retP = nullptr;
+    if( mActiveFlag )
+    {
+        _tmpOffset = mCurrOffset;
+        _retP = new uint8_t [ mFileLen ];
+
+        mInFileStream.seekg( 0, std::ios::beg );
+        mInFileStream.read( ( char * )_retP, mFileLen );
+        mInFileStream.seekg( _tmpOffset, std::ios::beg );
+    }
+
+    return _retP;
+}
+
+/**
  * @brief FileAnalyseBaseClass::fun_FileSeek
  * @param pStartOffset
  * @return

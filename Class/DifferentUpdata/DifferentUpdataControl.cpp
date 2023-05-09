@@ -18,14 +18,25 @@ DifferentUpdataControl::~DifferentUpdataControl()
     qDebug() << "~DifferentUpdataControl";
 }
 
+
+void DifferentUpdataControl::sub_GetOtherFileDataAndLen( uint8_t * pFileDataP, int pFileDataLen )
+{
+    qDebug() << "Main Call Back";
+}
+
 /**
  * @brief DifferentUpdataControl::sub_CreateBsDiffFile
  */
 void DifferentUpdataControl::sub_CreateBsDiffFile()
 {
     int _tmpLen;
+    PrivateEventClass * _tmpEventObjP;
 
-    _tmpLen = fun_StartBsDiff( nullptr, 0, nullptr, 0, nullptr );
+    _tmpEventObjP = new PrivateEventClass( EventType_e::GetOldFileDataAndLen, DataType_e::DataType, Sender_e::DifferentUpdate,
+                                           ( void * )this,  ( void * )( &this->sub_GetOtherFileDataAndLen ) );
+    mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
+
+    //_tmpLen = fun_StartBsDiff( nullptr, 0, nullptr, 0, nullptr );
 }
 
 /**

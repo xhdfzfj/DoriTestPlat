@@ -23,6 +23,7 @@ public:
     DifferentUpdataControl( QQuickItem * pParent = nullptr );
     virtual ~DifferentUpdataControl();
 
+    void sub_GetOtherFileDataAndLen( uint8_t * pFileDataP, int pFileDataLen );
     int GetDifferentDisplayType() { return mDifferentDisplayType; }
 
 private:

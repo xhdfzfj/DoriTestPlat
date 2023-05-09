@@ -17,6 +17,8 @@ public:
     virtual ~FileAnalyseBaseClass();
 
     void sub_SetFilePath( std::string pFilePath ) { mFilePath = pFilePath; }
+    int GetFileLen() { return mFileLen; }
+    uint8_t * fun_GetAllFileData();
 
 protected:
     int fun_GetFileData( uint8_t * pSaveBufP, int pLen, int pStartOffset = -1 );

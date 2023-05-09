@@ -1,4 +1,4 @@
-#ifndef __BSDIFF_H__
+﻿#ifndef __BSDIFF_H__
 #define __BSDIFF_H__
 
 #include <stdint.h>
@@ -12,5 +12,7 @@ int fun_StartBsDiff( uint8_t * pOldFileDataP, int pOldFileLen, uint8_t * pNewFil
 #if __cplusplus
 }
 #endif
+
+typedef uint8_t u_char;
 
 #endif

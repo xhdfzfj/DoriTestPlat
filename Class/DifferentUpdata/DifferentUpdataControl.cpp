@@ -2,6 +2,7 @@
 #include "../../Class/PrivateEventClass.h"
 #include "../../Model/MainModelClass.h"
 #include "DifferentUpdataControl.h"
+#include "../../BsDiff/bsdiff.h"
 
 DifferentUpdataControl::DifferentUpdataControl( QQuickItem * pParent ) : HexDataDisplayControl( pParent ), FileAnalyseBaseClass()
 {
@@ -22,10 +23,9 @@ DifferentUpdataControl::~DifferentUpdataControl()
  */
 void DifferentUpdataControl::sub_CreateBsDiffFile()
 {
-    #ifdef Q_OS_WIN
-#elif Q_OS_
-    #else
-    #endif
+    int _tmpLen;
+
+    _tmpLen = fun_StartBsDiff( nullptr, 0, nullptr, 0, nullptr );
 }
 
 /**

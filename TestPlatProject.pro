@@ -5,6 +5,8 @@ QT += serialport
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        BsDiff/BsDiffWithoutZip.c \
+        BsDiff/bsdiff.c \
         Class/AsyncTimerClass.cpp \
         Class/DifferentUpdata/DifferentUpdataControl.cpp \
         Class/FileAnalyseBaseClass.cpp \
@@ -46,6 +48,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    BsDiff/bsdiff.h \
     Class/AsyncTimerClass.h \
     Class/DifferentUpdata/DifferentUpdataControl.h \
     Class/FileAnalyseBaseClass.h \

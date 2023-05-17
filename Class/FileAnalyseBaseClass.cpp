@@ -11,6 +11,8 @@ FileAnalyseBaseClass::FileAnalyseBaseClass( string pFilePath )
     mCurrOffset = 0;
     mActiveFlag = false;
     mReadedLen = 0;
+
+    mMemoryDataSourceFlag = false;
 }
 
 
@@ -20,6 +22,8 @@ FileAnalyseBaseClass::FileAnalyseBaseClass()
     mCurrOffset = 0;
     mActiveFlag = false;
     mReadedLen = 0;
+
+    mMemoryDataSourceFlag = false;
 }
 
 /**

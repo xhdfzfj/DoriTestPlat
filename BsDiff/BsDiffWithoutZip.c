@@ -5,6 +5,24 @@
 
 #define MIN(x,y) (((x)<(y)) ? (x) : (y))
 
+void offtout(off_t x,u_char *buf)
+{
+    off_t y;
+
+    if(x<0) y=-x; else y=x;
+
+    buf[0]=y%256;y-=buf[0];
+    y=y/256;buf[1]=y%256;y-=buf[1];
+    y=y/256;buf[2]=y%256;y-=buf[2];
+    y=y/256;buf[3]=y%256;y-=buf[3];
+    y=y/256;buf[4]=y%256;y-=buf[4];
+    y=y/256;buf[5]=y%256;y-=buf[5];
+    y=y/256;buf[6]=y%256;y-=buf[6];
+    y=y/256;buf[7]=y%256;
+
+    if(x<0) buf[7]|=0x80;
+}
+
 void split(off_t *I,off_t *V,off_t start,off_t len,off_t h)
 {
     off_t i,j,k,x,tmp,jj,kk;
@@ -105,6 +123,42 @@ void qsufsort(off_t *I,off_t *V,u_char *old,off_t oldsize)
     for(i=0;i<oldsize+1;i++) I[V[i]]=i;
 }
 
+off_t matchlen(u_char *old,off_t oldsize,u_char *new,off_t newsize)
+{
+    off_t i;
+
+    for(i=0;(i<oldsize)&&(i<newsize);i++)
+        if(old[i]!=new[i]) break;
+
+    return i;
+}
+
+off_t search(off_t *I,u_char *old,off_t oldsize,
+             u_char *new,off_t newsize,off_t st,off_t en,off_t *pos)
+{
+    off_t x,y;
+
+    if(en-st<2) {
+        x=matchlen(old+I[st],oldsize-I[st],new,newsize);
+        y=matchlen(old+I[en],oldsize-I[en],new,newsize);
+
+        if(x>y) {
+            *pos=I[st];
+            return x;
+        } else {
+            *pos=I[en];
+            return y;
+        }
+    };
+
+    x=st+(en-st)/2;
+    if(memcmp(old+I[x],new,MIN(oldsize-I[x],newsize))<0) {
+        return search(I,old,oldsize,new,newsize,x,en,pos);
+    } else {
+        return search(I,old,oldsize,new,newsize,st,x,pos);
+    };
+}
+
 
 /**
  * @brief fun_StartBsDiff
@@ -117,11 +171,14 @@ void qsufsort(off_t *I,off_t *V,u_char *old,off_t oldsize)
 int fun_StartBsDiff( uint8_t * pOldFileDataP, int pOldFileLen, uint8_t * pNewFileDataP, int pNewFileLen, uint8_t ** pBsDiffDataPP )
 {
     int _ret;
+    int _index;
     u_char *old,*new;
     off_t oldsize,newsize;
     off_t *I,*V;
+    u_char * _resultP;
 
     _ret = 0;
+    _index = 0;
     oldsize = pOldFileLen;
     newsize = pNewFileLen;
     old = pOldFileDataP;
@@ -134,7 +191,142 @@ int fun_StartBsDiff( uint8_t * pOldFileDataP, int pOldFileLen, uint8_t * pNewFil
     }
 
     qsufsort( I, V, old, oldsize );
+    free( V );
+
+    _resultP = malloc( oldsize + newsize );
+
+    off_t scan,pos,len;
+    off_t lastscan,lastpos,lastoffset;
+    off_t oldscore,scsc;
+
+    off_t s,Sf,lenf,Sb,lenb;
+    off_t overlap,Ss,lens;
+    off_t i;
+
+    off_t dblen,eblen;
+    u_char *db,*eb;
+
+    u_char buf[8];
+    u_char header[32];
+
+    if(((db=malloc(newsize+1))==NULL) ||
+        ((eb=malloc(newsize+1))==NULL))
+    {
+        goto fun_StartBsDiff_exit;
+    }
+    dblen=0;
+    eblen=0;
+
+    memcpy(header,"BSDIFF40",8);
+    memset(header+8,0,24);
+    memcpy( _resultP, header, 32 );
+
+    scan=0;len=0;
+    lastscan=0;lastpos=0;lastoffset=0;
+    while(scan<newsize) {
+        oldscore=0;
+
+        for(scsc=scan+=len;scan<newsize;scan++) {
+            len=search(I,old,oldsize,new+scan,newsize-scan,
+                         0,oldsize,&pos);
+
+            for(;scsc<scan+len;scsc++)
+                if((scsc+lastoffset<oldsize) &&
+                    (old[scsc+lastoffset] == new[scsc]))
+                    oldscore++;
+
+            if(((len==oldscore) && (len!=0)) ||
+                (len>oldscore+8)) break;
+
+            if((scan+lastoffset<oldsize) &&
+                (old[scan+lastoffset] == new[scan]))
+                oldscore--;
+        };
+
+        if((len!=oldscore) || (scan==newsize)) {
+            s=0;Sf=0;lenf=0;
+            for(i=0;(lastscan+i<scan)&&(lastpos+i<oldsize);) {
+                if(old[lastpos+i]==new[lastscan+i]) s++;
+                i++;
+                if(s*2-i>Sf*2-lenf) { Sf=s; lenf=i; };
+            };
+
+            lenb=0;
+            if(scan<newsize) {
+                s=0;Sb=0;
+                for(i=1;(scan>=lastscan+i)&&(pos>=i);i++) {
+                    if(old[pos-i]==new[scan-i]) s++;
+                    if(s*2-i>Sb*2-lenb) { Sb=s; lenb=i; };
+                };
+            };
+
+            if(lastscan+lenf>scan-lenb) {
+                overlap=(lastscan+lenf)-(scan-lenb);
+                s=0;Ss=0;lens=0;
+                for(i=0;i<overlap;i++) {
+                    if(new[lastscan+lenf-overlap+i]==
+                        old[lastpos+lenf-overlap+i]) s++;
+                    if(new[scan-lenb+i]==
+                        old[pos-lenb+i]) s--;
+                    if(s>Ss) { Ss=s; lens=i+1; };
+                };
+
+                lenf+=lens-overlap;
+                lenb-=lens;
+            };
+
+            for(i=0;i<lenf;i++)
+                db[dblen+i]=new[lastscan+i]-old[lastpos+i];
+            for(i=0;i<(scan-lenb)-(lastscan+lenf);i++)
+                eb[eblen+i]=new[lastscan+lenf+i];
+
+            dblen+=lenf;
+            eblen+=(scan-lenb)-(lastscan+lenf);
+
+            offtout(lenf,buf);
+            memcpy( &_resultP[ 32 + _index ], buf, 8 );
+            _index += 8;
+
+            offtout((scan-lenb)-(lastscan+lenf),buf);
+            memcpy( &_resultP[ 32 + _index ], buf, 8 );
+            _index += 8;
+
+            offtout((pos-lenb)-(lastpos+lenf),buf);
+            memcpy( &_resultP[ 32 + _index ], buf, 8 );
+            _index += 8;
+
+            lastscan=scan-lenb;
+            lastpos=pos-lenb;
+            lastoffset=pos-scan;
+        };
+    };
+
+
+    offtout(len-32,buf);
+    memcpy( &_resultP[ 8 ], buf, 8 );
+
+    offtout(newsize,buf);
+    memcpy( &_resultP[ 24 ], buf, 8 );
+
+    memcpy( &_resultP[ 32 + _index ], db, dblen );
+    _index += dblen;
+
+    offtout(newsize-len,buf);
+    memcpy( &_resultP[ 16 ], buf, 8 );
+
+    memcpy( &_resultP[ 32 + _index ], eb, eblen );
+    _index += eblen;
+
+    _ret = _index + 32;
 
     fun_StartBsDiff_exit:
+    if( _ret == 0 )
+    {
+        free( _resultP );
+    }
+    else
+    {
+        *pBsDiffDataPP = _resultP;
+    }
     return _ret;
 }

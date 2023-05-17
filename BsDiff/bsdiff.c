@@ -171,7 +171,7 @@ void offtout(off_t x,u_char *buf)
 	if(x<0) buf[7]|=0x80;
 }
 
-#if 0
+#if 1
 int main(int argc,char *argv[])
 {
 	int fd,p[2];

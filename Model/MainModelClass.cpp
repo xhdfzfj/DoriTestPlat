@@ -220,27 +220,38 @@ void MainModelClass::sub_DifferentUpdataObjSyncWheel( void * pSenderObjP, int pD
  * @param pSenderObjP
  * @param pCallBackP
  */
-void MainModelClass::sub_DifferentUpdataObjectGetOldFile( void * pSenderObjP, void * pCallBackP )
+void MainModelClass::sub_DifferentUpdataObjectGetOldFile( void * pSenderObjP, void * pCallBackP, int pType )
 {
-    void( * _tmpCallBackP )( uint8_t *, int );
+    void( * _tmpCallBackP )( uint8_t *, int, void * );
     uint8_t * _tmpDataP;
     int _tmpLen;
 
     _tmpDataP = nullptr;
     _tmpLen = 0;
-    _tmpCallBackP = ( void ( * )( uint8_t *, int ) )( pCallBackP );
+    _tmpCallBackP = ( void ( * )( uint8_t *, int, void * ) )( pCallBackP );
 
     if( _tmpCallBackP != nullptr )
     {
         if( mDifferentUpdataObjSP != nullptr )
         {
-            if( mDifferentUpdataObjSP[ 0 ] != nullptr )
+            if( pType == 0 )
             {
-                _tmpLen = mDifferentUpdataObjSP[ 0 ]->GetFileLen();
-                _tmpDataP = mDifferentUpdataObjSP[ 0 ]->fun_GetAllFileData();
+                if( mDifferentUpdataObjSP[ 0 ] != nullptr )
+                {
+                    _tmpLen = mDifferentUpdataObjSP[ 0 ]->GetFileLen();
+                    _tmpDataP = mDifferentUpdataObjSP[ 0 ]->fun_GetAllFileData();
+                }
+            }
+            else
+            {
+                if( mDifferentUpdataObjSP[ 1 ] != nullptr )
+                {
+                    _tmpLen = mDifferentUpdataObjSP[ 1 ]->GetFileLen();
+                    _tmpDataP = mDifferentUpdataObjSP[ 1 ]->fun_GetAllFileData();
+                }
             }
         }
-        _tmpCallBackP( _tmpDataP, _tmpLen );
+        _tmpCallBackP( _tmpDataP, _tmpLen, pSenderObjP );
         if( _tmpDataP != nullptr )
         {
             delete _tmpDataP;
@@ -349,7 +360,15 @@ void MainModelClass::sub_EventHandle( void )
             {
                 if( _tmpEventObjP->mSender_e == Sender_e::DifferentUpdate )
                 {
-                    sub_DifferentUpdataObjectGetOldFile( _tmpEventObjP->mVoidParam1P, _tmpEventObjP->mVoidParam2P );
+                    sub_DifferentUpdataObjectGetOldFile( _tmpEventObjP->mVoidParam1P, _tmpEventObjP->mVoidParam2P, 0 );
+                    delete _tmpEventObjP;
+                }
+            }
+            else if( _tmpEventObjP->mEventType_e == EventType_e::GetNewFileDataAndLen )
+            {
+                if( _tmpEventObjP->mSender_e == Sender_e::DifferentUpdate )
+                {
+                    sub_DifferentUpdataObjectGetOldFile( _tmpEventObjP->mVoidParam1P, _tmpEventObjP->mVoidParam2P, 1 );
                     delete _tmpEventObjP;
                 }
             }

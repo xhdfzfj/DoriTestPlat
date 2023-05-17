@@ -11,17 +11,111 @@ DifferentUpdataControl::DifferentUpdataControl( QQuickItem * pParent ) : HexData
     mCurrDisplayEndY = -1;
 
     mCurrStartDisplayLine = 0;
+
+    mOldDataContentP = nullptr;
+    mOldDataContentLen = 0;
+
+    mNewDataContentP = nullptr;
+    mNewDataContentLen = 0;
 }
 
 DifferentUpdataControl::~DifferentUpdataControl()
 {
     qDebug() << "~DifferentUpdataControl";
+    if( mOldDataContentP != nullptr )
+    {
+        delete [] mOldDataContentP;
+    }
+
+    if( mNewDataContentP != nullptr )
+    {
+        delete [] mNewDataContentP;
+    }
 }
 
-
-void DifferentUpdataControl::sub_GetOtherFileDataAndLen( uint8_t * pFileDataP, int pFileDataLen )
+/**
+ * @brief DifferentUpdataControl::sub_GetOldFileDataAndLenCB
+ *      静态函数
+ * @param pFileDataP
+ * @param pFileDataLen
+ * @param pDestObjP
+ */
+void DifferentUpdataControl::sub_GetOldFileDataAndLenCB( uint8_t * pFileDataP, int pFileDataLen, void * pDestObjP )
 {
     qDebug() << "Main Call Back";
+
+    DifferentUpdataControl * _tmpObjP;
+
+    _tmpObjP = ( DifferentUpdataControl * )pDestObjP;
+
+    _tmpObjP->sub_GetOtherFileDataAndLen( pFileDataP, pFileDataLen, 0 );
+
+}
+
+/**
+ * @brief DifferentUpdataControl::sub_GetOldFileDataAndLenCB
+ *      静态函数
+ * @param pFileDataP
+ * @param pFileDataLen
+ * @param pDestObjP
+ */
+void DifferentUpdataControl::sub_GetNewFileDataAndLenCB( uint8_t * pFileDataP, int pFileDataLen, void * pDestObjP )
+{
+    qDebug() << "Main Call Back";
+
+    DifferentUpdataControl * _tmpObjP;
+
+    _tmpObjP = ( DifferentUpdataControl * )pDestObjP;
+
+    _tmpObjP->sub_GetOtherFileDataAndLen( pFileDataP, pFileDataLen, 1 );
+
+}
+
+/**
+ * @brief DifferentUpdataControl::sub_GetOtherFileDataAndLen
+ * @param pDataP
+ * @param pLen
+ * @param pType
+ */
+void DifferentUpdataControl::sub_GetOtherFileDataAndLen( uint8_t * pDataP, int pLen, int pType )
+{
+    int _tmpLen;
+    uint8_t * _resultP;
+
+    if( pType == 0 )
+    {
+        if( mOldDataContentP != nullptr )
+        {
+            delete [] mOldDataContentP;
+            mOldDataContentP = nullptr;
+        }
+
+        mOldDataContentP = new uint8_t [ pLen ];
+        memcpy( mOldDataContentP, pDataP, pLen );
+        mOldDataContentLen = pLen;
+    }
+    else
+    {
+        if( mNewDataContentP != nullptr )
+        {
+            delete [] mNewDataContentP;
+            mNewDataContentP = nullptr;
+        }
+
+        mNewDataContentP = new uint8_t [ pLen ];
+        memcpy( mNewDataContentP, pDataP, pLen );
+        mNewDataContentLen = pLen;
+    }
+
+    if( ( mOldDataContentP != nullptr ) && ( mNewDataContentP != nullptr ) )
+    {
+        _tmpLen = fun_StartBsDiff( mOldDataContentP, mOldDataContentLen, mNewDataContentP, mNewDataContentLen, &_resultP );
+        if( _tmpLen > 0 )
+        {
+            sub_SetDataSource( _resultP, _tmpLen );
+            free( _resultP );
+        }
+    }
 }
 
 /**
@@ -29,11 +123,16 @@ void DifferentUpdataControl::sub_GetOtherFileDataAndLen( uint8_t * pFileDataP, i
  */
 void DifferentUpdataControl::sub_CreateBsDiffFile()
 {
-    int _tmpLen;
+
     PrivateEventClass * _tmpEventObjP;
 
+
     _tmpEventObjP = new PrivateEventClass( EventType_e::GetOldFileDataAndLen, DataType_e::DataType, Sender_e::DifferentUpdate,
-                                           ( void * )this,  ( void * )( &this->sub_GetOtherFileDataAndLen ) );
+                                          ( void * )this,  ( void * )( DifferentUpdataControl::sub_GetOldFileDataAndLenCB ) );
+    mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
+
+    _tmpEventObjP = new PrivateEventClass( EventType_e::GetNewFileDataAndLen, DataType_e::DataType, Sender_e::DifferentUpdate,
+                                          ( void * )this,  ( void * )( DifferentUpdataControl::sub_GetNewFileDataAndLenCB ) );
     mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
 
     //_tmpLen = fun_StartBsDiff( nullptr, 0, nullptr, 0, nullptr );

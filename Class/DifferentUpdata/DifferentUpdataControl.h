@@ -23,12 +23,15 @@ public:
     DifferentUpdataControl( QQuickItem * pParent = nullptr );
     virtual ~DifferentUpdataControl();
 
-    void sub_GetOtherFileDataAndLen( uint8_t * pFileDataP, int pFileDataLen );
+    static void sub_GetOldFileDataAndLenCB( uint8_t * pFileDataP, int pFileDataLen, void * pDestObjP );
+    static void sub_GetNewFileDataAndLenCB( uint8_t * pFileDataP, int pFileDataLen, void * pDestObjP );
+
     int GetDifferentDisplayType() { return mDifferentDisplayType; }
 
 private:
     void sub_ReadyCreateGui( void );
     void sub_DataToImage( void );
+    void sub_GetOtherFileDataAndLen( uint8_t * pDataP, int pLen, int pType );   //0旧  1新
 
     int mCurrDisplayStartY;
     int mCurrDisplayEndY;
@@ -38,6 +41,11 @@ private:
 private:
     MainModelClass * mMainModelObjP;
     int mDifferentDisplayType;      //显示的类型 0 旧  1 新  2结果
+
+    uint8_t * mOldDataContentP;
+    int mOldDataContentLen;
+    uint8_t * mNewDataContentP;
+    int mNewDataContentLen;
 };
 
 #endif // DIFFERENTUPDATACONTROL_H

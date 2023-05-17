@@ -14,6 +14,7 @@ typedef enum __EventType_e
     RegisterObject,
     WheelEvent,
     GetOldFileDataAndLen,
+    GetNewFileDataAndLen,
 }EventType_e;
 
 typedef enum __DataType_e

@@ -113,7 +113,12 @@ void DifferentUpdataControl::sub_GetOtherFileDataAndLen( uint8_t * pDataP, int p
         if( _tmpLen > 0 )
         {
             sub_SetDataSource( _resultP, _tmpLen );
-            free( _resultP );
+            sub_FreeMallocAddr( _resultP );
+
+            sub_ReadyCreateGui();
+            ClrMainImage();
+            ResetCurrXY();
+            sub_DataToImage();
         }
     }
 }
@@ -146,20 +151,22 @@ void DifferentUpdataControl::sub_CreateBsDiffFile()
 void DifferentUpdataControl::sub_WheelEvent( int pDirect, int pFlag )
 {
     int _tmpLine;
+    int _tmpValue;
 
     if( pFlag )
     {
-        PrivateEventClass * _tmpEventObjP;
+//        PrivateEventClass * _tmpEventObjP;
 
-        _tmpEventObjP = new PrivateEventClass( EventType_e::WheelEvent, DataType_e::DataType, Sender_e::DifferentUpdate, ( void * )this, pDirect, 0 );
-        mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
+//        _tmpEventObjP = new PrivateEventClass( EventType_e::WheelEvent, DataType_e::DataType, Sender_e::DifferentUpdate, ( void * )this, pDirect, 0 );
+//        mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
     }
     _tmpLine = mCurrStartDisplayLine;
     if( pDirect == 0 )
     {
         //向下
         mCurrStartDisplayLine += 3;
-        if( fun_FileSeek( mCurrStartDisplayLine * mLineByteCount ) )
+        _tmpValue = mCurrStartDisplayLine * mLineByteCount;
+        if( fun_FileSeek( _tmpValue ) )
         {
             ClrMainImage();
             ResetCurrXY();

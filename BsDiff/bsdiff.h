@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 int fun_StartBsDiff( uint8_t * pOldFileDataP, int pOldFileLen, uint8_t * pNewFileDataP, int pNewFileLen, uint8_t ** pBsDiffDataPP );
+void sub_FreeMallocAddr( void * pDestP );
 
 #if __cplusplus
 }

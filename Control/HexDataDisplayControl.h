@@ -39,10 +39,9 @@ protected:
                             mCurrY = mSpaceValue;
                         }
 
-private:
+protected:
     QImage * mMainImageP;
 
-protected:
     const int mSpaceValue = 3;
     int mFontSize;
     QFont mFont;

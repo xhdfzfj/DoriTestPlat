@@ -199,20 +199,20 @@ void MainModelClass::sub_ClearEventQueue( void )
  */
 void MainModelClass::sub_DifferentUpdataObjSyncWheel( void * pSenderObjP, int pDirect )
 {
-    if( mDifferentUpdataObjSP != nullptr )
-    {
-        for( int i = 0; i < 3; i++ )
-        {
-            if( ( ( void * )mDifferentUpdataObjSP[ i ] != pSenderObjP ) &&
-                ( mDifferentUpdataObjSP[ i ] != nullptr ) )
-            {
-                if( mDifferentUpdataObjSP[ i ]->GetDifferentDisplayType() != 2 )
-                {
-                    mDifferentUpdataObjSP[ i ]->sub_WheelEvent( pDirect, 0 );
-                }
-            }
-        }
-    }
+//    if( mDifferentUpdataObjSP != nullptr )
+//    {
+//        for( int i = 0; i < 3; i++ )
+//        {
+//            if( ( ( void * )mDifferentUpdataObjSP[ i ] != pSenderObjP ) &&
+//                ( mDifferentUpdataObjSP[ i ] != nullptr ) )
+//            {
+//                //if( mDifferentUpdataObjSP[ i ]->GetDifferentDisplayType() != 2 )
+//                {
+//                    mDifferentUpdataObjSP[ i ]->sub_WheelEvent( pDirect, 0 );
+//                }
+//            }
+//        }
+//    }
 }
 
 /**

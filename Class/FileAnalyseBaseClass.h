@@ -35,6 +35,9 @@ protected:
     std::ifstream mInFileStream;
 
     bool mMemoryDataSourceFlag;
+
+    uint8_t * mMemoryDataP;
+    uint32_t mMemoryDataLen;
 };
 
 #endif // FILEANALYSEBASECLASS_H

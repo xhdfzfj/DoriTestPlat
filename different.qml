@@ -13,6 +13,7 @@ Item
             console.log( "sizeChange!!!" );
             guiDifferentUpdataControl1.sub_SizeChange();
             guiDifferentUpdataControl2.sub_SizeChange();
+            guiDifferentUpdataControl3.sub_SizeChange();
         }
     }
 
@@ -190,6 +191,24 @@ Item
                     width: parent.width
                     height: parent.height - guiSrcDiffFile.height
                     fillColor: "lightsteelblue"
+
+                    MouseArea
+                    {
+                        anchors.fill: parent
+                        propagateComposedEvents: true
+                        acceptedButtons: Qt.AllButtons
+                        onWheel:
+                        {
+                            if( wheel.angleDelta.y > 0 )
+                            {
+                                guiDifferentUpdataControl3.sub_WheelEvent( 1, 1 );
+                            }
+                            else
+                            {
+                                guiDifferentUpdataControl3.sub_WheelEvent( 0, 1 );
+                            }
+                        }
+                    }
                 }
             }
         }

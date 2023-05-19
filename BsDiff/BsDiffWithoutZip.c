@@ -193,7 +193,7 @@ int fun_StartBsDiff( uint8_t * pOldFileDataP, int pOldFileLen, uint8_t * pNewFil
     qsufsort( I, V, old, oldsize );
     free( V );
 
-    _resultP = malloc( oldsize + newsize );
+    _resultP = malloc( ( oldsize + newsize ) * 2 );
 
     off_t scan,pos,len;
     off_t lastscan,lastpos,lastoffset;
@@ -329,4 +329,13 @@ int fun_StartBsDiff( uint8_t * pOldFileDataP, int pOldFileLen, uint8_t * pNewFil
         *pBsDiffDataPP = _resultP;
     }
     return _ret;
+}
+
+/**
+ * @brief sub_FreeMallocAddr
+ * @param pDestP
+ */
+void sub_FreeMallocAddr( void * pDestP )
+{
+    free( pDestP );
 }

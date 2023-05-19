@@ -13,6 +13,8 @@ FileAnalyseBaseClass::FileAnalyseBaseClass( string pFilePath )
     mReadedLen = 0;
 
     mMemoryDataSourceFlag = false;
+    mMemoryDataP = nullptr;
+    mMemoryDataLen = 0;
 }
 
 
@@ -24,6 +26,8 @@ FileAnalyseBaseClass::FileAnalyseBaseClass()
     mReadedLen = 0;
 
     mMemoryDataSourceFlag = false;
+    mMemoryDataP = nullptr;
+    mMemoryDataLen = 0;
 }
 
 /**
@@ -32,6 +36,11 @@ FileAnalyseBaseClass::FileAnalyseBaseClass()
 FileAnalyseBaseClass::~FileAnalyseBaseClass()
 {
     sub_ClearHandle();
+
+    if( mMemoryDataP != nullptr )
+    {
+        delete [] mMemoryDataP;
+    }
 }
 
 /**
@@ -44,6 +53,26 @@ void FileAnalyseBaseClass::sub_ClearHandle()
     {
         mInFileStream.close();
     }
+}
+
+/**
+ * @brief FileAnalyseBaseClass::sub_SetDataSource
+ * @param pDataP
+ * @param pDataLen
+ */
+void FileAnalyseBaseClass::sub_SetDataSource( uint8_t * pDataP, uint32_t pDataLen )
+{
+    mMemoryDataSourceFlag = true;
+    if( mMemoryDataP != nullptr )
+    {
+        delete [] mMemoryDataP;
+    }
+
+    mMemoryDataP = new uint8_t [ pDataLen ];
+    mMemoryDataLen = pDataLen;
+    memcpy( mMemoryDataP, pDataP, pDataLen );
+
+    mCurrOffset = 0;
 }
 
 /**
@@ -79,35 +108,46 @@ bool FileAnalyseBaseClass::fun_FileSeek( int pStartOffset )
     bool _ret;
 
     _ret = false;
-
-    if( !mActiveFlag )
+    if( mMemoryDataSourceFlag )
     {
-        std::string _tmpFilePath;
-
-#ifdef Q_OS_WIN
-        _tmpFilePath = mFilePath.substr( 1, mFilePath.length() - 1 );
-#else
-        _tmpFilePath = mFilePath;
-#endif
-        mInFileStream.open( _tmpFilePath.c_str(), std::ios::binary );
-        if( mInFileStream )
+        if( pStartOffset < mMemoryDataLen )
         {
-            mActiveFlag = true;
-            mInFileStream.seekg( 0, std::ios::end );
-            mFileLen = ( int )mInFileStream.tellg();
-            mInFileStream.seekg( 0, std::ios::beg );
-
-            mCurrOffset = 0;
+            _ret = true;
+            mCurrOffset = pStartOffset;
         }
     }
-
-    if( mActiveFlag )
+    else
     {
-        if( pStartOffset < mFileLen )
+
+        if( !mActiveFlag )
         {
-            mInFileStream.seekg( pStartOffset, std::ios::beg );
-            mCurrOffset = pStartOffset;
-            _ret = true;
+            std::string _tmpFilePath;
+
+    #ifdef Q_OS_WIN
+            _tmpFilePath = mFilePath.substr( 1, mFilePath.length() - 1 );
+    #else
+            _tmpFilePath = mFilePath;
+    #endif
+            mInFileStream.open( _tmpFilePath.c_str(), std::ios::binary );
+            if( mInFileStream )
+            {
+                mActiveFlag = true;
+                mInFileStream.seekg( 0, std::ios::end );
+                mFileLen = ( int )mInFileStream.tellg();
+                mInFileStream.seekg( 0, std::ios::beg );
+
+                mCurrOffset = 0;
+            }
+        }
+
+        if( mActiveFlag )
+        {
+            if( pStartOffset < mFileLen )
+            {
+                mInFileStream.seekg( pStartOffset, std::ios::beg );
+                mCurrOffset = pStartOffset;
+                _ret = true;
+            }
         }
     }
     return _ret;
@@ -123,56 +163,84 @@ int FileAnalyseBaseClass::fun_GetFileData( uint8_t * pSaveBufP, int pLen, int pS
 {
     int _retValue;
 
-    if( !mActiveFlag )
+    if( mMemoryDataSourceFlag )
     {
-        std::string _tmpFilePath;
-
-#ifdef Q_OS_WIN
-        _tmpFilePath = mFilePath.substr( 1, mFilePath.length() - 1 );
-#else
-        _tmpFilePath = mFilePath;
-#endif
-        mInFileStream.open( _tmpFilePath.c_str(), std::ios::binary );
-        if( mInFileStream )
+        _retValue = 0;
+        if( mCurrOffset < mMemoryDataLen )
         {
-            mActiveFlag = true;
-            mInFileStream.seekg( 0, std::ios::end );
-            mFileLen = ( int )mInFileStream.tellg();
-            mInFileStream.seekg( 0, std::ios::beg );
-
-            mCurrOffset = 0;
-        }
-    }
-    if( pStartOffset != -1 )
-    {
-       //从当前位置获取文件的数据
-    }
-
-    if( mCurrOffset < mFileLen )
-    {
-        _retValue = mCurrOffset + pLen;
-        _retValue = mFileLen - _retValue;
-        if( _retValue > 0 )
-        {
-            if( _retValue > pLen )
+            _retValue = mCurrOffset + pLen;
+            _retValue = mMemoryDataLen - _retValue;
+            if( _retValue > 0 )
             {
-                _retValue = pLen;
+                if( _retValue > pLen )
+                {
+                    _retValue = pLen;
+                }
             }
-        }
-        else
-        {
-            _retValue = mFileLen - mCurrOffset;
-        }
+            else
+            {
+                _retValue = mMemoryDataLen - mCurrOffset;
+            }
 
-        mCurrOffset += _retValue;
+            memcpy( pSaveBufP, &mMemoryDataP[ mCurrOffset ], _retValue );
+            mCurrOffset += _retValue;
+
+            mReadedLen = _retValue;
+        }
     }
     else
     {
-        _retValue = 0;
-    }
-    mInFileStream.read( ( char * )pSaveBufP, _retValue );
+        if( !mActiveFlag )
+        {
+            std::string _tmpFilePath;
 
-    mReadedLen = _retValue;
+    #ifdef Q_OS_WIN
+            _tmpFilePath = mFilePath.substr( 1, mFilePath.length() - 1 );
+    #else
+            _tmpFilePath = mFilePath;
+    #endif
+            mInFileStream.open( _tmpFilePath.c_str(), std::ios::binary );
+            if( mInFileStream )
+            {
+                mActiveFlag = true;
+                mInFileStream.seekg( 0, std::ios::end );
+                mFileLen = ( int )mInFileStream.tellg();
+                mInFileStream.seekg( 0, std::ios::beg );
+
+                mCurrOffset = 0;
+            }
+        }
+        if( pStartOffset != -1 )
+        {
+           //从当前位置获取文件的数据
+        }
+
+        if( mCurrOffset < mFileLen )
+        {
+            _retValue = mCurrOffset + pLen;
+            _retValue = mFileLen - _retValue;
+            if( _retValue > 0 )
+            {
+                if( _retValue > pLen )
+                {
+                    _retValue = pLen;
+                }
+            }
+            else
+            {
+                _retValue = mFileLen - mCurrOffset;
+            }
+
+            mCurrOffset += _retValue;
+        }
+        else
+        {
+            _retValue = 0;
+        }
+        mInFileStream.read( ( char * )pSaveBufP, _retValue );
+
+        mReadedLen = _retValue;
+    }
 
     return _retValue;
 }

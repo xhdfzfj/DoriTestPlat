@@ -24,6 +24,9 @@ public:
     int GetSelectIndex() { return mSelectIndex; }
     bool isDisplay()    { return mMenuDisplayFlag; }
 
+protected:
+    int GetItemCount() { return mItemS.size(); }
+
 private:
     QFont mFont;
     int mFontSize;

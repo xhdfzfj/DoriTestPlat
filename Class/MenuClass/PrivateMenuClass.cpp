@@ -3,8 +3,8 @@
 
 PrivateMenuClass::PrivateMenuClass()
 {
-    mFont = QFont( "SimSun", mFontSize );
     mFontSize = 12;
+    mFont = QFont( "SimSun", mFontSize );
 
     mDisplayPoint = QPoint( -1, -1 );
     mMenuRect = QRect( -1, -1, -1, -1 );

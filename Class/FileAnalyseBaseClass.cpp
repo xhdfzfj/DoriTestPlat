@@ -1,4 +1,5 @@
 ﻿#include <QtGlobal>
+#include <memory.h>
 #include "FileAnalyseBaseClass.h"
 
 /**

@@ -7,6 +7,7 @@
 #include <QtQuick/QQuickPaintedItem>
 #include <QPainter>
 #include <QImage>
+#include "../Class/MenuClass/PrivateMenuClass.h"
 
 
 class HexDataDisplayControl : public QQuickPaintedItem
@@ -16,8 +17,10 @@ public:
     Q_INVOKABLE void sub_SizeChange();
 
 public:
-    HexDataDisplayControl( QQuickItem * pParent = nullptr );
+    HexDataDisplayControl( PrivateMenuClass * & pRefMeneP, QQuickItem * pParent = nullptr );
     virtual ~HexDataDisplayControl();
+
+    void hoverMoveEvent( QHoverEvent * event ) override;
 
 protected:
     void setXToInit() { mCurrX = mSpaceValue; }
@@ -41,6 +44,7 @@ protected:
 
 protected:
     QImage * mMainImageP;
+    PrivateMenuClass * & mContentMenuRefp;
 
     const int mSpaceValue = 3;
     int mFontSize;
@@ -57,6 +61,8 @@ protected:
     int mCurrY;
     int mCurrX;
 
+    bool mMenuDisplayFlag;
+
 signals:
     void sub_SignalReDraw();
 
@@ -65,6 +71,7 @@ public slots:
 
 protected:
     bool fun_LineHexDataToImage( uint8_t * pDataBuf, int pDataLen, int pStartOffset );
+    void sub_DebugPointTest();
 
     /*********************************
      * 系统重载

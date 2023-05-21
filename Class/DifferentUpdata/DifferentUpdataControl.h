@@ -3,6 +3,7 @@
 #define DIFFERENTUPDATACONTROL_H
 
 #include <QUrl>
+#include "../MenuClass/PrivateMenuClass.h"
 #include "../../Control/HexDataDisplayControl.h"
 #include "../../Class/FileAnalyseBaseClass.h"
 
@@ -14,10 +15,11 @@ class DifferentUpdataControl : public HexDataDisplayControl, public FileAnalyseB
 
 public:
     Q_INVOKABLE void sub_SetMainModelObj( QObject * pObjectP );
-    Q_INVOKABLE void sub_DifferentType( int pState )    { mDifferentDisplayType = pState; }
+    Q_INVOKABLE void sub_DifferentType( int pState );
     Q_INVOKABLE void sub_DifferentFile( QUrl pSpiFilePath );
     Q_INVOKABLE void sub_WheelEvent( int pDirect, int pFlag ); //0代表向下  1代表向上
     Q_INVOKABLE void sub_CreateBsDiffFile( void );  //生成BSDIFF文件
+    Q_INVOKABLE void sub_MouseRightButtonClick( qreal pX, qreal pY );
 
 public:
     DifferentUpdataControl( QQuickItem * pParent = nullptr );
@@ -46,6 +48,10 @@ private:
     int mOldDataContentLen;
     uint8_t * mNewDataContentP;
     int mNewDataContentLen;
+
+    PrivateMenuClass * mContentMenuP;
+    QRect * mContentItemRectP;
+    int mContentItemRectCount;
 };
 
 #endif // DIFFERENTUPDATACONTROL_H

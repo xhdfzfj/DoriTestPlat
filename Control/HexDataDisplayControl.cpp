@@ -1,7 +1,7 @@
 ﻿
 #include "HexDataDisplayControl.h"
 
-HexDataDisplayControl::HexDataDisplayControl( QQuickItem * pParent ) : QQuickPaintedItem( pParent )
+HexDataDisplayControl::HexDataDisplayControl( PrivateMenuClass * & pRefMeneP, QQuickItem * pParent ) : mContentMenuRefp( pRefMeneP ), QQuickPaintedItem( pParent )
 {
     mMainImageP = nullptr;
 
@@ -37,6 +37,8 @@ HexDataDisplayControl::HexDataDisplayControl( QQuickItem * pParent ) : QQuickPai
     mLineByteCount = 0;
     mCurrX = mSpaceValue;
     mCurrY = mSpaceValue;
+
+    setAcceptHoverEvents( true );
 
     connect( this, SIGNAL( sub_SignalReDraw() ), this, SLOT( sub_SlotReDraw() ), Qt::QueuedConnection );
 }
@@ -144,6 +146,49 @@ void HexDataDisplayControl::sub_SlotReDraw()
 }
 
 
+void HexDataDisplayControl::sub_DebugPointTest()
+{
+    qDebug() << "debug point";
+    if( mContentMenuRefp != nullptr )
+    {
+        qDebug() << "debug point";
+    }
+}
+
+
+void HexDataDisplayControl::hoverMoveEvent( QHoverEvent * pEventP )
+{
+    QRect _tmpRect;
+    //if( mDragSelectFlag )
+    {
+        pEventP->accept();
+
+        QPoint _tmpPoint = pEventP->pos();
+
+        qDebug() << "hover x:" << _tmpPoint.x();
+
+//        if( ( mContentItemRectCount != 0 ) && ( mContentItemRectP != nullptr ) )
+//        {
+//            for( int i = 0; i < mContentItemRectCount; i++ )
+//            {
+//                _tmpRect = mContentItemRectP[ i ];
+//                if( _tmpRect.contains( _tmpPoint ) )
+//                {
+//                    if( mContentMenuP->GetSelectIndex() != i )
+//                    {
+//                        mContentMenuP->sub_SetSelectItem( i );
+
+//                        qDebug() << "hover select:" << i;
+//                        update();
+//                    }
+//                    break;
+//                }
+//            }
+//        }
+    }
+}
+
+
 /**
  * @brief GuiDrawControl::paint
  * @param pPainter
@@ -151,9 +196,29 @@ void HexDataDisplayControl::sub_SlotReDraw()
 void HexDataDisplayControl::paint( QPainter * pPainter )
 {
     //paint( pPainter );  //调用基类的重绘函数
+    QPoint _tmpMenuPoint;
+    QImage * _tmpImageP;
+
     if( mMainImageP != nullptr )
     {
         pPainter->setRenderHint( QPainter::Antialiasing );
         pPainter->drawImage( 0, 0, *mMainImageP );
+
+        if( mContentMenuRefp != nullptr )
+        {
+            _tmpMenuPoint = mContentMenuRefp->fun_GetMenuDisplayPoint();
+            if( _tmpMenuPoint == QPoint( -1, -1 ) )
+            {
+                qDebug() << "no display menu";
+            }
+            else
+            {
+                _tmpImageP = mContentMenuRefp->GetMenuImage();
+                if( _tmpImageP != nullptr )
+                {
+                    pPainter->drawImage( _tmpMenuPoint, *_tmpImageP );
+                }
+            }
+        }
     }
 }

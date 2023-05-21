@@ -208,6 +208,20 @@ Item
                                 guiDifferentUpdataControl3.sub_WheelEvent( 0, 1 );
                             }
                         }
+
+                        onClicked:
+                        {
+                            if( mouse.button === Qt.RightButton )
+                            {
+                                console.log( "mouse right button x:", mouse.x, " y:", mouse.y );
+                                guiDifferentUpdataControl3.sub_MouseRightButtonClick( mouse.x, mouse.y )
+                            }
+
+                            if( mouse.button === Qt.LeftButton )
+                            {
+                                //guiSimFlashControl.sub_MouseLeftButtonClick( mouse.x, mouse.y )
+                            }
+                        }
                     }
                 }
             }

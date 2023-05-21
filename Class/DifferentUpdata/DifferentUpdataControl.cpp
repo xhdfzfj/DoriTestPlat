@@ -4,7 +4,7 @@
 #include "DifferentUpdataControl.h"
 #include "../../BsDiff/bsdiff.h"
 
-DifferentUpdataControl::DifferentUpdataControl( QQuickItem * pParent ) : HexDataDisplayControl( pParent ), FileAnalyseBaseClass()
+DifferentUpdataControl::DifferentUpdataControl( QQuickItem * pParent ) : HexDataDisplayControl( mContentMenuP, pParent ), FileAnalyseBaseClass()
 {
     mMainModelObjP = nullptr;
     mCurrDisplayStartY = -1;
@@ -17,6 +17,10 @@ DifferentUpdataControl::DifferentUpdataControl( QQuickItem * pParent ) : HexData
 
     mNewDataContentP = nullptr;
     mNewDataContentLen = 0;
+
+    mContentMenuP = nullptr;
+
+    //setAcceptHoverEvents( true );
 }
 
 DifferentUpdataControl::~DifferentUpdataControl()
@@ -30,6 +34,11 @@ DifferentUpdataControl::~DifferentUpdataControl()
     if( mNewDataContentP != nullptr )
     {
         delete [] mNewDataContentP;
+    }
+
+    if( mContentMenuP != nullptr )
+    {
+        delete mContentMenuP;
     }
 }
 
@@ -153,12 +162,14 @@ void DifferentUpdataControl::sub_WheelEvent( int pDirect, int pFlag )
     int _tmpLine;
     int _tmpValue;
 
-    if( pFlag )
+    if( pFlag && ( mDifferentDisplayType != 2 ) )
     {
-//        PrivateEventClass * _tmpEventObjP;
+        PrivateEventClass * _tmpEventObjP;
 
-//        _tmpEventObjP = new PrivateEventClass( EventType_e::WheelEvent, DataType_e::DataType, Sender_e::DifferentUpdate, ( void * )this, pDirect, 0 );
-//        mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
+        _tmpEventObjP = new PrivateEventClass( EventType_e::WheelEvent, DataType_e::DataType, Sender_e::DifferentUpdate, ( void * )this, pDirect, 0 );
+        _tmpEventObjP->SetFreeState( FreeParamType_e::NoFreeType );
+        mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
+
     }
     _tmpLine = mCurrStartDisplayLine;
     if( pDirect == 0 )
@@ -195,6 +206,22 @@ void DifferentUpdataControl::sub_WheelEvent( int pDirect, int pFlag )
 }
 
 /**
+ * @brief DifferentUpdataControl::sub_MouseRightButtonClick
+ * @param pX
+ * @param pY
+ */
+void DifferentUpdataControl::sub_MouseRightButtonClick( qreal pX, qreal pY )
+{
+    QPoint _tmpPoint( pX, pY );
+
+    if( mContentMenuP != nullptr )
+    {
+        mContentMenuP->sub_SetDisplayPoint( _tmpPoint );
+        emit sub_SignalReDraw();
+    }
+}
+
+/**
  * @brief DifferentUpdataControl::sub_SetMainModelObj
  * @param pObjectP
  */
@@ -206,6 +233,30 @@ void DifferentUpdataControl::sub_SetMainModelObj( QObject * pObjectP )
 
     _tmpEventObjP = new PrivateEventClass( EventType_e::RegisterObject, DataType_e::DataType, Sender_e::DifferentUpdate, ( void * )this );
     mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
+}
+
+/**
+ * @brief DifferentUpdataControl::sub_DifferentType
+ * @param pState
+ */
+void DifferentUpdataControl::sub_DifferentType( int pState )
+{
+    mDifferentDisplayType = pState;
+    if( mDifferentDisplayType == 2 )
+    {
+        if( mContentMenuP != nullptr )
+        {
+            delete mContentMenuP;
+        }
+        mContentMenuP = new PrivateMenuClass();
+
+        mContentMenuP->sub_AddMenuItem( "设置内容" );
+        mContentMenuP->sub_AddMenuItem( "重置内容" );
+        mContentMenuP->sub_AddMenuItem( "测试菜单1" );
+        mContentMenuP->sub_AddMenuItem( "测试菜单2" );
+        mContentMenuP->sub_AddMenuItem( "测试菜单3" );
+        mContentMenuP->sub_AddMenuItem( "测试菜单4" );
+    }
 }
 
 /**

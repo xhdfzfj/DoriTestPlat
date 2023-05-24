@@ -216,6 +216,7 @@ void DifferentUpdataControl::sub_MouseRightButtonClick( qreal pX, qreal pY )
 
     if( mContentMenuP != nullptr )
     {
+        mMenuDisplayFlag = true;
         mContentMenuP->sub_SetDisplayPoint( _tmpPoint );
         emit sub_SignalReDraw();
     }
@@ -249,6 +250,7 @@ void DifferentUpdataControl::sub_DifferentType( int pState )
             delete mContentMenuP;
         }
         mContentMenuP = new PrivateMenuClass();
+        mContentMenuP->SetMenuFont( GetHexDisplayFont() );
 
         mContentMenuP->sub_AddMenuItem( "设置内容" );
         mContentMenuP->sub_AddMenuItem( "重置内容" );

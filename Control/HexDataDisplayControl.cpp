@@ -5,8 +5,8 @@ HexDataDisplayControl::HexDataDisplayControl( PrivateMenuClass * & pRefMeneP, QQ
 {
     mMainImageP = nullptr;
 
-    mFont = QFont( "SimSun", 16 );
     mFontSize = 16;
+    mFont = QFont( "SimSun", mFontSize );
     mFontColor = Qt::black;
 
     QFontMetrics _tmpFm( mFont );
@@ -37,6 +37,8 @@ HexDataDisplayControl::HexDataDisplayControl( PrivateMenuClass * & pRefMeneP, QQ
     mLineByteCount = 0;
     mCurrX = mSpaceValue;
     mCurrY = mSpaceValue;
+
+    mMenuDisplayFlag = false;   //在派生类中赋值为TRUE
 
     setAcceptHoverEvents( true );
 
@@ -159,32 +161,31 @@ void HexDataDisplayControl::sub_DebugPointTest()
 void HexDataDisplayControl::hoverMoveEvent( QHoverEvent * pEventP )
 {
     QRect _tmpRect;
-    //if( mDragSelectFlag )
+    int _tmpCount;
+    QRect * mContentItemRectP;
+    QPoint _tmpPoint;
+
+    if( mMenuDisplayFlag )
     {
-        pEventP->accept();
-
-        QPoint _tmpPoint = pEventP->pos();
-
-        qDebug() << "hover x:" << _tmpPoint.x();
-
-//        if( ( mContentItemRectCount != 0 ) && ( mContentItemRectP != nullptr ) )
-//        {
-//            for( int i = 0; i < mContentItemRectCount; i++ )
-//            {
-//                _tmpRect = mContentItemRectP[ i ];
-//                if( _tmpRect.contains( _tmpPoint ) )
-//                {
-//                    if( mContentMenuP->GetSelectIndex() != i )
-//                    {
-//                        mContentMenuP->sub_SetSelectItem( i );
-
-//                        qDebug() << "hover select:" << i;
-//                        update();
-//                    }
-//                    break;
-//                }
-//            }
-//        }
+        _tmpCount = mContentMenuRefp->GetItemCount();
+        if( _tmpCount != 0 )
+        {
+            _tmpPoint = pEventP->pos();
+            mContentItemRectP = mContentMenuRefp->fun_GetDisplayMenuItemRect( _tmpCount );
+            if( mContentItemRectP != nullptr )
+            {
+                for( int i = 0; i < _tmpCount; i++ )
+                {
+                    _tmpRect = mContentItemRectP[ i ];
+                    if( _tmpRect.contains( _tmpPoint ) )
+                    {
+                        mContentMenuRefp->sub_SetSelectItem( i );
+                        emit sub_SignalReDraw();
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -72,6 +72,7 @@ public slots:
 protected:
     bool fun_LineHexDataToImage( uint8_t * pDataBuf, int pDataLen, int pStartOffset );
     void sub_DebugPointTest();
+    QFont GetHexDisplayFont() { return mFont; }
 
     /*********************************
      * 系统重载

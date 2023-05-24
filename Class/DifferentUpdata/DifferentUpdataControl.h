@@ -50,8 +50,7 @@ private:
     int mNewDataContentLen;
 
     PrivateMenuClass * mContentMenuP;
-    QRect * mContentItemRectP;
-    int mContentItemRectCount;
+
 };
 
 #endif // DIFFERENTUPDATACONTROL_H

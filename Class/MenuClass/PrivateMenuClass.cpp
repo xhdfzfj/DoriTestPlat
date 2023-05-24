@@ -223,6 +223,7 @@ void PrivateMenuClass::sub_SetSelectItem( int pIndex )
                 QRect _tmpRect;
                 QColor _tmpColor;
                 QPainter _tmpPainter( mMenuImageP );
+                _tmpPainter.setFont( mFont );
 
                 _tmpRect = _itemP->GetItemRect();
 

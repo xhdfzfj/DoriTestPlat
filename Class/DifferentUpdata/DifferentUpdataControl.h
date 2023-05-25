@@ -31,10 +31,13 @@ public:
 
     int GetDifferentDisplayType() { return mDifferentDisplayType; }
 
+    void sub_StartRestoreBsDiff( void );
+
 private:
     void sub_ReadyCreateGui( void );
     void sub_DataToImage( void );
     void sub_GetOtherFileDataAndLen( uint8_t * pDataP, int pLen, int pType );   //0旧  1新
+    void sub_SaveBsDiffFile( void );
 
     int mCurrDisplayStartY;
     int mCurrDisplayEndY;

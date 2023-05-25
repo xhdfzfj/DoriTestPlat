@@ -1,4 +1,5 @@
-﻿
+﻿#include <QFile>
+#include <QDataStream>
 #include "../../Class/PrivateEventClass.h"
 #include "../../Model/MainModelClass.h"
 #include "DifferentUpdataControl.h"
@@ -232,7 +233,7 @@ void DifferentUpdataControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
     QPoint _tmpPoint( pX, pY );
     QRect _tmpRect;
     int _tmpCount;
-    int
+    int _tmpIndex;
     QRect * mContentItemRectP;
 
     if( mContentMenuP != nullptr )
@@ -240,12 +241,37 @@ void DifferentUpdataControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
         if( mMenuDisplayFlag )
         {
             mContentItemRectP = mContentMenuP->fun_GetDisplayMenuItemRect( _tmpCount );
-
+            _tmpIndex = mContentMenuP->GetSelectIndex();
+            if( _tmpIndex != -1 )
+            {
+                _tmpRect = mContentItemRectP[ _tmpIndex ];
+                if( _tmpRect.contains( _tmpPoint ) )
+                {
+                    //菜单处理
+                    if( _tmpIndex == 0 )
+                    {
+                        sub_SaveBsDiffFile();
+                    }
+                    else if( _tmpIndex == 1 )
+                    {
+                        sub_StartRestoreBsDiff();
+                    }
+                }
+            }
             mContentMenuP->sub_SetDisplayPoint( QPoint( -1, -1 ) );
             mMenuDisplayFlag = false;
             emit sub_SignalReDraw();
         }
     }
+}
+
+/**
+ * @brief DifferentUpdataControl::sub_StartRestoreBsDiff
+ *      启动BSDIFF文件的恢复
+ */
+void DifferentUpdataControl::sub_StartRestoreBsDiff( void )
+{
+    hjkhkhjkhkjhk
 }
 
 /**
@@ -278,12 +304,12 @@ void DifferentUpdataControl::sub_DifferentType( int pState )
         mContentMenuP = new PrivateMenuClass();
         mContentMenuP->SetMenuFont( GetHexDisplayFont() );
 
-        mContentMenuP->sub_AddMenuItem( "设置内容" );
-        mContentMenuP->sub_AddMenuItem( "重置内容" );
-        mContentMenuP->sub_AddMenuItem( "测试菜单1" );
-        mContentMenuP->sub_AddMenuItem( "测试菜单2" );
-        mContentMenuP->sub_AddMenuItem( "测试菜单3" );
-        mContentMenuP->sub_AddMenuItem( "测试菜单4" );
+        mContentMenuP->sub_AddMenuItem( "保存文件" );
+        mContentMenuP->sub_AddMenuItem( "恢复文件" );
+//        mContentMenuP->sub_AddMenuItem( "测试菜单1" );
+//        mContentMenuP->sub_AddMenuItem( "测试菜单2" );
+//        mContentMenuP->sub_AddMenuItem( "测试菜单3" );
+//        mContentMenuP->sub_AddMenuItem( "测试菜单4" );
     }
 }
 
@@ -328,6 +354,38 @@ void DifferentUpdataControl::sub_DifferentFile( QUrl pFilePath )
             {
                 sub_DataToImage();
             }
+        }
+    }
+}
+
+/**
+ * @brief DifferentUpdataControl::sub_SaveBsDiffFile
+ */
+void DifferentUpdataControl::sub_SaveBsDiffFile()
+{
+    uint8_t * _tmpP;
+    int _tmpLen;
+    QString _tmpFilePath;
+    QFile _tmpFile( "BsDiff.bin" );
+
+    if( mDifferentDisplayType == 2 )
+    {
+        if( mMemoryDataSourceFlag )
+        {
+            _tmpFile.open( QIODevice::WriteOnly );
+            QDataStream _ds( &_tmpFile );
+
+            _tmpP = mMemoryDataP;
+            if( _tmpP != nullptr )
+            {
+                _tmpLen = mMemoryDataLen;
+                for( int i = 0; i < _tmpLen; i++ )
+                {
+                    _ds << ( uint8_t )_tmpP[ i ];
+                }
+            }
+
+            _tmpFile.close();
         }
     }
 }

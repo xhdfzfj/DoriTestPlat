@@ -219,7 +219,7 @@ Item
 
                             if( mouse.button === Qt.LeftButton )
                             {
-                                //guiSimFlashControl.sub_MouseLeftButtonClick( mouse.x, mouse.y )
+                                guiDifferentUpdataControl3.sub_MouseLeftButtonClick( mouse.x, mouse.y )
                             }
                         }
                     }

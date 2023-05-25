@@ -20,6 +20,7 @@ public:
     Q_INVOKABLE void sub_WheelEvent( int pDirect, int pFlag ); //0代表向下  1代表向上
     Q_INVOKABLE void sub_CreateBsDiffFile( void );  //生成BSDIFF文件
     Q_INVOKABLE void sub_MouseRightButtonClick( qreal pX, qreal pY );
+    Q_INVOKABLE void sub_MouseLeftButtonClick( qreal pX, qreal pY );
 
 public:
     DifferentUpdataControl( QQuickItem * pParent = nullptr );

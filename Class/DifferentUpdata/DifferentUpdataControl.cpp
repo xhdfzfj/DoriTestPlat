@@ -223,6 +223,32 @@ void DifferentUpdataControl::sub_MouseRightButtonClick( qreal pX, qreal pY )
 }
 
 /**
+ * @brief DifferentUpdataControl::sub_MouseLeftButtonClick
+ * @param pX
+ * @param pY
+ */
+void DifferentUpdataControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
+{
+    QPoint _tmpPoint( pX, pY );
+    QRect _tmpRect;
+    int _tmpCount;
+    int
+    QRect * mContentItemRectP;
+
+    if( mContentMenuP != nullptr )
+    {
+        if( mMenuDisplayFlag )
+        {
+            mContentItemRectP = mContentMenuP->fun_GetDisplayMenuItemRect( _tmpCount );
+
+            mContentMenuP->sub_SetDisplayPoint( QPoint( -1, -1 ) );
+            mMenuDisplayFlag = false;
+            emit sub_SignalReDraw();
+        }
+    }
+}
+
+/**
  * @brief DifferentUpdataControl::sub_SetMainModelObj
  * @param pObjectP
  */

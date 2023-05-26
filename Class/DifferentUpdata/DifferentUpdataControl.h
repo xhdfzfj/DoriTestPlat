@@ -3,11 +3,18 @@
 #define DIFFERENTUPDATACONTROL_H
 
 #include <QUrl>
+#include <thread>
 #include "../MenuClass/PrivateMenuClass.h"
 #include "../../Control/HexDataDisplayControl.h"
 #include "../../Class/FileAnalyseBaseClass.h"
 
 class MainModelClass;
+
+typedef enum __DifferenceThreadType
+{
+    NoThreadWorkType,
+    DifferenceRestoreType,
+}DifferenceThreadType;
 
 class DifferentUpdataControl : public HexDataDisplayControl, public FileAnalyseBaseClass
 {
@@ -32,6 +39,9 @@ public:
     int GetDifferentDisplayType() { return mDifferentDisplayType; }
 
     void sub_StartRestoreBsDiff( void );
+    void sub_RestoreBsDiffHandle( void );
+
+    void sub_ClearCurrentDisplayData( void );
 
 private:
     void sub_ReadyCreateGui( void );
@@ -54,6 +64,9 @@ private:
     int mNewDataContentLen;
 
     PrivateMenuClass * mContentMenuP;
+
+    DifferenceThreadType mThreadWorkType;
+    std::thread * mWorkThreadP;
 
 };
 

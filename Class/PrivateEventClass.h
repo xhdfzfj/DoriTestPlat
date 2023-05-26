@@ -15,6 +15,7 @@ typedef enum __EventType_e
     WheelEvent,
     GetOldFileDataAndLen,
     GetNewFileDataAndLen,
+    ClearBsDiffNewFileDisplay,
 }EventType_e;
 
 typedef enum __DataType_e

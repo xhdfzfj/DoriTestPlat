@@ -124,6 +124,11 @@ bool FileAnalyseBaseClass::fun_FileSeek( int pStartOffset )
         {
             std::string _tmpFilePath;
 
+            if( mFilePath.length() < 3 )
+            {
+                return _ret;
+            }
+
     #ifdef Q_OS_WIN
             _tmpFilePath = mFilePath.substr( 1, mFilePath.length() - 1 );
     #else
@@ -152,6 +157,30 @@ bool FileAnalyseBaseClass::fun_FileSeek( int pStartOffset )
         }
     }
     return _ret;
+}
+
+/**
+ * @brief FileAnalyseBaseClass::sub_ClearCurrDataSource
+ * @return
+ */
+void FileAnalyseBaseClass::sub_ClearCurrDataSource()
+{
+    if( mMemoryDataSourceFlag )
+    {
+        delete [] mMemoryDataP;
+        mMemoryDataP = nullptr;
+        mMemoryDataLen = 0;
+    }
+    else
+    {
+        if( mActiveFlag )
+        {
+            mInFileStream.close();
+            mActiveFlag = false;
+        }
+
+        mFilePath = "";
+    }
 }
 
 /**

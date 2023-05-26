@@ -1,9 +1,10 @@
 ﻿#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "./bsdiff.h"
+#include "./BsDiffWithOutZip.h"
 
 #define MIN(x,y) (((x)<(y)) ? (x) : (y))
+typedef unsigned char   u_char;
 
 void offtout(off_t x,u_char *buf)
 {

@@ -24,6 +24,7 @@ public:
 protected:
     int fun_GetFileData( uint8_t * pSaveBufP, int pLen, int pStartOffset = -1 );
     bool fun_FileSeek( int pStartOffset );
+    void sub_ClearCurrDataSource();
     void sub_ClearHandle() override;
 
 protected:

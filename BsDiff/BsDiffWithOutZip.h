@@ -1,5 +1,5 @@
-﻿#ifndef __BSDIFF_H__
-#define __BSDIFF_H__
+﻿#ifndef BSDIFFWITHOUTZIP_H
+#define BSDIFFWITHOUTZIP_H
 
 #include <stdint.h>
 
@@ -14,6 +14,4 @@ void sub_FreeMallocAddr( void * pDestP );
 }
 #endif
 
-typedef uint8_t u_char;
-
-#endif
+#endif // BSDIFFWITHOUTZIP_H

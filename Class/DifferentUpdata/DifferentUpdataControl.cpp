@@ -3,7 +3,8 @@
 #include "../../Class/PrivateEventClass.h"
 #include "../../Model/MainModelClass.h"
 #include "DifferentUpdataControl.h"
-#include "../../BsDiff/bsdiff.h"
+#include "../../BsDiff/BsDiffWithOutZip.h"
+#include "../../BsDiff/BsDiffRestore.h"
 
 DifferentUpdataControl::DifferentUpdataControl( QQuickItem * pParent ) : HexDataDisplayControl( mContentMenuP, pParent ), FileAnalyseBaseClass()
 {
@@ -20,6 +21,8 @@ DifferentUpdataControl::DifferentUpdataControl( QQuickItem * pParent ) : HexData
     mNewDataContentLen = 0;
 
     mContentMenuP = nullptr;
+    mThreadWorkType = DifferenceThreadType::NoThreadWorkType;
+    mWorkThreadP = nullptr;
 
     //setAcceptHoverEvents( true );
 }
@@ -266,12 +269,40 @@ void DifferentUpdataControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
 }
 
 /**
+ * @brief DifferentUpdataControl::sub_RestoreBsDiffHandle
+ */
+void DifferentUpdataControl::sub_RestoreBsDiffHandle( void )
+{
+    int _ret;
+
+    _ret = fun_BsDiffRestore( mOldDataContentP, mOldDataContentLen, mMemoryDataP, mMemoryDataLen );
+}
+
+/**
  * @brief DifferentUpdataControl::sub_StartRestoreBsDiff
  *      启动BSDIFF文件的恢复
  */
 void DifferentUpdataControl::sub_StartRestoreBsDiff( void )
 {
-    hjkhkhjkhkjhk
+    mThreadWorkType = DifferenceThreadType::DifferenceRestoreType;
+    if( mWorkThreadP != nullptr )
+    {
+        mWorkThreadP->detach(); //分离线程
+        delete mWorkThreadP;    //分离出来的线程，可以强行终止
+        mWorkThreadP = nullptr;
+    }
+
+    mWorkThreadP = new std::thread( &DifferentUpdataControl::sub_RestoreBsDiffHandle, this );
+
+    PrivateEventClass * _tmpEventObjP;
+    _tmpEventObjP = new PrivateEventClass( EventType_e::logInfoType, DataType_e::StringType, "启动BSDIFF恢复线程" );    //不用清理,接口处清理
+    _tmpEventObjP->SetLogLevel( xhdLogEventClass::logInfo );
+    mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
+
+    _tmpEventObjP = new PrivateEventClass( EventType_e::ClearBsDiffNewFileDisplay, DataType_e::DataType, Sender_e::DifferentUpdate, nullptr, 0, 0 );
+    _tmpEventObjP->SetFreeState( FreeParamType_e::NoFreeType );
+    mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
+
 }
 
 /**
@@ -468,3 +499,17 @@ void DifferentUpdataControl::sub_DataToImage()
     }
 
 }
+
+/**
+ * @brief DifferentUpdataControl::sub_ClearCurrentDisplayData
+ */
+void DifferentUpdataControl::sub_ClearCurrentDisplayData( void )
+{
+    ClrMainImage();
+
+    sub_ClearCurrDataSource();
+
+    emit sub_SignalReDraw();
+}
+
+

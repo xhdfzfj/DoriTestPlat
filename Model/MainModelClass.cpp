@@ -372,6 +372,20 @@ void MainModelClass::sub_EventHandle( void )
                     delete _tmpEventObjP;
                 }
             }
+            else if( _tmpEventObjP->mEventType_e == EventType_e::ClearBsDiffNewFileDisplay )
+            {
+                if( _tmpEventObjP->mSender_e == Sender_e::DifferentUpdate )
+                {
+                    if( mDifferentUpdataObjSP != nullptr )
+                    {
+                        if( mDifferentUpdataObjSP[ 1 ] != nullptr )
+                        {
+                            mDifferentUpdataObjSP[ 1 ]->sub_ClearCurrentDisplayData();
+                        }
+                    }
+                    delete _tmpEventObjP;
+                }
+            }
         }
     }
 }

@@ -28,6 +28,7 @@ public:
     Q_INVOKABLE void sub_CreateBsDiffFile( void );  //生成BSDIFF文件
     Q_INVOKABLE void sub_MouseRightButtonClick( qreal pX, qreal pY );
     Q_INVOKABLE void sub_MouseLeftButtonClick( qreal pX, qreal pY );
+    Q_INVOKABLE void sub_BsRestoreProcessDisplayClick( void );  //恢复时的过程观察
 
 public:
     DifferentUpdataControl( QQuickItem * pParent = nullptr );
@@ -42,6 +43,7 @@ public:
     void sub_RestoreBsDiffHandle( void );
 
     void sub_ClearCurrentDisplayData( void );
+    void sub_RequestReDrawdata( void );
 
 private:
     void sub_ReadyCreateGui( void );
@@ -66,6 +68,7 @@ private:
     PrivateMenuClass * mContentMenuP;
 
     DifferenceThreadType mThreadWorkType;
+    int mDisplayCount;
     std::thread * mWorkThreadP;
 
 };

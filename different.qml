@@ -169,6 +169,7 @@ Item
                 anchors.fill: parent
                 Row
                 {
+                    spacing: 5
                     Label
                     {
                         id:guiResultDiffFile
@@ -182,6 +183,16 @@ Item
                         onClicked:
                         {
                             guiDifferentUpdataControl3.sub_CreateBsDiffFile();
+                        }
+                    }
+
+                    Button
+                    {
+                        text:qsTr( "恢复过程显示  " )
+                        height: 20
+                        onClicked:
+                        {
+                            guiDifferentUpdataControl3.sub_BsRestoreProcessDisplayClick();
                         }
                     }
                 }

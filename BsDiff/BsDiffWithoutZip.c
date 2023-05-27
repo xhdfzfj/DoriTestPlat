@@ -302,6 +302,9 @@ int fun_StartBsDiff( uint8_t * pOldFileDataP, int pOldFileLen, uint8_t * pNewFil
         };
     };
 
+    off_t _tmpValue;
+
+    _tmpValue = _index;
 
     offtout(_index,buf);
     memcpy( &_resultP[ 8 ], buf, 8 );
@@ -312,7 +315,7 @@ int fun_StartBsDiff( uint8_t * pOldFileDataP, int pOldFileLen, uint8_t * pNewFil
     memcpy( &_resultP[ 32 + _index ], db, dblen );
     _index += dblen;
 
-    offtout(newsize-_index,buf);
+    offtout(_index + 32 - _tmpValue, buf);
     memcpy( &_resultP[ 16 ], buf, 8 );
 
     memcpy( &_resultP[ 32 + _index ], eb, eblen );

@@ -157,6 +157,45 @@ void DifferentUpdataControl::sub_CreateBsDiffFile()
 }
 
 /**
+ * @brief DifferentUpdataControl::sub_BsRestoreProcessDisplayClick
+ *      恢复时的过程显示
+ */
+void DifferentUpdataControl::sub_BsRestoreProcessDisplayClick()
+{
+    BsRestoreState_e _tmpState;
+    uint8_t * _tmpBufP;
+    int _tmpLen;
+    PrivateEventClass * _tmpEventObjP;
+
+    if( mThreadWorkType == DifferenceRestoreType )
+    {
+        _tmpState = fun_GetBsDiffRestoreState();
+        if( _tmpState == BufReadyOkState )
+        {
+            if( mDisplayCount == 0 )
+            {
+                _tmpBufP = fun_GetBsDiffRestoreBuf( mDisplayCount, &_tmpLen );
+
+                if( _tmpBufP != nullptr )
+                {
+
+                    _tmpEventObjP = new PrivateEventClass( EventType_e::SetBsDiffNewDataSource, DataType_e::DataType, Sender_e::DifferentUpdate,
+                                                           ( void * )_tmpBufP, _tmpLen, 0 );
+                    _tmpEventObjP->SetFreeState( FreeParamType_e::NoFreeType );
+
+                    mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
+                }
+                mDisplayCount += 1;
+                if( mDisplayCount >= 3 )
+                {
+                    mDisplayCount = 0;
+                }
+            }
+        }
+    }
+}
+
+/**
  * @brief DifferentUpdataControl::sub_WheelEvent
  * @param pDirect
  *      0代表向下  1代表向上
@@ -275,7 +314,14 @@ void DifferentUpdataControl::sub_RestoreBsDiffHandle( void )
 {
     int _ret;
 
-    _ret = fun_BsDiffRestore( mOldDataContentP, mOldDataContentLen, mMemoryDataP, mMemoryDataLen );
+    _ret = fun_BsDiffRestore( mOldDataContentP, mOldDataContentLen, mMemoryDataP, mMemoryDataLen, 0 );
+
+    if( _ret == 2 )
+    {
+        //可以继续进行
+        _ret = fun_BsDiffRestore( mOldDataContentP, mOldDataContentLen, mMemoryDataP, mMemoryDataLen, 1 );
+
+    }
 }
 
 /**
@@ -285,6 +331,7 @@ void DifferentUpdataControl::sub_RestoreBsDiffHandle( void )
 void DifferentUpdataControl::sub_StartRestoreBsDiff( void )
 {
     mThreadWorkType = DifferenceThreadType::DifferenceRestoreType;
+    mDisplayCount = 0;
     if( mWorkThreadP != nullptr )
     {
         mWorkThreadP->detach(); //分离线程

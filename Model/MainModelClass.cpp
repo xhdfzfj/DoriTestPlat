@@ -394,8 +394,11 @@ void MainModelClass::sub_EventHandle( void )
                     {
                         if( mDifferentUpdataObjSP[ 1 ] != nullptr )
                         {
-                            mDifferentUpdataObjSP[ 1 ]->sub_SetDataSource( _tmpEventObjP->mVoidParam1P, _tmpEventObjP->mVoidParam1Len );
-                            mDifferentUpdataObjSP[ 1 ]->sub_RequestReDrawdata();
+                            mDifferentUpdataObjSP[ 1 ]->sub_ClearCurrDataSource();
+                            mDifferentUpdataObjSP[ 1 ]->sub_SetDataSource( ( uint8_t * )_tmpEventObjP->mVoidParam1P, _tmpEventObjP->mVoidParam1Len );
+                            mDifferentUpdataObjSP[ 1 ]->sub_InitDiplayParam();
+                            mDifferentUpdataObjSP[ 1 ]->sub_DataToImage();
+
                         }
                     }
                     delete _tmpEventObjP;

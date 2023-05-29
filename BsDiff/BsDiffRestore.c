@@ -43,6 +43,7 @@ int fun_BsDiffRestore( uint8_t * pOldDataP, int pOldLen, uint8_t * pBsDataP, int
     int _tmpLen;
     int _tmpOffset;
     uint8_t * _tmpP;
+    off_t _tmpCtrl[ 3 ];
 
     _retValue = 0;
 
@@ -50,6 +51,22 @@ int fun_BsDiffRestore( uint8_t * pOldDataP, int pOldLen, uint8_t * pBsDataP, int
     {
         if( mBsDiffRestoreP != NULL )
         {
+            if( mBsDiffRestoreP->BsNewFileBufP != NULL )
+            {
+                free( mBsDiffRestoreP->BsNewFileBufP );
+            }
+            if( mBsDiffRestoreP->mCtrlBufP != NULL )
+            {
+                free( mBsDiffRestoreP->mCtrlBufP );
+            }
+            if( mBsDiffRestoreP->mDataBufP != NULL )
+            {
+                free( mBsDiffRestoreP->mDataBufP );
+            }
+            if( mBsDiffRestoreP->mEDataBufP != NULL )
+            {
+                free( mBsDiffRestoreP->mEDataBufP );
+            }
             free( mBsDiffRestoreP );
         }
 
@@ -65,6 +82,9 @@ int fun_BsDiffRestore( uint8_t * pOldDataP, int pOldLen, uint8_t * pBsDataP, int
         mBsDiffRestoreP->BsCtrlLen = offtin( _tmpP + 8 );
         mBsDiffRestoreP->BsDataLen = offtin( _tmpP + 16 );
         mBsDiffRestoreP->BsNewFileLen = offtin( _tmpP + 24 );
+
+        mBsDiffRestoreP->BsNewFileBufP = malloc( mBsDiffRestoreP->BsNewFileLen + 1);
+        memset( mBsDiffRestoreP->BsNewFileBufP, 0, mBsDiffRestoreP->BsNewFileLen + 1 );
 
         mBsDiffRestoreP->mState = ReadAllLenState;
 
@@ -89,6 +109,72 @@ int fun_BsDiffRestore( uint8_t * pOldDataP, int pOldLen, uint8_t * pBsDataP, int
             mBsDiffRestoreP->mState = BufReadyOkState;
 
             _retValue = 2;
+        }
+        else if( mBsDiffRestoreP->mState == BufReadyOkState )
+        {
+            mBsDiffRestoreP->oldPos = 0;
+            mBsDiffRestoreP->newPos = 0;
+            mBsDiffRestoreP->mCtrlBufOffset = 0;
+            mBsDiffRestoreP->mDiffBufOffset = 0;
+            mBsDiffRestoreP->mEdBufOffset = 0;
+
+            mBsDiffRestoreP->mState = CtrlRunState;
+            _retValue = 2;
+        }
+        else if( mBsDiffRestoreP->mState == CtrlRunState )
+        {
+            _retValue = 2;
+
+            if( mBsDiffRestoreP->newPos < mBsDiffRestoreP->BsNewFileLen )
+            {
+                for( _tmpLen = 0; _tmpLen <= 2; _tmpLen++ )
+                {
+                    if( ( mBsDiffRestoreP->BsCtrlLen - mBsDiffRestoreP->mCtrlBufOffset ) < 8 )
+                    {
+                        _retValue = 0;
+                        break;
+                    }
+                    _tmpCtrl[ _tmpLen ] = offtin( &mBsDiffRestoreP->mCtrlBufP[ mBsDiffRestoreP->mCtrlBufOffset ] );
+                    mBsDiffRestoreP->mCtrlBufOffset += 8;
+
+                }
+
+                if( _retValue == 2 )
+                {
+                    if( ( mBsDiffRestoreP->newPos + _tmpCtrl[ 0 ] ) > mBsDiffRestoreP->BsNewFileLen )
+                    {
+                        _retValue = 0;
+                    }
+                    else
+                    {
+                        memcpy( &mBsDiffRestoreP->BsNewFileBufP[ mBsDiffRestoreP->newPos ],
+                               &mBsDiffRestoreP->mDataBufP[ mBsDiffRestoreP->mDiffBufOffset ],
+                               _tmpCtrl[ 0 ] );
+                        mBsDiffRestoreP->mDiffBufOffset += _tmpCtrl[ 0 ];
+                        for( _tmpLen = 0; _tmpLen < _tmpCtrl[0]; _tmpLen++ )
+                        {
+                            mBsDiffRestoreP->BsNewFileBufP[ mBsDiffRestoreP->newPos + _tmpLen ] += mBsDiffRestoreP->mOldDataP[ mBsDiffRestoreP->oldPos + _tmpLen ];
+                        }
+
+                        mBsDiffRestoreP->newPos += _tmpCtrl[ 0 ];
+                        mBsDiffRestoreP->oldPos += _tmpCtrl[ 0 ];
+
+
+                        memcpy( &mBsDiffRestoreP->BsNewFileBufP[ mBsDiffRestoreP->newPos ],
+                               &mBsDiffRestoreP->mEDataBufP[ mBsDiffRestoreP->mEdBufOffset ],
+                               _tmpCtrl[ 1 ] );
+                        mBsDiffRestoreP->mEdBufOffset += _tmpCtrl[ 1 ];
+                        mBsDiffRestoreP->newPos += _tmpCtrl[ 1 ];
+                        mBsDiffRestoreP->oldPos += _tmpCtrl[ 2 ];
+
+                    }
+                }
+            }
+            else
+            {
+                _retValue = 1;
+            }
+
         }
     }
 
@@ -131,6 +217,16 @@ uint8_t * fun_GetBsDiffRestoreBuf( int pFlag, int * pRetLen )
             _retP = mBsDiffRestoreP->mCtrlBufP;
             *pRetLen = mBsDiffRestoreP->BsCtrlLen;
         }
+        else if( pFlag == 1 )
+        {
+            _retP = mBsDiffRestoreP->mDataBufP;
+            *pRetLen = mBsDiffRestoreP->BsDataLen;
+        }
+    }
+    else if( mBsDiffRestoreP->mState == CtrlRunState )
+    {
+        _retP = mBsDiffRestoreP->BsNewFileBufP;
+        *pRetLen = mBsDiffRestoreP->BsNewFileLen;
     }
 
     return _retP;

@@ -1,6 +1,7 @@
 ﻿#ifndef BSDIFFRESTORE_H
 #define BSDIFFRESTORE_H
 
+#include <stdlib.h>
 #include <stdint.h>
 
 typedef enum _BsRestoreState_e
@@ -8,6 +9,7 @@ typedef enum _BsRestoreState_e
     NoRestoreState,
     ReadAllLenState,
     BufReadyOkState,
+    CtrlRunState,
 }BsRestoreState_e;
 
 typedef struct __BsDiffRestore_S
@@ -26,6 +28,15 @@ typedef struct __BsDiffRestore_S
     uint8_t * mCtrlBufP;
     uint8_t * mDataBufP;
     uint8_t * mEDataBufP;
+
+    uint8_t * BsNewFileBufP;
+
+    int oldPos;
+    int newPos;
+    int mCtrlBufOffset;
+    int mDiffBufOffset;
+    int mEdBufOffset;
+
 }BsDiffRestore_S;
 
 #if __cplusplus

@@ -44,6 +44,20 @@ DifferentUpdataControl::~DifferentUpdataControl()
     {
         delete mContentMenuP;
     }
+
+    if( mWorkThreadP != nullptr )
+    {
+        if( mThreadWorkType != DifferenceThreadType::NoThreadWorkType )
+        {
+            if( !mWorkThreadExitFlag )
+            {
+                mWorkThreadExitFlag = true;
+                mWorkThreadCv.notify_one();
+                mWorkThreadP->join();
+            }
+            delete mWorkThreadP;
+        }
+    }
 }
 
 /**
@@ -169,28 +183,26 @@ void DifferentUpdataControl::sub_BsRestoreProcessDisplayClick()
 
     if( mThreadWorkType == DifferenceRestoreType )
     {
-        _tmpState = fun_GetBsDiffRestoreState();
-        if( _tmpState == BufReadyOkState )
+        //_tmpState = fun_GetBsDiffRestoreState();
+        //if( _tmpState == BufReadyOkState )
         {
-            if( mDisplayCount == 0 )
+            _tmpBufP = fun_GetBsDiffRestoreBuf( mDisplayCount, &_tmpLen );
+
+            if( _tmpBufP != nullptr )
             {
-                _tmpBufP = fun_GetBsDiffRestoreBuf( mDisplayCount, &_tmpLen );
 
-                if( _tmpBufP != nullptr )
-                {
+                _tmpEventObjP = new PrivateEventClass( EventType_e::SetBsDiffNewDataSource, DataType_e::DataType, Sender_e::DifferentUpdate,
+                                                       ( void * )_tmpBufP, _tmpLen, 0 );
+                _tmpEventObjP->SetFreeState( FreeParamType_e::NoFreeType );
 
-                    _tmpEventObjP = new PrivateEventClass( EventType_e::SetBsDiffNewDataSource, DataType_e::DataType, Sender_e::DifferentUpdate,
-                                                           ( void * )_tmpBufP, _tmpLen, 0 );
-                    _tmpEventObjP->SetFreeState( FreeParamType_e::NoFreeType );
-
-                    mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
-                }
-                mDisplayCount += 1;
-                if( mDisplayCount >= 3 )
-                {
-                    mDisplayCount = 0;
-                }
+                mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
             }
+            mDisplayCount += 1;
+            if( mDisplayCount >= 3 )
+            {
+                mDisplayCount = 0;
+            }
+
         }
     }
 }
@@ -298,6 +310,13 @@ void DifferentUpdataControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
                     {
                         sub_StartRestoreBsDiff();
                     }
+                    else if( _tmpIndex == 2 )
+                    {
+                        uint8_t * _tmpHuffmanP;
+                        int _tmpHuffmanLen;
+
+                        _tmpHuffmanP = fun_CreateHuffmanCode( mMemoryDataP, mMemoryDataLen, &_tmpHuffmanLen );
+                    }
                 }
             }
             mContentMenuP->sub_SetDisplayPoint( QPoint( -1, -1 ) );
@@ -316,12 +335,27 @@ void DifferentUpdataControl::sub_RestoreBsDiffHandle( void )
 
     _ret = fun_BsDiffRestore( mOldDataContentP, mOldDataContentLen, mMemoryDataP, mMemoryDataLen, 0 );
 
-    if( _ret == 2 )
+    while( ( _ret == 2 ) && ( !mWorkThreadExitFlag ) )
     {
+        if( mWorkThreadExitFlag )
+        {
+            break;
+        }
+        std::unique_lock< std::mutex > mSyncLock( mWorkThreadmtx );
+        mWorkThreadCv.wait( mSyncLock );
         //可以继续进行
         _ret = fun_BsDiffRestore( mOldDataContentP, mOldDataContentLen, mMemoryDataP, mMemoryDataLen, 1 );
-
+        if( _ret == 1 )
+        {
+            //结束恢复
+            PrivateEventClass * _tmpEventObjP;
+            _tmpEventObjP = new PrivateEventClass( EventType_e::logInfoType, DataType_e::StringType, "启动BSDIFF恢复完成!!!" );    //不用清理,接口处清理
+            _tmpEventObjP->SetLogLevel( xhdLogEventClass::logInfo );
+            mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
+        }
     }
+
+    mWorkThreadExitFlag = true;
 }
 
 /**
@@ -339,6 +373,7 @@ void DifferentUpdataControl::sub_StartRestoreBsDiff( void )
         mWorkThreadP = nullptr;
     }
 
+    mWorkThreadExitFlag = false;
     mWorkThreadP = new std::thread( &DifferentUpdataControl::sub_RestoreBsDiffHandle, this );
 
     PrivateEventClass * _tmpEventObjP;
@@ -384,6 +419,7 @@ void DifferentUpdataControl::sub_DifferentType( int pState )
 
         mContentMenuP->sub_AddMenuItem( "保存文件" );
         mContentMenuP->sub_AddMenuItem( "恢复文件" );
+        mContentMenuP->sub_AddMenuItem( "哈夫曼处理" );
 //        mContentMenuP->sub_AddMenuItem( "测试菜单1" );
 //        mContentMenuP->sub_AddMenuItem( "测试菜单2" );
 //        mContentMenuP->sub_AddMenuItem( "测试菜单3" );
@@ -554,6 +590,8 @@ void DifferentUpdataControl::sub_ClearCurrentDisplayData( void )
 {
     ClrMainImage();
 
+    setYToInit();
+    setXToInit();
     sub_ClearCurrDataSource();
 
     emit sub_SignalReDraw();

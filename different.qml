@@ -22,7 +22,6 @@ Item
         id:guiFlashSimGrid
         width: parent.width
         height: parent.height
-        columnSpacing: 2
         columns: 3
         Rectangle
         {
@@ -33,6 +32,7 @@ Item
                 anchors.fill: parent
                 Row
                 {
+                    spacing: 3
                     Label
                     {
                         id:guiSrcDiffFile
@@ -112,6 +112,7 @@ Item
                 anchors.fill: parent
                 Row
                 {
+                    spacing: 3
                     Label
                     {
                         id:guiSrcNewFile
@@ -169,6 +170,8 @@ Item
                 anchors.fill: parent
                 Row
                 {
+                    layoutDirection: Qt.LeftToRight
+                    clip: true
                     spacing: 5
                     Label
                     {
@@ -188,14 +191,25 @@ Item
 
                     Button
                     {
-                        text:qsTr( "恢复过程显示  " )
+                        text:qsTr( "过程显示" )
                         height: 20
                         onClicked:
                         {
                             guiDifferentUpdataControl3.sub_BsRestoreProcessDisplayClick();
                         }
                     }
+
+                    Button
+                    {
+                        height: 20
+                        text: qsTr("继续动作")
+                        onClicked:
+                        {
+                            guiDifferentUpdataControl3.sub_WorkThreadContinueClick();
+                        }
+                    }
                 }
+
                 DifferentUpdataControl
                 {
                     id:guiDifferentUpdataControl3
@@ -235,6 +249,7 @@ Item
                         }
                     }
                 }
+
             }
         }
     }

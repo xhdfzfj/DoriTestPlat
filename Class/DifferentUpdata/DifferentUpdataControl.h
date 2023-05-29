@@ -4,6 +4,8 @@
 
 #include <QUrl>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 #include "../MenuClass/PrivateMenuClass.h"
 #include "../../Control/HexDataDisplayControl.h"
 #include "../../Class/FileAnalyseBaseClass.h"
@@ -29,6 +31,7 @@ public:
     Q_INVOKABLE void sub_MouseRightButtonClick( qreal pX, qreal pY );
     Q_INVOKABLE void sub_MouseLeftButtonClick( qreal pX, qreal pY );
     Q_INVOKABLE void sub_BsRestoreProcessDisplayClick( void );  //恢复时的过程观察
+    Q_INVOKABLE void sub_WorkThreadContinueClick( void )    { mWorkThreadCv.notify_one(); }
 
 public:
     DifferentUpdataControl( QQuickItem * pParent = nullptr );
@@ -43,11 +46,12 @@ public:
     void sub_RestoreBsDiffHandle( void );
 
     void sub_ClearCurrentDisplayData( void );
-    void sub_RequestReDrawdata( void );
+    void sub_RequestReDrawdata( void ) { emit sub_SignalReDraw(); };
+    void sub_DataToImage( void );
 
 private:
     void sub_ReadyCreateGui( void );
-    void sub_DataToImage( void );
+
     void sub_GetOtherFileDataAndLen( uint8_t * pDataP, int pLen, int pType );   //0旧  1新
     void sub_SaveBsDiffFile( void );
 
@@ -70,6 +74,9 @@ private:
     DifferenceThreadType mThreadWorkType;
     int mDisplayCount;
     std::thread * mWorkThreadP;
+    std::mutex mWorkThreadmtx;
+    std::condition_variable mWorkThreadCv;
+    bool mWorkThreadExitFlag;
 
 };
 

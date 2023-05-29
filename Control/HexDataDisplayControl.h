@@ -21,6 +21,7 @@ public:
     virtual ~HexDataDisplayControl();
 
     void hoverMoveEvent( QHoverEvent * event ) override;
+    void sub_InitDiplayParam() { setXToInit();  setYToInit(); }
 
 protected:
     void setXToInit() { mCurrX = mSpaceValue; }

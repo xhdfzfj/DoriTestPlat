@@ -5,6 +5,7 @@
 #include "DifferentUpdataControl.h"
 #include "../../BsDiff/BsDiffWithOutZip.h"
 #include "../../BsDiff/BsDiffRestore.h"
+#include "../../Huffman/XhdHuffman.h"
 
 DifferentUpdataControl::DifferentUpdataControl( QQuickItem * pParent ) : HexDataDisplayControl( mContentMenuP, pParent ), FileAnalyseBaseClass()
 {

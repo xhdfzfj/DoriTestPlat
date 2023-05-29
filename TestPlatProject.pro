@@ -22,6 +22,7 @@ SOURCES += \
         Control/GuiDrawControl.cpp \
         Control/HexDataClass.cpp \
         Control/HexDataDisplayControl.cpp \
+        Huffman/XhdHuffman.c \
         Model/LogViewModel.cpp \
         Model/MainModelClass.cpp \
         Model/serialconfigmodel.cpp \
@@ -65,6 +66,7 @@ HEADERS += \
     Control/GuiDrawControl.h \
     Control/HexDataClass.h \
     Control/HexDataDisplayControl.h \
+    Huffman/XhdHuffman.h \
     Include/CommonStruct.h \
     Model/LogViewModel.h \
     Model/MainModelClass.h \

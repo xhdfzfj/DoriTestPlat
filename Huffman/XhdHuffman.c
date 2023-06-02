@@ -1,4 +1,4 @@
-#include "memory.h"
+﻿#include "memory.h"
 #include "./XhdHuffman.h"
 #include <stdio.h>
 
@@ -64,9 +64,11 @@ uint8_t * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, in
 {
     uint32_t i, _tmpLen;
     uint8_t * _retP;
+    uint32_t * _tmpValueSP;
     uint32_t _tmpCodeS[ 256 ];
 
     _retP = NULL;
+    _tmpValueSP = NULL;
     memset( ( void * )_tmpCodeS, 0, sizeof( uint32_t ) * 256 );
 
     _tmpLen = pDestDataLen;
@@ -76,23 +78,32 @@ uint8_t * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, in
         _tmpCodeS[ pDestDataP[ i ] ] += 1;
     }
 
+    sub_MergSort( _tmpCodeS, 256 );
+    for( i = 0; i < 256; i++ )
+    {
+        if( _tmpCodeS[ i ] != 0 )
+        {
+            break;
+        }
+    }
 
-    uint32_t _testBuf[ 12 ];
+    if( i != 256 )
+    {
+        //不为全空的情况
+        _tmpLen = 256 - i;
+        if( _tmpLen != 256 )
+        {
+            _tmpValueSP = ( uint32_t * )malloc( _tmpLen * sizeof( uint32_t ) );
+            memcpy( _tmpValueSP, &_tmpCodeS[ i ], _tmpLen * sizeof( uint32_t ) );
 
-    _testBuf[ 0 ] = 6;
-    _testBuf[ 1 ] = 7;
-    _testBuf[ 2 ] = 5;
-    _testBuf[ 3 ] = 7;
-    _testBuf[ 4 ] = 9;
-    _testBuf[ 5 ] = 6;
-    _testBuf[ 6 ] = 4;
-    _testBuf[ 7 ] = 10;
-    _testBuf[ 8 ] = 3;
-    _testBuf[ 9 ] = 2;
-    _testBuf[ 10 ] = 8;
-    _testBuf[ 11 ] = 91;
+            aaaa
+        }
+    }
 
-    sub_MergSort( _testBuf, 12 );
+    if( _tmpValueSP != NULL )
+    {
+        free( _tmpValueSP );
+    }
 
     return _retP;
 }

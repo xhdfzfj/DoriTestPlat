@@ -265,15 +265,183 @@ void sub_DisplayTreeLeafNode( TreeNode_S * pRootNodeP )
                 }
             }
         }
+
+        free( _tmpStackP );
     }
 }
 
-uint8_t * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, int * pRetLen )
+
+HuffmanResult_S fun_GetHuffmanVaule( TreeNode_S * pRootNode, TreeNode_S * pDestNodeP )
 {
-    uint32_t i, _tmpLen;
-    uint8_t * _retP;
+    HuffmanResult_S _retValue;
+    uint32_t _tmpU32Value;
+    TreeNode_S * _tmpNodeP;
+    int _tmpByteIndex;
+    int _tmpBitIndex;
+
+    _tmpU32Value = *( ( uint32_t * )pDestNodeP->mValue_U.mVoidPointP );
+    _retValue.mDestValue = _tmpU32Value;
+
+    _retValue.mBitS = 0;
+    memset( _retValue.mHuffmanValue, 0, 16 );
+
+    _tmpNodeP = pDestNodeP;
+    _tmpBitIndex = 0;
+    _tmpByteIndex = 0;
+
+    while( _tmpNodeP->mParentP != NULL )
+    {
+        _tmpBitIndex = _retValue.mBitS & 0x07;
+        if( ( ( TreeNode_S * )_tmpNodeP->mParentP )->mRightChildP == _tmpNodeP )
+        {
+            _retValue.mHuffmanValue[ _tmpByteIndex ] &= ( ~( 1 << _tmpBitIndex ) );
+            _retValue.mHuffmanValue[ _tmpByteIndex ] |= ( 1 << _tmpBitIndex );
+        }
+        else
+        {
+            _retValue.mHuffmanValue[ _tmpByteIndex ] &= ( ~( 1 << _tmpBitIndex ) );
+        }
+
+        _retValue.mBitS += 1;
+        _tmpByteIndex = _retValue.mBitS >> 3;
+
+        _tmpNodeP = _tmpNodeP->mParentP;
+    }
+
+    return _retValue;
+}
+
+
+HuffmanResult_S * fun_GetHuffmanResultByHuffmanTree( TreeNode_S * pTreeRootNodeP, uint32_t pDestValueS )
+{
+    int i;
+    HuffmanResult_S * _retResultArrayS;
+    Stack_S * _tmpStackP;
+    ListElement_S * _tmpElementP;
+    TreeNode_S * _tmpNodeP;
+    uint32_t _tmpU32Value;
+
+    _retResultArrayS = NULL;
+
+    if( pTreeRootNodeP != NULL )
+    {
+        i = 0;
+        _tmpStackP = ( Stack_S * )malloc( sizeof( Stack_S ) );
+        INIT_STACK( _tmpStackP );
+
+        _retResultArrayS = ( HuffmanResult_S * )malloc( sizeof( HuffmanResult_S ) * pDestValueS );
+
+        _tmpNodeP = pTreeRootNodeP;
+        while( ( _tmpNodeP != NULL ) && ( _tmpNodeP->mLeftChildP == NULL ) )
+        {
+            if( ( _tmpNodeP->mLeftChildP == NULL ) && ( _tmpNodeP->mRightChildP != NULL ) )
+            {
+                _tmpU32Value = *( ( uint32_t * )_tmpNodeP->mValue_U.mVoidPointP );
+                _retResultArrayS[ i ] = fun_GetHuffmanVaule( pTreeRootNodeP, _tmpNodeP );
+                i += 1;
+            }
+
+            _tmpNodeP = _tmpNodeP->mRightChildP;
+        }
+
+        if( _tmpNodeP != NULL )
+        {
+            //找到第一个左子不为NULL的节点
+            _tmpElementP = ( ListElement_S * )malloc( sizeof( ListElement_S ) );
+            INIT_LISTELEMENT( _tmpElementP );
+            _tmpElementP->ElementP = ( void * )_tmpNodeP;
+
+            PUSH_STACK( _tmpStackP, _tmpElementP );
+            _tmpNodeP = _tmpNodeP->mLeftChildP;
+
+            while( ( _tmpStackP->ElementCount != 0 ) || ( _tmpNodeP != NULL ) )
+            {
+                while( ( _tmpNodeP != NULL ) && ( _tmpNodeP->mLeftChildP == NULL ) )
+                {
+                    if( ( _tmpNodeP->mLeftChildP == NULL ) && ( _tmpNodeP->mRightChildP == NULL ) )
+                    {
+                        _tmpU32Value = *( ( uint32_t * )_tmpNodeP->mValue_U.mVoidPointP );
+                        _retResultArrayS[ i ] = fun_GetHuffmanVaule( pTreeRootNodeP, _tmpNodeP );
+                        i += 1;
+                    }
+                    _tmpNodeP = _tmpNodeP->mRightChildP;
+                }
+
+                if( _tmpNodeP != NULL )
+                {
+                    _tmpElementP = ( ListElement_S * )malloc( sizeof( ListElement_S ) );
+                    INIT_LISTELEMENT( _tmpElementP );
+                    _tmpElementP->ElementP = ( void * )_tmpNodeP;
+                    PUSH_STACK( _tmpStackP, _tmpElementP );
+
+                    _tmpNodeP = _tmpNodeP->mLeftChildP;
+                    if( ( _tmpNodeP->mLeftChildP == NULL ) && ( _tmpNodeP->mRightChildP == NULL ) )
+                    {
+                        _tmpU32Value = *( ( uint32_t * )_tmpNodeP->mValue_U.mVoidPointP );
+                        _retResultArrayS[ i ] = fun_GetHuffmanVaule( pTreeRootNodeP, _tmpNodeP );
+                        i += 1;
+
+                        POP_STACK( _tmpStackP, _tmpElementP );
+                        _tmpNodeP = _tmpElementP->ElementP;
+                        free( _tmpElementP );
+
+                        _tmpNodeP = _tmpNodeP->mRightChildP;
+                        continue;
+                    }
+
+                }
+                else if( _tmpStackP->ElementCount != 0 )
+                {
+                    POP_STACK( _tmpStackP, _tmpElementP );
+                    _tmpNodeP = _tmpElementP->ElementP;
+                    free( _tmpElementP );
+
+                    _tmpNodeP = _tmpNodeP->mRightChildP;
+
+                    continue;
+                }
+            }
+        }
+
+        free( _tmpStackP );
+    }
+
+
+    return _retResultArrayS;
+}
+
+
+void sub_ClearTree( TreeNode_S * pTreeNodeP )
+{
+    if( ( pTreeNodeP->mLeftChildP == NULL ) && ( pTreeNodeP->mRightChildP == NULL ) )
+    {
+        free( pTreeNodeP );
+    }
+    else
+    {
+        if( pTreeNodeP->mLeftChildP != NULL )
+        {
+            sub_ClearTree( ( TreeNode_S * )pTreeNodeP->mLeftChildP );
+        }
+
+        if( pTreeNodeP->mRightChildP != NULL )
+        {
+            sub_ClearTree( ( TreeNode_S * )pTreeNodeP->mRightChildP );
+        }
+
+        free( pTreeNodeP );
+    }
+}
+
+
+HuffmanResult_S * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, int * pRetLen )
+{
+    uint32_t i, j, _tmpLen;
+    uint32_t _tmpU32Value;
+    HuffmanResult_S * _retP;
     uint32_t _tmpValueS[ 256 ];
     uint32_t _tmpCodeS[ 256 ];
+    HuffmanResult_S * _tmpHuffmanResultArrayP;
 
     _retP = NULL;
     memset( ( void * )_tmpCodeS, 0, sizeof( uint32_t ) * 256 );
@@ -305,8 +473,65 @@ uint8_t * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, in
 
         _tmpHuffmanRootP = fun_CreateHuffmanTree( &_tmpValueS[ i ], _tmpLen );
 
-        sub_DisplayTreeLeafNode( _tmpHuffmanRootP );
+        _tmpHuffmanResultArrayP = fun_GetHuffmanResultByHuffmanTree( _tmpHuffmanRootP, _tmpLen );
+
+        if( _tmpHuffmanResultArrayP != NULL )
+        {
+            sub_ClearTree( _tmpHuffmanRootP );
+
+            memcpy( _tmpValueS, _tmpCodeS, sizeof( uint32_t ) * 256 );
+
+            *pRetLen = _tmpLen;
+
+            _retP = ( HuffmanResult_S * )malloc( sizeof( HuffmanResult_S ) * _tmpLen );
+            for( i = 0; i < _tmpLen; i++ )
+            {
+                _tmpU32Value = _tmpHuffmanResultArrayP[ i ].mDestValue;
+                for( j = 0; j < 256; j++ )
+                {
+                    if( _tmpCodeS[ j ] == _tmpU32Value )
+                    {
+                        break;
+                    }
+                }
+
+                if( j == 256 )
+                {
+                    free( _retP );
+                    _retP = NULL;
+                    break;
+                }
+                else
+                {
+                    _retP[ i ].mDestValue = j;
+                    _retP[ i ].mBitS = _tmpHuffmanResultArrayP[ i ].mBitS;
+                    mempcpy( _retP[ i ].mHuffmanValue, _tmpHuffmanResultArrayP[ i ].mHuffmanValue, 16 );
+                    _tmpCodeS[ j ] = 0;
+                }
+            }
+        }
+
+        free( _tmpHuffmanResultArrayP );
+    }
+
+    uint32_t _tmpTest = 0;
+    if( _retP != 0 )
+    {
+        _tmpU32Value = 0;
+        for( i = 0; i < 256; i++ )
+        {
+            for( j = 0; j < _tmpLen; j++ )
+            {
+                if( i == _retP[ j ].mDestValue )
+                {
+                    _tmpU32Value += _tmpValueS[ i ] * _retP[ j ].mBitS;
+                    _tmpTest += _retP[ j ].mBitS;
+                    break;
+                }
+            }
+        }
     }
 
     return _retP;
 }
+

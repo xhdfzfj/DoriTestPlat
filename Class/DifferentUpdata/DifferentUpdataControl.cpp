@@ -313,7 +313,7 @@ void DifferentUpdataControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
                     }
                     else if( _tmpIndex == 2 )
                     {
-                        uint8_t * _tmpHuffmanP;
+                        HuffmanResult_S * _tmpHuffmanP;
                         int _tmpHuffmanLen;
 
                         _tmpHuffmanP = fun_CreateHuffmanCode( mMemoryDataP, mMemoryDataLen, &_tmpHuffmanLen );

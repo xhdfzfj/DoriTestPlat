@@ -434,10 +434,38 @@ void sub_ClearTree( TreeNode_S * pTreeNodeP )
 }
 
 
+uint8_t * fun_HuffmanCodeData( HuffmanResult_S * pHuffmanCodeP, uint32_t pHuffmanCodeLen, uint8_t * pDataP, uint32_t pDataLen, uint32_t * pRetLen )
+{
+    uint8_t * _retP;
+    uint32_t j, i;
+    uint32_t _tmpLen;
+
+    _retP = NULL;
+    _tmpLen = 256;
+    j = 0;
+
+    _retP = malloc( _tmpLen );
+    j += 4;
+
+    i = 0;
+    while( i < pHuffmanCodeLen )
+    {
+        _retP[ j ] = pHuffmanCodeP[ i ].mDestValue;
+        j += 1;
+        _retP[ j ] = pHuffmanCodeP[ i ].mBitS;
+        j += 1;
+
+    }
+
+    return _retP;
+}
+
+
 HuffmanResult_S * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, int * pRetLen )
 {
     uint32_t i, j, _tmpLen;
     uint32_t _tmpU32Value;
+    uint8_t * _tmpP;
     HuffmanResult_S * _retP;
     uint32_t _tmpValueS[ 256 ];
     uint32_t _tmpCodeS[ 256 ];
@@ -505,32 +533,38 @@ HuffmanResult_S * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDat
                 {
                     _retP[ i ].mDestValue = j;
                     _retP[ i ].mBitS = _tmpHuffmanResultArrayP[ i ].mBitS;
-                    mempcpy( _retP[ i ].mHuffmanValue, _tmpHuffmanResultArrayP[ i ].mHuffmanValue, 16 );
+                    memcpy( _retP[ i ].mHuffmanValue, _tmpHuffmanResultArrayP[ i ].mHuffmanValue, 16 );
                     _tmpCodeS[ j ] = 0;
                 }
+            }
+
+            _tmpP = NULL;
+            if( _retP != NULL )
+            {
+                _tmpP = fun_HuffmanCodeData( _retP, _tmpLen, pDestDataP, pDestDataLen, &j );
             }
         }
 
         free( _tmpHuffmanResultArrayP );
     }
 
-    uint32_t _tmpTest = 0;
-    if( _retP != 0 )
-    {
-        _tmpU32Value = 0;
-        for( i = 0; i < 256; i++ )
-        {
-            for( j = 0; j < _tmpLen; j++ )
-            {
-                if( i == _retP[ j ].mDestValue )
-                {
-                    _tmpU32Value += _tmpValueS[ i ] * _retP[ j ].mBitS;
-                    _tmpTest += _retP[ j ].mBitS;
-                    break;
-                }
-            }
-        }
-    }
+//    uint32_t _tmpTest = 0;
+//    if( _retP != 0 )
+//    {
+//        _tmpU32Value = 0;
+//        for( i = 0; i < 256; i++ )
+//        {
+//            for( j = 0; j < _tmpLen; j++ )
+//            {
+//                if( i == _retP[ j ].mDestValue )
+//                {
+//                    _tmpU32Value += _tmpValueS[ i ] * _retP[ j ].mBitS;
+//                    _tmpTest += _retP[ j ].mBitS;
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
     return _retP;
 }

@@ -317,6 +317,8 @@ void DifferentUpdataControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
                         int _tmpHuffmanLen;
 
                         _tmpHuffmanP = fun_CreateHuffmanCode( mMemoryDataP, mMemoryDataLen, &_tmpHuffmanLen );
+
+
                     }
                 }
             }
@@ -562,7 +564,7 @@ void DifferentUpdataControl::sub_DataToImage()
     if( _retValue != 0 )
     {
         setXToInit();
-        _flag = fun_LineHexDataToImage( _tmpLineBufP, mLineByteCount, _tmpOffset );
+        _flag = fun_LineHexDataToImage( _tmpLineBufP, _retValue, _tmpOffset );
         _tmpOffset += _retValue;
 
         while( !_flag )
@@ -573,7 +575,7 @@ void DifferentUpdataControl::sub_DataToImage()
                 break;
             }
             setXToInit();
-            _flag = fun_LineHexDataToImage( _tmpLineBufP, mLineByteCount, _tmpOffset );
+            _flag = fun_LineHexDataToImage( _tmpLineBufP, _retValue, _tmpOffset );
             _tmpOffset += _retValue;
         }
 

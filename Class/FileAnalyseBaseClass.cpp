@@ -198,8 +198,8 @@ int FileAnalyseBaseClass::fun_GetFileData( uint8_t * pSaveBufP, int pLen, int pS
         _retValue = 0;
         if( mCurrOffset < mMemoryDataLen )
         {
-            _retValue = mCurrOffset + pLen;
-            _retValue = mMemoryDataLen - _retValue;
+            //_retValue = mCurrOffset + pLen;
+            _retValue = mMemoryDataLen - mCurrOffset;
             if( _retValue > 0 )
             {
                 if( _retValue > pLen )
@@ -247,8 +247,8 @@ int FileAnalyseBaseClass::fun_GetFileData( uint8_t * pSaveBufP, int pLen, int pS
 
         if( mCurrOffset < mFileLen )
         {
-            _retValue = mCurrOffset + pLen;
-            _retValue = mFileLen - _retValue;
+            //_retValue = mCurrOffset + pLen;
+            _retValue = mFileLen - mCurrOffset;
             if( _retValue > 0 )
             {
                 if( _retValue > pLen )

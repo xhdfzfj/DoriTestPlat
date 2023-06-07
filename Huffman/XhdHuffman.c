@@ -485,7 +485,7 @@ uint32_t fun_HuffmanCodeMapCreate( HuffmanResult_S * pHuffmanCodeP, uint32_t pHu
             if( z )
             {
                 _tmpU8Value1 &= gRervBitMaskS[ _tmpHufBitOffset - 1 ];
-                _tmpU8Value |= ( _tmpU8Value1 >>  _tmpHufBitOffset );
+                _tmpU8Value |= ( _tmpU8Value1 >>  ( 8 - _tmpHufBitOffset ) );
             }
             else
             {
@@ -525,7 +525,7 @@ uint32_t fun_HuffmanCodeMapCreate( HuffmanResult_S * pHuffmanCodeP, uint32_t pHu
             if( z )
             {
                 _tmpU8Value1 &= gRervBitMaskS[ _tmpHufBitOffset - 1 ];
-                _tmpU8Value |= ( _tmpU8Value1 >> _tmpHufBitOffset );
+                _tmpU8Value |= ( _tmpU8Value1 >> ( 8 - _tmpHufBitOffset ) );
             }
             else
             {
@@ -571,7 +571,7 @@ uint32_t fun_HuffmanCodeMapCreate( HuffmanResult_S * pHuffmanCodeP, uint32_t pHu
             if( z )
             {
                 _tmpU8Value1 &= gRervBitMaskS[ _tmpHufBitOffset - 1 ];
-                _tmpU8Value |= ( _tmpU8Value1 >> _tmpHufBitOffset );
+                _tmpU8Value |= ( _tmpU8Value1 >> ( 8 - _tmpHufBitOffset ) );
             }
             else
             {

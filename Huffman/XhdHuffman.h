@@ -15,6 +15,8 @@ extern "C" {
 
 HuffmanResult_S * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, int * pRetLen );
 
+HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pHuffmanMapLen, uint32_t * pRetLen );
+
 #if __cplusplus
 }
 #endif

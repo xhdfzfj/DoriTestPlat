@@ -455,6 +455,7 @@ uint32_t fun_HuffmanCodeMapCreate( HuffmanResult_S * pHuffmanCodeP, uint32_t pHu
     _tmpBitOffset = 8;
     _tmpByteIndex = j;
     _retP[ _tmpByteIndex ] = 0;
+    i = 0;
     while( i < pHuffmanCodeLen )
     {
         if( ( _tmpLen - _tmpByteIndex ) < 32 )
@@ -756,10 +757,9 @@ HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pH
     HuffmanResult_S * _tmpResultSP;
     uint32_t i, x, j, z;
     uint8_t * _tmpP;
-    uint8_t _tmpDestValue, _tmpU8Value, _tmpState;
-    uint8_t _tmpHuffmanBits;
+    uint8_t _tmpU8Value, _tmpState;
+    uint8_t  _tmpU8Value1;
     uint8_t _tmpBits, _tmpHuffmanByteIndex;
-    uint32_t _tmpByteIndex;
     uint32_t _tmpBitOffset;
     #if DEBUG_TEST_FLAG
     HuffmanResult_S _testArray[ 256 ];
@@ -774,7 +774,6 @@ HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pH
 
     _tmpP = pHuffmanMapP;
     i = 0;
-    _tmpByteIndex = 0;
     _tmpBitOffset = 8;
     _tmpState = 0;
     j = 0;
@@ -782,44 +781,110 @@ HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pH
     {
         if( _tmpState == 0 )
         {
-            _tmpU8Value = _tmpP[ i ];
-            _tmpU8Value &= gBitMaskS[ _tmpBitOffset - 1 ];
-            _tmpDestValue = _tmpU8Value;
+            x = 8;
+            z = 0;
+            _tmpResultSP[ j ].mDestValue = 0;
 
-            _tmpBitOffset -= 8;
-            if( _tmpBitOffset == 0 )
+            do
             {
-                _tmpBitOffset = 8;
-                i += 1;
-            }
-            _tmpResultSP[ j ].mDestValue = _tmpDestValue;
+                if( z != 0 )
+                {
+                    x = z;
+                    z = 0;
+                }
+
+                if( x > _tmpBitOffset )
+                {
+                    z = x - _tmpBitOffset;
+                    x = _tmpBitOffset;
+                }
+
+                _tmpU8Value = _tmpP[ i ];
+                _tmpU8Value1 = _tmpResultSP[ j ].mDestValue;
+
+                if( z != 0 )
+                {
+                    _tmpU8Value &= gBitMaskS[ x - 1 ];
+
+                    _tmpU8Value1 |= ( _tmpU8Value << z );
+                }
+                if( z == 0 )
+                {
+                    _tmpU8Value &= gRervBitMaskS[ x - 1 ];
+                    _tmpU8Value >>= ( _tmpBitOffset - x );
+                    _tmpU8Value1 |= _tmpU8Value;
+                }
+                _tmpResultSP[ j ].mDestValue = _tmpU8Value1;
+
+                _tmpBitOffset -= x;
+                if( _tmpBitOffset == 0 )
+                {
+                    _tmpBitOffset = 8;
+                    i += 1;
+                }
+
+            }while( z != 0 );
+
             _tmpState = 1;
         }
         else if( _tmpState == 1 )
         {
-            _tmpU8Value = _tmpP[ i ];
-            _tmpU8Value &= gBitMaskS[ _tmpBitOffset - 1 ];
-            _tmpHuffmanBits = _tmpU8Value;
+            x = 8;
+            z = 0;
+            _tmpResultSP[ j ].mBitS = 0;
 
-            _tmpBitOffset -= 8;
-            if( _tmpBitOffset == 0 )
+            do
             {
-                _tmpBitOffset = 8;
-                i += 1;
-            }
-            _tmpResultSP[ j ].mBitS = _tmpHuffmanBits;
+                if( z != 0 )
+                {
+                    x = z;
+                    z = 0;
+                }
+
+                if( x > _tmpBitOffset )
+                {
+                    z = x - _tmpBitOffset;
+                    x = _tmpBitOffset;
+                }
+
+                _tmpU8Value = _tmpP[ i ];
+                _tmpU8Value1 = _tmpResultSP[ j ].mBitS;
+
+                if( z != 0 )
+                {
+                    _tmpU8Value &= gBitMaskS[ x - 1 ];
+
+                    _tmpU8Value1 |= ( _tmpU8Value << z );
+                }
+                if( z == 0 )
+                {
+                    _tmpU8Value &= gRervBitMaskS[ x - 1 ];
+                    _tmpU8Value >>= ( _tmpBitOffset - x );
+                    _tmpU8Value1 |= _tmpU8Value;
+                }
+                _tmpResultSP[ j ].mBitS = _tmpU8Value1;
+
+                _tmpBitOffset -= x;
+                if( _tmpBitOffset == 0 )
+                {
+                    _tmpBitOffset = 8;
+                    i += 1;
+                }
+
+            }while( z != 0 );
+
             _tmpState = 2;
         }
         else if( _tmpState == 2 )
         {
             _tmpBits = 0;
-            _tmpHuffmanByteIndex = ( _tmpHuffmanBits + 7 ) / 8;
-            _tmpResultSP[ j ].mHuffmanValue[ _tmpHuffmanByteIndex - 1 ] = 0;
-            x = _tmpHuffmanBits & 0x07;
+            _tmpHuffmanByteIndex = ( _tmpResultSP[ j ].mBitS + 7 ) / 8;
+            x = _tmpResultSP[ j ].mBitS & 0x07;
             z = 0;
 
-            while( _tmpBits < _tmpHuffmanBits )
+            while( _tmpBits < _tmpResultSP[ j ].mBitS )
             {
+                _tmpResultSP[ j ].mHuffmanValue[ _tmpHuffmanByteIndex - 1 ] = 0;
                 do
                 {
                     if( z != 0 )
@@ -834,13 +899,22 @@ HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pH
                     }
                     _tmpBits += x;
                     _tmpU8Value = _tmpP[ i ];
-                    _tmpU8Value &= gBitMaskS[ _tmpBitOffset ];
 
+                    _tmpU8Value1 = _tmpResultSP[ j ].mHuffmanValue[ _tmpHuffmanByteIndex - 1 ];
+                    if( z != 0 )
+                    {
+                        _tmpU8Value &= gBitMaskS[ x - 1 ];
+
+                        _tmpU8Value1 |= ( _tmpU8Value << z );
+                    }
                     if( z == 0 )
                     {
+                        _tmpU8Value &= gRervBitMaskS[ x - 1 ];
                         _tmpU8Value >>= ( _tmpBitOffset - x );
+                        _tmpU8Value1 |= _tmpU8Value;
+
                     }
-                    _tmpResultSP[ j ].mHuffmanValue[ _tmpHuffmanByteIndex - 1 ] |= ( _tmpU8Value << ( x + z ) );
+                    _tmpResultSP[ j ].mHuffmanValue[ _tmpHuffmanByteIndex - 1 ] = _tmpU8Value1;
 
                     _tmpBitOffset -= x;
                     if( _tmpBitOffset == 0 )
@@ -852,8 +926,10 @@ HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pH
 
                 x = 8;
                 _tmpHuffmanByteIndex -= 1;
-                _tmpResultSP[ j ].mHuffmanValue[ _tmpHuffmanByteIndex - 1 ] = 0;
             }
+
+            j += 1;
+            _tmpState = 0;
         }
     }
 

@@ -623,10 +623,41 @@ uint8_t * fun_HuffmanCodeData( HuffmanResult_S * pHuffmanCodeP, uint32_t pHuffma
     _retP[ 6 ] = _tmpCodeMapLen >> 8;
     _retP[ 7 ] = _tmpCodeMapLen & 0xff;
 
+    #if DEBUG_TEST_FLAG
     HuffmanResult_S * _testP;
     uint32_t j;
 
     _testP = fun_RestoreHuffmanCodeMap( &_retP[ 8 ], _tmpCodeMapLen, &j );  //在此处进行测试
+    if( j == pHuffmanCodeLen )
+    {
+        uint32_t _testValue;
+        uint32_t _testValue1;
+
+        for( _testValue = 0; _testValue < j; _testValue += 1 )
+        {
+            if( ( _testP[ _testValue ].mDestValue == pHuffmanCodeP[ _testValue ].mDestValue ) &&
+                ( _testP[ _testValue ].mBitS == pHuffmanCodeP[ _testValue ].mBitS ) )
+            {
+                for( _testValue1 = 0; _testValue1 < ( ( _testP[ _testValue ].mBitS + 7 ) / 8 ); _testValue1+= 1 )
+                {
+                    if( _testP[ _testValue ].mHuffmanValue[ _testValue1 ] != pHuffmanCodeP[ _testValue ].mHuffmanValue[ _testValue1 ] )
+                    {
+                        printf( "restore error!!!" );
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                printf( "restore error!!!" );
+                break;
+            }
+        }
+
+        free( _testP );
+    }
+    #endif
+
 
     return _retP;
 }
@@ -749,7 +780,9 @@ HuffmanResult_S * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDat
  *      HUFFMAN结果数组的长度
  * @return
  */
-#define DEBUG_TEST_FLAG 1
+#if DEBUG_TEST_FLAG
+HuffmanResult_S _testArray[ 256 ];
+#endif
 HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pHuffmanMapLen, uint32_t * pRetLen )
 {
 
@@ -761,9 +794,6 @@ HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pH
     uint8_t  _tmpU8Value1;
     uint8_t _tmpBits, _tmpHuffmanByteIndex;
     uint32_t _tmpBitOffset;
-    #if DEBUG_TEST_FLAG
-    HuffmanResult_S _testArray[ 256 ];
-    #endif
 
     _retP = NULL;
     #if DEBUG_TEST_FLAG
@@ -827,7 +857,7 @@ HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pH
 
             _tmpState = 1;
         }
-        else if( _tmpState == 1 )
+        if( _tmpState == 1 )
         {
             x = 8;
             z = 0;
@@ -875,11 +905,15 @@ HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pH
 
             _tmpState = 2;
         }
-        else if( _tmpState == 2 )
+        if( _tmpState == 2 )
         {
             _tmpBits = 0;
             _tmpHuffmanByteIndex = ( _tmpResultSP[ j ].mBitS + 7 ) / 8;
             x = _tmpResultSP[ j ].mBitS & 0x07;
+            if( x == 0 )
+            {
+                x = 8;
+            }
             z = 0;
 
             while( _tmpBits < _tmpResultSP[ j ].mBitS )
@@ -909,7 +943,8 @@ HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pH
                     }
                     if( z == 0 )
                     {
-                        _tmpU8Value &= gRervBitMaskS[ x - 1 ];
+                        _tmpU8Value &= gBitMaskS[ _tmpBitOffset - 1 ];
+
                         _tmpU8Value >>= ( _tmpBitOffset - x );
                         _tmpU8Value1 |= _tmpU8Value;
 
@@ -933,9 +968,17 @@ HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pH
         }
     }
 
+    if( j != 0 )
+    {
+        _retP = ( HuffmanResult_S * )malloc( sizeof( HuffmanResult_S ) * j );
+        memcpy( ( void * )_retP, ( void * )_tmpResultSP, sizeof( HuffmanResult_S ) * j );
+    }
+
     #if DEBUG_TEST_FLAG == 0
     free( _tmpResultSP );
     #endif
+
+    *pRetLen = j;
 
     return _retP;
 }

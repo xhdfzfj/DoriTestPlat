@@ -9,6 +9,8 @@ typedef struct __HuffmanResult_S
     uint8_t mHuffmanValue[ 16 ];
 }HuffmanResult_S;
 
+#define DEBUG_TEST_FLAG 1
+
 #if __cplusplus
 extern "C" {
 #endif

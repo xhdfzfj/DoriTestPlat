@@ -9,13 +9,13 @@ typedef struct __HuffmanResult_S
     uint8_t mHuffmanValue[ 16 ];
 }HuffmanResult_S;
 
-#define DEBUG_TEST_FLAG 1
+#define DEBUG_TEST_FLAG     0
 
 #if __cplusplus
 extern "C" {
 #endif
 
-HuffmanResult_S * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, int * pRetLen );
+uint8_t * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, int * pRetLen );
 
 HuffmanResult_S * fun_RestoreHuffmanCodeMap( uint8_t * pHuffmanMapP, uint32_t pHuffmanMapLen, uint32_t * pRetLen );
 

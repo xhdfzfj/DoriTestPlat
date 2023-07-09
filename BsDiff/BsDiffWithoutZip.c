@@ -315,7 +315,7 @@ int fun_StartBsDiff( uint8_t * pOldFileDataP, int pOldFileLen, uint8_t * pNewFil
     memcpy( &_resultP[ 32 + _index ], db, dblen );
     _index += dblen;
 
-    offtout(_index + 32 - _tmpValue, buf);
+    offtout(_index - _tmpValue, buf);
     memcpy( &_resultP[ 16 ], buf, 8 );
 
     memcpy( &_resultP[ 32 + _index ], eb, eblen );

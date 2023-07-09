@@ -458,16 +458,6 @@ uint32_t fun_HuffmanCodeMapCreate( HuffmanResult_S * pHuffmanCodeP, uint32_t pHu
     i = 0;
     while( i < pHuffmanCodeLen )
     {
-        if( ( _tmpLen - _tmpByteIndex ) < 32 )
-        {
-            _tmpLen += 256;
-            _tmpP = ( uint8_t * )malloc( _tmpLen );
-            memcpy( _tmpP, _retP, _tmpLen - 256 );
-            free( _retP );
-
-            _retP = _tmpP;
-        }
-
         _tmpHufBitOffset = 8;
         do
         {
@@ -552,7 +542,11 @@ uint32_t fun_HuffmanCodeMapCreate( HuffmanResult_S * pHuffmanCodeP, uint32_t pHu
 
         _tmpHufByteIndex = pHuffmanCodeP[ i ].mBitS / 8;
         _tmpHufBitOffset = pHuffmanCodeP[ i ].mBitS % 8;
-
+        if( _tmpHufBitOffset == 0 )
+        {
+            _tmpHufBitOffset = 8;
+            _tmpHufByteIndex -= 1;
+        }
         do
         {
             z = 0;
@@ -608,12 +602,14 @@ uint32_t fun_HuffmanCodeMapCreate( HuffmanResult_S * pHuffmanCodeP, uint32_t pHu
 uint8_t * fun_HuffmanCodeData( HuffmanResult_S * pHuffmanCodeP, uint32_t pHuffmanCodeLen, uint8_t * pDataP, uint32_t pDataLen, uint32_t * pRetLen )
 {
     uint8_t * _retP;
-    uint32_t _tmpLen, i;
+    uint32_t _tmpLen, i, j;
+    uint32_t _ByteIndex, _BitFree;
     uint32_t _tmpCodeMapLen;
 
     _retP = NULL;
-    _tmpLen = 1024;
+    _tmpLen = 2048;
     _retP = malloc( _tmpLen );
+    memset( _retP, 0xff, _tmpLen );
 
     i = fun_HuffmanCodeMapCreate( pHuffmanCodeP, pHuffmanCodeLen, _retP );
     _tmpCodeMapLen = i - 8;
@@ -625,7 +621,6 @@ uint8_t * fun_HuffmanCodeData( HuffmanResult_S * pHuffmanCodeP, uint32_t pHuffma
 
     #if DEBUG_TEST_FLAG
     HuffmanResult_S * _testP;
-    uint32_t j;
 
     _testP = fun_RestoreHuffmanCodeMap( &_retP[ 8 ], _tmpCodeMapLen, &j );  //在此处进行测试
     if( j == pHuffmanCodeLen )
@@ -658,12 +653,114 @@ uint8_t * fun_HuffmanCodeData( HuffmanResult_S * pHuffmanCodeP, uint32_t pHuffma
     }
     #endif
 
+    i += 1;
+    uint8_t * _tmpP;
+    HuffmanResult_S * _tmpHufP;
+    uint32_t _freeLen;
+    uint32_t _tmpBitOffset;
+    uint32_t _tmpHufBitOffset;
+    uint32_t z;
+    uint8_t _tmpU8Value, _tmpU8Value1;
+
+    _ByteIndex = 0;
+    _BitFree = 8;
+    _retP[ i ] = 0;
+    for( j = 0; j < pDataLen; j++ )
+    {
+        _freeLen = _tmpLen - i;
+        if( _freeLen < 16 )
+        {
+            _tmpP = malloc( _tmpLen + 2048 );
+            memcpy( _tmpP, _retP, _tmpLen );
+            free( _retP );
+            _tmpLen += 2048;
+            _retP = _tmpP;
+        }
+        _tmpHufP = NULL;
+        for( z = 0; z < pHuffmanCodeLen; z++ )
+        {
+            if( pHuffmanCodeP[ z ].mDestValue == pDataP[ j ] )
+            {
+                _tmpHufP = pHuffmanCodeP + z;
+                break;
+            }
+        }
+
+        if( _tmpHufP == NULL )
+        {
+            free( _retP );
+            _retP = NULL;
+            break;
+        }
+
+        _tmpBitOffset = 0;
+
+        _ByteIndex = ( _tmpHufP->mBitS + 7 ) / 8;
+        _ByteIndex -= 1;
+        _tmpHufBitOffset = _tmpHufP->mBitS & 0x07;
+        if( _tmpHufBitOffset == 0 )
+        {
+            _tmpHufBitOffset = 8;
+        }
+        do
+        {
+            z = 0;
+
+            if( _BitFree < _tmpHufBitOffset )
+            {
+                z = _tmpHufBitOffset - _BitFree;
+                _tmpHufBitOffset = _BitFree;
+            }
+
+            _tmpBitOffset += _tmpHufBitOffset;
+
+            _tmpU8Value = _retP[ i ];
+            //_tmpU8Value &= gRervBitMaskS[ _tmpBitOffset - 1 ];
+
+            _tmpU8Value1 = _tmpHufP->mHuffmanValue[ _ByteIndex ];
+            if( z )
+            {
+                _tmpU8Value1 &= gRervBitMaskS[ _tmpHufBitOffset - 1 ];
+                _tmpU8Value |= ( _tmpU8Value1 >> ( 8 - _tmpHufBitOffset ) );
+            }
+            else
+            {
+                _tmpU8Value1 &= gBitMaskS[ _tmpHufBitOffset - 1 ];
+                _tmpU8Value |= ( _tmpU8Value1 << ( _BitFree - _tmpHufBitOffset ) );
+            }
+            _retP[ i ] = _tmpU8Value;
+
+            _BitFree -= _tmpHufBitOffset;
+            if( _BitFree == 0 )
+            {
+                i += 1;
+                _BitFree = 8;
+                _retP[ i ] = 0;
+            }
+
+            if( z != 0 )
+            {
+                _tmpHufBitOffset = z;
+                continue;
+            }
+            _ByteIndex -= 1;
+            _tmpHufBitOffset = 8;
+
+        }while( _tmpBitOffset < _tmpHufP->mBitS);
+
+    }
+
+    _retP[ 0 ] = i >> 24;
+    _retP[ 1 ] = i >> 16;
+    _retP[ 2 ] = i >> 8;
+    _retP[ 3 ] = i & 0xff;
+    *pRetLen = i;
 
     return _retP;
 }
 
 
-HuffmanResult_S * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, int * pRetLen )
+uint8_t * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDataLen, int * pRetLen )
 {
     uint32_t i, j, _tmpLen;
     uint32_t _tmpU32Value;
@@ -674,6 +771,7 @@ HuffmanResult_S * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDat
     HuffmanResult_S * _tmpHuffmanResultArrayP;
 
     _retP = NULL;
+    _tmpP = NULL;
     memset( ( void * )_tmpCodeS, 0, sizeof( uint32_t ) * 256 );
 
     _tmpLen = pDestDataLen;
@@ -744,6 +842,7 @@ HuffmanResult_S * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDat
             if( _retP != NULL )
             {
                 _tmpP = fun_HuffmanCodeData( _retP, _tmpLen, pDestDataP, pDestDataLen, &j );
+                *pRetLen = j;
             }
         }
 
@@ -768,7 +867,7 @@ HuffmanResult_S * fun_CreateHuffmanCode( uint8_t * pDestDataP, uint32_t pDestDat
 //        }
 //    }
 
-    return _retP;
+    return _tmpP;
 }
 
 /**

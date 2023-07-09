@@ -313,10 +313,33 @@ void DifferentUpdataControl::sub_MouseLeftButtonClick( qreal pX, qreal pY )
                     }
                     else if( _tmpIndex == 2 )
                     {
-                        HuffmanResult_S * _tmpHuffmanP;
+                        //菜单HUFFMAN处理
+                        uint8_t * _tmpP;
                         int _tmpHuffmanLen;
+                        PrivateEventClass * _tmpEventObjP;
 
-                        _tmpHuffmanP = fun_CreateHuffmanCode( mMemoryDataP, mMemoryDataLen, &_tmpHuffmanLen );
+                        _tmpP = fun_CreateHuffmanCode( mMemoryDataP, mMemoryDataLen, &_tmpHuffmanLen );
+
+                        if( _tmpP != nullptr )
+                        {
+                            _tmpEventObjP = new PrivateEventClass( EventType_e::logInfoType, DataType_e::StringType, "哈夫曼处理完成!!!" );    //不用清理,接口处清理
+                            std::fstream _file;
+
+                            _file.open( "./huffman.dat", std::ios_base::out | std::ios_base::binary );
+                            if( _file.is_open() )
+                            {
+                                _file.write( ( const char * )_tmpP, _tmpHuffmanLen );
+                                _file.close();
+                            }
+
+                            delete [] _tmpP;
+                        }
+                        else
+                        {
+                            _tmpEventObjP = new PrivateEventClass( EventType_e::logInfoType, DataType_e::StringType, "哈夫曼处理失败!!!" );    //不用清理,接口处清理
+                        }
+                        _tmpEventObjP->SetLogLevel( xhdLogEventClass::logInfo );
+                        mMainModelObjP->sub_ChildObjectEventHandle( ( void * )_tmpEventObjP );
 
 
                     }
@@ -579,7 +602,7 @@ void DifferentUpdataControl::sub_DataToImage()
             _tmpOffset += _retValue;
         }
 
-        saveMainImageToJpg( "diffrent.jpg" );
+        //saveMainImageToJpg( "diffrent.jpg" );
 
         emit sub_SignalReDraw();
     }
